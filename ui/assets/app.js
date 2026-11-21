@@ -708,30 +708,34 @@ function chartDefaults() {
           boxHeight: 9,
           usePointStyle: false,
           font: { family: CHART_FONT, size: 10 },
-          color: '#455763',
+          color: '#475569',
           padding: 10,
         },
       },
       tooltip: {
-        backgroundColor: '#101a22',
+        backgroundColor: '#FFFFFF',
+        titleColor: '#0F172A',
+        bodyColor: '#334155',
+        borderColor: '#E2E8F0',
+        borderWidth: 1,
         titleFont: { family: CHART_FONT, size: 11 },
         bodyFont: { family: CHART_FONT, size: 11 },
-        padding: 8,
-        cornerRadius: 0,
+        padding: 10,
+        cornerRadius: 8,
         displayColors: true,
       },
     },
     scales: {
       x: {
-        grid: { color: 'rgba(16,26,34,0.08)', drawTicks: false },
-        border: { color: '#a4b2bb' },
-        ticks: { color: '#778894', font: { family: CHART_FONT, size: 10 }, maxRotation: 0, autoSkipPadding: 12 },
-        title: { display: true, text: 'vòng', color: '#778894', font: { family: CHART_FONT, size: 10 } },
+        grid: { color: '#F1F5F9', drawTicks: false },
+        border: { color: '#E2E8F0' },
+        ticks: { color: '#64748B', font: { family: CHART_FONT, size: 10 }, maxRotation: 0, autoSkipPadding: 12 },
+        title: { display: true, text: 'vòng', color: '#64748B', font: { family: CHART_FONT, size: 10 } },
       },
       y: {
-        grid: { color: 'rgba(16,26,34,0.08)', drawTicks: false },
-        border: { color: '#a4b2bb' },
-        ticks: { color: '#778894', font: { family: CHART_FONT, size: 10 }, maxTicksLimit: 5 },
+        grid: { color: '#F1F5F9', drawTicks: false },
+        border: { color: '#E2E8F0' },
+        ticks: { color: '#64748B', font: { family: CHART_FONT, size: 10 }, maxTicksLimit: 5 },
       },
     },
   };
@@ -753,11 +757,11 @@ function initCharts() {
         {
           label: 'Recall@20',
           data: [],
-          borderColor: '#20415c',
-          backgroundColor: 'rgba(32,65,92,0.08)',
+          borderColor: '#FF5A1F',
+          backgroundColor: 'rgba(255, 90, 31, 0.12)',
           borderWidth: 2,
           pointRadius: 2,
-          pointBackgroundColor: '#20415c',
+          pointBackgroundColor: '#EA580C',
           tension: 0.25,
           fill: true,
         },
@@ -781,23 +785,23 @@ function initCharts() {
         {
           label: 'p50',
           data: [],
-          borderColor: '#2c7f57',
-          backgroundColor: 'rgba(44,127,87,0.08)',
+          borderColor: '#10B981',
+          backgroundColor: 'rgba(16, 185, 129, 0.10)',
           borderWidth: 2,
           pointRadius: 2,
-          pointBackgroundColor: '#2c7f57',
+          pointBackgroundColor: '#10B981',
           tension: 0.25,
           fill: true,
         },
         {
           label: 'p95',
           data: [],
-          borderColor: '#b23a32',
+          borderColor: '#EF4444',
           backgroundColor: 'transparent',
           borderWidth: 2,
           borderDash: [4, 3],
           pointRadius: 2,
-          pointBackgroundColor: '#b23a32',
+          pointBackgroundColor: '#EF4444',
           tension: 0.25,
         },
       ],
@@ -1979,6 +1983,65 @@ function boot() {
   setInterval(() => {
     if (ncState.traceId !== null && state.runStatus === 'running') ncRenderTrace();
   }, 250);
+
+  initTactile3D();
+}
+
+function initTactile3D() {
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const shell = document.querySelector('.shell');
+  if (!shell) return;
+  let rafId = 0;
+  let lastEvt = null;
+  let lastSheen = null;
+  let lastTilt = null;
+
+  function resetCard(el, clearTilt) {
+    if (!el) return;
+    el.style.setProperty('--mx', '-999px');
+    el.style.setProperty('--my', '-999px');
+    if (clearTilt) el.style.transform = '';
+  }
+
+  shell.addEventListener('pointermove', (e) => {
+    lastEvt = e;
+    if (rafId) return;
+    rafId = requestAnimationFrame(() => {
+      rafId = 0;
+      if (!lastEvt) return;
+      const target = lastEvt.target;
+      const sheenEl = target && target.closest ? target.closest('.panel, .nc-employer-card') : null;
+      const tiltEl = target && target.closest ? target.closest('.nc-employer-card, .chart-panel') : null;
+
+      if (lastSheen && lastSheen !== sheenEl) resetCard(lastSheen, false);
+      if (lastTilt && lastTilt !== tiltEl) lastTilt.style.transform = '';
+      lastSheen = sheenEl;
+      lastTilt = tiltEl;
+
+      if (sheenEl) {
+        const r = sheenEl.getBoundingClientRect();
+        sheenEl.style.setProperty('--mx', `${Math.round(lastEvt.clientX - r.left)}px`);
+        sheenEl.style.setProperty('--my', `${Math.round(lastEvt.clientY - r.top)}px`);
+      }
+      if (tiltEl) {
+        const r = tiltEl.getBoundingClientRect();
+        if (r.width > 0 && r.height > 0) {
+          const nx = (lastEvt.clientX - r.left) / r.width - 0.5;
+          const ny = (lastEvt.clientY - r.top) / r.height - 0.5;
+          const rx = (-ny * 5).toFixed(2);
+          const ry = (nx * 5).toFixed(2);
+          tiltEl.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+        }
+      }
+    });
+  }, { passive: true });
+
+  shell.addEventListener('pointerleave', () => {
+    resetCard(lastSheen, false);
+    if (lastTilt) lastTilt.style.transform = '';
+    lastSheen = null;
+    lastTilt = null;
+  });
 }
 
 document.addEventListener('DOMContentLoaded', boot);

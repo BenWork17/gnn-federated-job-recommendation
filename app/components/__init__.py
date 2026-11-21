@@ -9,44 +9,48 @@ import altair as alt
 import pandas as pd
 import streamlit as st
 
-# Bảng màu dùng thống nhất toàn app (khớp với src/report/figures.py)
-BLUE = "#2f6fb5"
-RED = "#c0392b"
-GREEN = "#27ae60"
-GREY = "#7f8c8d"
-ORANGE = "#e67e22"
-PURPLE = "#8e44ad"
-PALETTE = [BLUE, RED, GREEN, ORANGE, PURPLE, GREY]
+# Bảng màu White + Signal Orange design system
+ORANGE = "#FF5A1F"
+ORANGE_DARK = "#C2410C"
+INK = "#0F172A"
+SKY = "#0EA5E9"
+BLUE = SKY  # alias giữ tương thích cho các trang đang import BLUE
+RED = "#EF4444"
+GREEN = "#10B981"
+WARN = "#F59E0B"
+PURPLE = "#8B5CF6"
+GREY = "#64748B"
+PALETTE = [ORANGE, INK, SKY, GREEN, PURPLE, GREY]
 
 # Theme riêng: Altair mặc định dùng xám nhạt + lưới đậm, trông "tài liệu kỹ
 # thuật" chứ không "demo". Theme dưới đây làm nền trắng, lưới mảnh, chữ đậm
-# hơn, và dùng đúng bảng màu của báo cáo.
+# hơn, và dùng đúng bảng màu White + Orange.
 _ALT_THEME = {
     "config": {
-        "background": "#ffffff",
+        "background": "#FFFFFF",
         "view": {"stroke": "transparent", "continuousWidth": 400},
         "axis": {
-            "labelColor": "#3d4757",
+            "labelColor": "#475569",
             "labelFontSize": 12,
-            "titleColor": "#1f2733",
+            "titleColor": "#0F172A",
             "titleFontSize": 12,
             "titleFontWeight": "bold",
-            "gridColor": "#eef2f7",
+            "gridColor": "#F1F5F9",
             "gridWidth": 1,
-            "domainColor": "#d7dee8",
-            "tickColor": "#d7dee8",
+            "domainColor": "#E2E8F0",
+            "tickColor": "#E2E8F0",
         },
         "legend": {
-            "labelColor": "#3d4757",
+            "labelColor": "#475569",
             "labelFontSize": 11,
-            "titleColor": "#1f2733",
+            "titleColor": "#0F172A",
             "titleFontSize": 11,
             "titleFontWeight": "bold",
             "symbolType": "circle",
             "symbolSize": 110,
         },
         "title": {
-            "color": "#1f2733",
+            "color": "#0F172A",
             "fontSize": 14,
             "fontWeight": "bold",
             "anchor": "start",
@@ -126,9 +130,9 @@ def header(title: str, question: str, kicker: str | None = None) -> None:
         st.caption(kicker)
     st.title(title)
     st.markdown(
-        f"<div class='hx-question' style='background:{BLUE}0d;"
-        f"border-left:4px solid {BLUE};padding:0.7rem 1rem;"
-        f"border-radius:0 8px 8px 0;margin-bottom:1.2rem'>"
+        f"<div class='hx-question' style='background:#FFF7ED;"
+        f"border:1px solid #FED7AA;border-left:4px solid {ORANGE};color:#0F172A;"
+        f"padding:0.65rem 0.95rem;border-radius:8px;margin-bottom:1.2rem'>"
         f"<b>Câu hỏi của trang này:</b> {question}</div>",
         unsafe_allow_html=True,
     )
@@ -139,15 +143,14 @@ def metric_row(items: list[dict]) -> None:
     cols = st.columns(len(items))
     for i, (col, it) in enumerate(zip(cols, items)):
         with col:
-            color = it.get("color", BLUE)
+            color = it.get("color", INK)
             st.markdown(
-                f"<div class='hx-card' style='border:1px solid #e3e8ef;"
-                f"border-radius:10px;padding:0.85rem 0.9rem;background:#fff;"
-                f"animation-delay:{i * 70}ms;"
-                f"box-shadow:0 1px 3px rgba(31,39,51,0.05)'>"
+                f"<div class='hx-card' style='"
+                f"border-radius:10px;padding:0.9rem 1rem;"
+                f"animation-delay:{i * 70}ms'>"
                 f"<div class='hx-metric' style='color:{color};"
                 f"animation-delay:{i * 70 + 90}ms'>{it['value']}</div>"
-                f"<div style='font-size:0.78rem;color:#5a6273;margin-top:0.3rem;"
+                f"<div style='font-size:0.78rem;color:#64748B;margin-top:0.3rem;"
                 f"line-height:1.3'>{it['label']}</div></div>",
                 unsafe_allow_html=True,
             )
@@ -165,15 +168,15 @@ def delta_badge(text: str, positive: bool = True) -> str:
 
 def finding(title: str, body: str, kind: str = "info") -> None:
     """Ô nêu một phát hiện. kind: info | warn | good | bad."""
-    colors = {"info": BLUE, "warn": ORANGE, "good": GREEN, "bad": RED}
+    colors = {"info": SKY, "warn": WARN, "good": GREEN, "bad": RED}
     icons = {"info": "ℹ️", "warn": "⚠️", "good": "✅", "bad": "❌"}
-    c = colors.get(kind, BLUE)
+    c = colors.get(kind, SKY)
     st.markdown(
-        f"<div class='hx-finding' style='border-left:4px solid {c};"
-        f"background:{c}0a;padding:0.7rem 1rem;border-radius:0 8px 8px 0;"
-        f"margin:0.5rem 0'>"
+        f"<div class='hx-finding' style='border:1px solid #E2E8F0;"
+        f"border-left:4px solid {c};"
+        f"padding:0.7rem 1rem;border-radius:8px;margin:0.5rem 0'>"
         f"<b>{icons.get(kind, '')} {title}</b><br>"
-        f"<span style='font-size:0.9rem;color:#3d4757'>{body}</span></div>",
+        f"<span style='font-size:0.9rem;color:#334155'>{body}</span></div>",
         unsafe_allow_html=True,
     )
 
@@ -249,7 +252,7 @@ def bar_chart(df: pd.DataFrame, x: str, y: str, color_col: str | None = None,
         enc["color"] = alt.Color(f"{color_col}:N",
                                  scale=alt.Scale(range=PALETTE), legend=None)
     else:
-        enc["color"] = alt.value(BLUE)
+        enc["color"] = alt.value(ORANGE)
     enc["tooltip"] = list(df.columns)
 
     chart = base.mark_bar(cornerRadiusEnd=4).encode(**enc)
@@ -261,13 +264,13 @@ def bar_chart(df: pd.DataFrame, x: str, y: str, color_col: str | None = None,
     lab_scale = alt.Scale(type="log") if use_log else alt.Undefined
     if horizontal:
         labels = base.mark_text(dx=5, align="left", fontSize=11,
-                                color="#3d4757").encode(
+                                color="#475569").encode(
             y=alt.Y(f"{y}:N", sort=sort_spec),
             x=alt.X(f"{x}:Q", scale=lab_scale),
             text=alt.Text(f"{x}:Q", format=fmt),
         )
     else:
-        labels = base.mark_text(dy=-6, fontSize=11, color="#3d4757").encode(
+        labels = base.mark_text(dy=-6, fontSize=11, color="#475569").encode(
             x=alt.X(f"{x}:N", sort=sort_spec),
             y=alt.Y(f"{y}:Q", scale=lab_scale),
             text=alt.Text(f"{y}:Q", format=fmt),
@@ -396,10 +399,10 @@ def graph_chart(nodes: pd.DataFrame, edges: pd.DataFrame,
 _KIND_COLOR_2D = {
     "Người dùng":     "#7b241c",
     "Tin tuyển dụng": "#e8836b",
-    "Kỹ năng":        "#2f6fb5",
-    "Ngành":          "#27ae60",
+    "Kỹ năng":        "#0EA5E9",
+    "Ngành":          "#10B981",
 }
-_EDGE_COLOR_2D = {"Công khai": BLUE, "Riêng tư": RED}
+_EDGE_COLOR_2D = {"Công khai": "#F97316", "Riêng tư": RED}
 
 _ASSET_2D = Path(__file__).resolve().parents[1] / "assets" / "force-graph.min.js"
 
@@ -654,7 +657,7 @@ _JS_2D = r"""
       ctx.beginPath();
       ctx.arc(node.x, node.y, r + 3 / scale, 0, 2 * Math.PI, false);
       ctx.lineWidth = 1.6 / scale;
-      ctx.strokeStyle = '#1f2733';
+      ctx.strokeStyle = '#0F172A';
       ctx.stroke();
     }
 
@@ -670,7 +673,7 @@ _JS_2D = r"""
       ctx.lineWidth = 3 / scale;
       ctx.strokeStyle = 'rgba(255,255,255,0.92)';
       ctx.strokeText(lab, node.x + r + 4 / scale, node.y);
-      ctx.fillStyle = '#1f2733';
+      ctx.fillStyle = '#0F172A';
       ctx.fillText(lab, node.x + r + 4 / scale, node.y);
     }
     ctx.globalAlpha = 1;
@@ -1031,74 +1034,74 @@ _JS_2D = r"""
 _HTML_2D = """<!DOCTYPE html>
 <html lang="vi"><head><meta charset="utf-8">
 <style>
-  html,body{margin:0;padding:0;background:#fff;overflow:hidden;
+  html,body{margin:0;padding:0;background:#FFFFFF;overflow:hidden;
             font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-            color:#1f2733}
+            color:#0F172A}
   #g{width:100%;height:__HEIGHT__px;position:relative}
-  #err{display:none;font-size:14px;color:#c0392b;padding:18px;line-height:1.5}
+  #err{display:none;font-size:14px;color:#EF4444;padding:18px;line-height:1.5}
   /* Overlay phải đứng SAU #g trong DOM và có z-index: canvas do thư viện vẽ
      nằm trong phần tử position:relative, nếu overlay đứng trước thì bị vẽ đè
      và biến mất (đúng lỗi đã gặp ở bản 3D). */
   #search{position:absolute;top:10px;left:10px;z-index:30;
-          background:#fffffff2;border:1px solid #e3e8ef;border-radius:10px;
-          padding:8px 9px;box-shadow:0 2px 10px #0000000f;
+          background:#fffffff2;border:1px solid #E2E8F0;border-radius:10px;
+          padding:8px 9px;box-shadow:0 2px 10px rgba(15,23,42,0.06);
           width:min(330px,calc(100% - 40px))}
   #search .s-row{display:flex;gap:6px;align-items:center}
   #search .s-row + .s-row{margin-top:6px}
   #q{flex:1 1 auto;min-width:0;font:inherit;font-size:12px;padding:5px 8px;
-     border:1px solid #d7dee7;border-radius:7px;color:#1f2733;background:#fff}
+     border:1px solid #E2E8F0;border-radius:8px;color:#0F172A;background:#FFFFFF}
   #kf{flex:0 0 auto;font:inherit;font-size:12px;padding:4px 6px;
-      border:1px solid #d7dee7;border-radius:7px;background:#fff;color:#1f2733}
+      border:1px solid #E2E8F0;border-radius:8px;background:#FFFFFF;color:#0F172A}
   #fit{flex:0 0 auto;font:inherit;font-size:12px;padding:4px 9px;
-       border:1px solid #d7dee7;border-radius:7px;background:#fff;
-       color:#1f2733;cursor:pointer;white-space:nowrap}
-  #fit:hover{background:#f2f6fb;border-color:#b9c8da}
-  #search .muted{color:#7f8c8d;font-size:11px}
+       border:1px solid #E2E8F0;border-radius:8px;background:#FFFFFF;
+       color:#0F172A;cursor:pointer;white-space:nowrap}
+  #fit:hover{background:#FFF7ED;border-color:#FDBA74;color:#C2410C}
+  #search .muted{color:#64748B;font-size:11px}
   #res{margin-top:6px;max-height:250px;overflow:auto}
   #res[hidden]{display:none}
   .s-hit{display:flex;align-items:center;gap:6px;padding:4px 5px;
          border-radius:6px;cursor:pointer;font-size:12px}
-  .s-hit:hover{background:#eef4fb}
-  .s-empty{font-size:11px;color:#7f8c8d;padding:4px 2px}
+  .s-hit:hover{background:#FFF7ED}
+  .s-empty{font-size:11px;color:#64748B;padding:4px 2px}
   .p-dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
   .p-lbl{flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;
          white-space:nowrap}
-  .p-k{flex:0 0 auto;font-size:10px;color:#7f8c8d}
+  .p-k{flex:0 0 auto;font-size:10px;color:#64748B}
   #panel{position:absolute;top:10px;right:10px;bottom:10px;z-index:30;
          width:min(300px,46%);background:#fffffff7;
-         border:1px solid #e3e8ef;border-radius:12px;
-         box-shadow:0 6px 22px #0000001a;padding:12px 14px;
+         border:1px solid #E2E8F0;border-radius:10px;
+         box-shadow:0 6px 22px rgba(15,23,42,0.10);padding:12px 14px;
          overflow:auto;font-size:12px}
   #panel[hidden]{display:none}
   #pclose{position:absolute;top:7px;right:8px;font:inherit;font-size:13px;
-          line-height:1;border:0;background:transparent;color:#7f8c8d;
+          line-height:1;border:0;background:transparent;color:#64748B;
           cursor:pointer;padding:4px 6px;border-radius:6px}
-  #pclose:hover{background:#f2f6fb;color:#1f2733}
+  #pclose:hover{background:#FFF7ED;color:#C2410C}
   .p-kind{display:flex;align-items:center;gap:6px;font-size:11px;
-          color:#5b6675;font-weight:700;padding-right:22px}
+          color:#475569;font-weight:700;padding-right:22px}
   .p-name{font-size:14px;font-weight:700;line-height:1.35;margin:6px 0 4px;
-          color:#111824}
-  .p-meta{font-size:11px;color:#5b6675}
-  .p-sub{margin-top:11px;padding-top:8px;border-top:1px solid #eef2f7;
-         font-size:11px;font-weight:700;color:#5b6675}
+          color:#0F172A}
+  .p-meta{font-size:11px;color:#475569}
+  .p-sub{margin-top:11px;padding-top:8px;border-top:1px solid #F1F5F9;
+         font-size:11px;font-weight:700;color:#475569}
   .p-list{list-style:none;margin:5px 0 0;padding:0}
   .p-list li{display:flex;align-items:center;gap:6px;padding:4px 5px;
              border-radius:6px;cursor:pointer;font-size:12px}
-  .p-list li:hover{background:#eef4fb}
-  .p-empty{font-size:11px;color:#7f8c8d;margin-top:5px}
+  .p-list li:hover{background:#FFF7ED}
+  .p-empty{font-size:11px;color:#64748B;margin-top:5px}
   #legend{position:absolute;left:10px;bottom:10px;z-index:30;
-          background:#fffffff2;border:1px solid #e3e8ef;border-radius:10px;
+          background:#fffffff2;border:1px solid #E2E8F0;border-radius:10px;
           padding:7px 10px;font-size:11px;line-height:1.7;
-          box-shadow:0 2px 10px #0000000f}
-  #legend .lg-t{font-weight:700;font-size:11px;color:#5b6675;
+          box-shadow:0 2px 10px rgba(15,23,42,0.06)}
+  #legend .lg-t{font-weight:700;font-size:11px;color:#475569;
                 margin-bottom:2px}
   #legend .lg-r{display:flex;align-items:center;gap:6px;white-space:nowrap}
   #legend .lg-d{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
   #legend .lg-l{width:16px;height:0;border-top-width:2px;
                 border-top-style:solid;flex:0 0 auto}
-  #legend .lg-s{height:1px;background:#eef2f7;margin:5px 0}
+  #legend .lg-s{height:1px;background:#F1F5F9;margin:5px 0}
   #hint{position:absolute;right:10px;bottom:10px;z-index:30;font-size:11px;
-        color:#5b6675;background:#ffffffdd;padding:3px 7px;border-radius:6px}
+        color:#475569;background:#ffffffdd;padding:3px 7px;border-radius:6px}
 </style></head>
 <body>
 <div id="err"></div>
@@ -1129,12 +1132,12 @@ _HTML_2D = """<!DOCTYPE html>
   <div class="lg-t">Loại nút</div>
   <div class="lg-r"><span class="lg-d" style="background:#7b241c"></span>Người dùng</div>
   <div class="lg-r"><span class="lg-d" style="background:#e8836b"></span>Tin tuyển dụng</div>
-  <div class="lg-r"><span class="lg-d" style="background:#2f6fb5"></span>Kỹ năng</div>
-  <div class="lg-r"><span class="lg-d" style="background:#27ae60"></span>Ngành</div>
+  <div class="lg-r"><span class="lg-d" style="background:#0EA5E9"></span>Kỹ năng</div>
+  <div class="lg-r"><span class="lg-d" style="background:#10B981"></span>Ngành</div>
   <div class="lg-s"></div>
   <div class="lg-t">Loại cạnh</div>
-  <div class="lg-r"><span class="lg-l" style="border-top-color:#2f6fb5"></span>Công khai</div>
-  <div class="lg-r"><span class="lg-l" style="border-top-color:#c0392b"></span>Riêng tư</div>
+  <div class="lg-r"><span class="lg-l" style="border-top-color:#F97316"></span>Công khai</div>
+  <div class="lg-r"><span class="lg-l" style="border-top-color:#EF4444"></span>Riêng tư</div>
 </div>
 
 <div id="hint">Kéo nút để dời · thả ra để ghim · bấm đúp để bỏ ghim · cuộn để zoom</div>

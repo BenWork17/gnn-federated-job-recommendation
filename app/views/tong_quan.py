@@ -1,20 +1,11 @@
-"""Trang 1 — Tổng quan: đặt vấn đề trong 30 giây.
-
-BỐ CỤC (đã đo lại, xem báo cáo của task t2):
-- Dải số liệu nằm NGAY dưới header, trước mọi đoạn văn -> người xem thấy
-  kết quả trước khi phải đọc.
-- Phần văn dài và phần số liệu minh hoạ đứng CẠNH NHAU (2 cột), thay vì
-  dàn dọc như trước.
-- Khung "Cách xem bộ demo" (4 bước điều hướng) gập trong `st.expander`:
-  thông tin vẫn còn nguyên, chỉ không chiếm chỗ khi chưa cần.
-- Ba ô `finding()` trước đây dàn dọc 3 tầng -> 2 ô đầu sang 2 cột.
-"""
+"""Trang 1 — Tổng quan: đặt vấn đề trong 30 giây."""
 
 from __future__ import annotations
 
 import streamlit as st
 
-from app.components import (BLUE, GREEN, data_note, finding, header, load_json, metric_row)
+from app.components import header, load_json
+from app.components.three_hero import render_fl_three_hero
 from app.paths import PATHS
 
 
@@ -27,123 +18,157 @@ def render() -> None:
     )
 
     reco = load_json(PATHS["reco"])
-
     d = reco["data_summary"]
     fed = reco["systems"]["fedavg"]
     loc = reco["systems"]["local_only"]
     cent = reco["systems"]["centralized"]
 
-    # -----------------------------------------------------------------
-    # 1. Dải số liệu lên đầu: 4 ô chiếm hết chiều rộng, nằm trên mọi
-    #    đoạn văn để người xem nắm kết quả trong một cái liếc mắt.
-    # -----------------------------------------------------------------
-    st.subheader("Bốn con số quan trọng nhất")
-
-    metric_row([
-        {"value": f"{fed['recall@20']:.3f}",
-         "label": "Recall@20 — mô hình FL",
-         "help": f"Cục bộ (không chia sẻ): {loc['recall@20']:.3f} · "
-                 f"Tập trung (mốc trên): {cent['recall@20']:.3f}",
-         "color": BLUE},
-        {"value": f"{cent['recall@20']:.3f}",
-         "label": "Recall@20 — mốc tập trung",
-         "help": "Mức trần nếu được gom toàn bộ dữ liệu về một máy chủ",
-         "color": BLUE},
-        {"value": f"{(fed['recall@20'] - loc['recall@20']) / (cent['recall@20'] - loc['recall@20']):.0%}",
-         "label": "Phần khoảng cách FL lấy lại",
-         "help": "So với việc mỗi khách hàng tự học riêng, không chia sẻ",
-         "color": GREEN},
-        {"value": "0",
-         "label": "Dòng dữ liệu thô rời khỏi khách hàng",
-         "help": "Chỉ tham số mô hình được trao đổi",
-         "color": GREEN},
-    ])
-
-    # -----------------------------------------------------------------
-    # 2. Hai cột: bên trái là lập luận "vì sao", bên phải là những con số
-    #    minh hoạ cho chính lập luận đó. Trước đây hai phần này dàn dọc
-    #    nên mỗi bên chỉ dùng nửa chiều ngang.
-    # -----------------------------------------------------------------
-    col_vi_sao, col_so_lieu = st.columns([1, 1], gap="medium")
-
-    with col_vi_sao:
-        st.subheader("Đặt vấn đề")
-        st.markdown(
-            """
-            Mô hình gợi ý việc làm truyền thống giả định toàn bộ tin tuyển dụng và
-            hồ sơ ứng viên nằm trên **một máy chủ duy nhất**. Thực tế dữ liệu tuyển
-            dụng thuộc về nhiều nền tảng và doanh nghiệp khác nhau — gom hồ sơ cá
-            nhân về một chỗ bị chặn bởi Luật Bảo vệ Dữ liệu Cá nhân và GDPR.
-
-            **Cách giải**: dựng *đồ thị* để tận dụng quan hệ giữa người dùng, tin
-            tuyển dụng, kỹ năng và ngành nghề; dùng *Federated Learning* để mô hình học
-            mà dữ liệu gốc không rời khỏi nơi lưu trữ.
-            """
-        )
-
-    with col_so_lieu:
-        st.subheader("Dữ liệu và đồ thị")
-        st.markdown(
-            f"""
-            **Dữ liệu**: {d['n_jobs']:,} tin tuyển dụng, {d['n_users']} ứng viên,
-            {d['n_train'] + d['n_test']} tương tác thật.
-
-            **Đồ thị**: {d['n_users']} nút người dùng + {d['n_jobs']:,} nút tin
-            + {d['n_skills']} nút kỹ năng + {d['n_industries']} nút ngành.
-            """
-        )
-        st.subheader("Ai giữ cái gì")
-        st.markdown(
-            f"""
-            **Máy chủ trung tâm** giữ {d['public_edges']:,} cạnh công khai
-            (tin–kỹ năng, tin–ngành) — dữ liệu không nhạy cảm.
-
-            **Khách hàng** giữ {d['private_edges']:,} cạnh riêng tư
-            (người dùng–kỹ năng, người dùng–tin). Máy chủ không bao giờ thấy
-            phần này.
-            """
-        )
-
-    # -----------------------------------------------------------------
-    # 3. Ba phát hiện: hai ô đầu đứng cạnh nhau (2 cột), ô cảnh báo về cỡ
-    #    tập kiểm thử giữ nguyên độ rộng để chữ không bị bó.
-    # -----------------------------------------------------------------
-    st.divider()
-    st.subheader("Đọc kết quả cho đúng: cái gì đạt, cái gì chưa")
-
-    col_f1, col_f2 = st.columns([1, 1], gap="medium")
-
-    with col_f1:
-        finding(
-            "Federated Learning hoạt động: "
-            f"{loc['recall@20']:.3f} → {fed['recall@20']:.3f} Recall@20",
-            f"Khi mỗi khách hàng tự huấn luyện trên dữ liệu riêng (không chia sẻ), "
-            f"Recall@20 chỉ đạt {loc['recall@20']:.3f}. Với FedAvg, con số này lên "
-            f"{fed['recall@20']:.3f} — gần bằng mô hình tập trung "
-            f"({cent['recall@20']:.3f}) mà dữ liệu gốc không hề rời khỏi khách hàng.",
-            "good",
-        )
-
-    with col_f2:
-        finding(
-            "FL không tiết kiệm băng thông ở quy mô này",
-            f"Gửi tham số tốn {reco['communication']['up_bytes_total'] / 1024:,.0f} KB, "
-            f"trong khi gửi thẳng dữ liệu thô chỉ "
-            f"{reco['communication']['raw_data_bytes_if_centralized'] / 1024:.0f} KB. "
-            "Lợi ích thật của FL ở đây là **dữ liệu không rời chỗ**, không phải băng thông.",
-            "info",
-        )
-
-    finding(
-        f"Tập kiểm thử chỉ có {d['users_in_test']} ứng viên",
-        "Khoảng tin cậy 95% vì thế khá rộng — nhiều khác biệt vài phần trăm "
-        "giữa các phương pháp **chưa** có ý nghĩa thống kê. Con số đáng tin là "
-        "thứ hạng tương đối, không phải chênh lệch nhỏ.",
-        "warn",
+    gap_pct = (fed["recall@20"] - loc["recall@20"]) / max(
+        cent["recall@20"] - loc["recall@20"], 1e-9
     )
+    up_kb = reco["communication"]["up_bytes_total"] / 1024
+    raw_kb = reco["communication"]["raw_data_bytes_if_centralized"] / 1024
+
+    max_r = max(cent["recall@20"], 1e-6)
+    loc_w = min(100.0, loc["recall@20"] / max_r * 100.0)
+    fed_w = min(100.0, fed["recall@20"] / max_r * 100.0)
+    cent_w = 100.0
 
     # -----------------------------------------------------------------
-    # 4. Khối điều hướng dài: gập lại, chỉ mở khi người xem cần.
+    # 1. Top Bento Hero Stage: Three.js 3D FL Topology + Border Beam KPI
+    # -----------------------------------------------------------------
+    col_3d, col_kpi = st.columns([1.35, 1], gap="medium")
+
+    with col_3d:
+        with st.container(key="hx-three-frame"):
+            render_fl_three_hero(height=360, n_clients=9116)
+
+    with col_kpi:
+        st.markdown(
+            f"""
+            <div class="hx-bento-hero" style="min-height:360px;display:flex;flex-direction:column;justify-content:space-between;">
+              <div>
+                <div class="hx-kicker">01 // FEDAVG RECALL@20</div>
+                <div class="hx-hero-row">
+                  <span class="hx-hero-val">{fed['recall@20']:.3f}</span>
+                  <span class="hx-pill-orange">▲ +{gap_pct:.0%} khoảng cách lấy lại</span>
+                </div>
+              </div>
+              <div class="hx-track-list">
+                <div class="hx-track-item">
+                  <span class="hx-track-lbl">Cục bộ</span>
+                  <div class="hx-track-bar-bg">
+                    <div class="hx-track-bar-fill" style="width:{loc_w:.1f}%;background:#94A3B8"></div>
+                  </div>
+                  <span class="hx-track-num">{loc['recall@20']:.3f}</span>
+                </div>
+                <div class="hx-track-item">
+                  <span class="hx-track-lbl" style="color:#C2410C">FedAvg (FL)</span>
+                  <div class="hx-track-bar-bg">
+                    <div class="hx-track-bar-fill" style="width:{fed_w:.1f}%;background:#FF5A1F"></div>
+                  </div>
+                  <span class="hx-track-num" style="color:#C2410C">{fed['recall@20']:.3f}</span>
+                </div>
+                <div class="hx-track-item">
+                  <span class="hx-track-lbl" style="color:#0F172A">Tập trung</span>
+                  <div class="hx-track-bar-bg">
+                    <div class="hx-track-bar-fill" style="width:{cent_w:.1f}%;background:#0F172A"></div>
+                  </div>
+                  <span class="hx-track-num">{cent['recall@20']:.3f}</span>
+                </div>
+              </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("<div style='height:0.6rem'></div>", unsafe_allow_html=True)
+
+    # -----------------------------------------------------------------
+    # 2. Two Compact Glass Metric Tiles
+    # -----------------------------------------------------------------
+    col_t1, col_t2 = st.columns([1, 1], gap="medium")
+
+    with col_t1:
+        st.markdown(
+            """
+            <div class="hx-bento-tile" style="margin-bottom:0">
+              <div class="hx-kicker">02 // BẢO MẬT TUYỆT ĐỐI</div>
+              <div class="hx-tile-val">
+                <span class="sb-dot"></span>0 dòng dữ liệu thô
+              </div>
+              <div class="hx-tile-sub">
+                Dữ liệu ứng viên ở lại máy khách; <b>9.116</b> node CareerBuilder chỉ trao đổi tham số mô hình.
+              </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    with col_t2:
+        st.markdown(
+            f"""
+            <div class="hx-bento-tile" style="margin-bottom:0">
+              <div class="hx-kicker">03 // ĐÁNH ĐỔI BĂNG THÔNG &amp; CỠ MẪU</div>
+              <div class="hx-tile-val">{up_kb:,.0f} KB</div>
+              <div class="hx-tile-sub">
+                Gửi tham số so với {raw_kb:.0f} KB dữ liệu thô · Tập test <b>{d['users_in_test']} ứng viên</b> (đọc theo thứ hạng).
+              </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("<div style='height:0.6rem'></div>", unsafe_allow_html=True)
+
+    # -----------------------------------------------------------------
+    # 3. Two Styled Glass Narrative Cards
+    # -----------------------------------------------------------------
+    col_l, col_r = st.columns([1, 1], gap="medium")
+
+    pub = int(d["public_edges"])
+    priv = int(d["private_edges"])
+    total_e = max(pub + priv, 1)
+    pub_pct = pub / total_e * 100.0
+    priv_pct = 100.0 - pub_pct
+
+    with col_l:
+        st.markdown(
+            f"""
+            <div class="hx-editorial-card">
+              <div class="hx-kicker">VÌ SAO CẦN FEDERATED GRAPH</div>
+              <div class="hx-editorial-body">
+                Dữ liệu tuyển dụng phân mảnh qua nhiều nền tảng và bị ràng buộc bởi Luật Bảo vệ Dữ liệu Cá nhân / GDPR.
+                Hệ thống dựng đồ thị gồm <b>{d['n_jobs']:,}</b> tin, <b>{d['n_users']}</b> ứng viên,
+                <b>{d['n_skills']}</b> kỹ năng và <b>{d['n_industries']}</b> ngành để học biểu diễn mà không gom dữ liệu thô.
+              </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    with col_r:
+        st.markdown(
+            f"""
+            <div class="hx-editorial-card">
+              <div class="hx-kicker">PHÂN TÁCH CÔNG KHAI / RIÊNG TƯ</div>
+              <div class="hx-split-pill">
+                <div style="width:{pub_pct:.1f}%;background:#FF5A1F"></div>
+                <div style="width:{priv_pct:.1f}%;background:#0F172A"></div>
+              </div>
+              <div class="hx-editorial-body">
+                <b style="color:#C2410C">{pub:,} cạnh công khai</b> (tin – kỹ năng – ngành) nằm trên Server ·
+                <b style="color:#0F172A">{priv:,} cạnh riêng tư</b> (ứng viên – kỹ năng / tin) giữ tuyệt đối tại Client.
+              </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("<div style='height:0.6rem'></div>", unsafe_allow_html=True)
+
+    # -----------------------------------------------------------------
+    # 4. Khối điều hướng gập lại
     # -----------------------------------------------------------------
     with st.expander("Cách xem bộ demo này"):
         st.markdown(
@@ -154,9 +179,3 @@ def render() -> None:
             4. **Kết luận & hạn chế** — bảng đạt/không và hướng làm tiếp.
             """
         )
-
-    data_note(
-        f"Số liệu lấy từ results/*.json do pipeline sinh ra. "
-        f"Tập kiểm thử gợi ý chỉ có {d['users_in_test']} ứng viên — "
-        "khoảng tin cậy vì thế khá rộng, được hiển thị ở trang Gợi ý."
-    )

@@ -12,11 +12,11 @@
 [theme]
 base = "light"
 
-primaryColor = "#2f6fb5"            # xanh chủ đạo (giống C_BLUE trong figures.py)
-backgroundColor = "#ffffff"
-secondaryBackgroundColor = "#f6f8fb"  # nền phụ, rất nhẹ
-textColor = "#1f2733"
-borderColor = "#e3e8ef"
+primaryColor = "#FF5A1F"            # Signal Orange chủ đạo (DESIGN.md)
+backgroundColor = "#F8FAFC"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#0F172A"
+borderColor = "#E2E8F0"
 
 font = "sans serif"
 baseFontSize = 16
@@ -25,10 +25,10 @@ buttonRadius = "8px"
 
 # Bảng màu cho biểu đồ Streamlit tự vẽ (dataframe, v.v.)
 chartCategoricalColors = [
-    "#2f6fb5", "#c0392b", "#27ae60", "#e67e22", "#8e44ad", "#7f8c8d",
+    "#FF5A1F", "#0F172A", "#0EA5E9", "#10B981", "#8B5CF6", "#64748B",
 ]
 
-codeBackgroundColor = "#f6f8fb"
+codeBackgroundColor = "#F8FAFC"
 codeFont = "monospace"
 codeFontSize = "13px"
 

@@ -109,9 +109,6 @@ def render() -> None:
                       + ["Loss huấn luyện"] * len(view)
                       + ["Mốc tập trung"] * len(view)),
         })
-        if autoplay:
-            st.caption(f"Đang phát: vòng **{up_to}/{max_round}** · "
-                       f"{metric} = **{view[metric].iloc[-1]:.4f}**")
 
         # (1) Biểu đồ CHÍNH — đường cong hội tụ — chiếm toàn bộ bề ngang.
         #     Trước đây nó chỉ được 2/3 khung, 1/3 còn lại là loss; nay loss
@@ -196,14 +193,12 @@ def render() -> None:
         """
     )
 
-    finding(
-        "Vậy lợi ích của Federated Learning nằm ở đâu?",
-        f"Không phải ở băng thông — mà ở chỗ **dữ liệu gốc không rời khách hàng**. "
-        f"FL chỉ rẻ hơn về byte khi dữ liệu vượt khoảng "
-        f"{comm['crossover_interactions']:,} tương tác (xem hình F09 trong báo cáo). "
-        "Với bài toán tuân thủ pháp lý, đây mới là điểm quyết định.",
-        "info",
-    )
+    with st.expander("Lợi ích thực tế của Federated Learning", expanded=False):
+        st.markdown(
+            f"Giá trị cốt lõi là **dữ liệu gốc không rời khách hàng**. "
+            f"FL chỉ rẻ hơn về băng thông khi vượt khoảng "
+            f"{comm['crossover_interactions']:,} tương tác (hình F09)."
+        )
 
     st.divider()
     st.subheader("FedAvg so với FedProx")
@@ -221,8 +216,13 @@ def render() -> None:
     ])
     st.dataframe(df.style.format({"Recall@20": "{:.4f}", "NDCG@20": "{:.4f}"}),
                  use_container_width=True, hide_index=True)
-    st.caption(
-        "FedProx thêm số hạng kéo tham số cục bộ về phía mô hình toàn cục, "
-        "giảm «trôi» khi dữ liệu các khách hàng khác nhau. Trong thí nghiệm này "
-        "FedProx không vượt FedAvg về Recall@20 nhưng ổn định hơn NDCG@20."
+    st.caption("FedProx giảm «trôi» khi dữ liệu khác nhau và ổn định hơn NDCG@20.")
+
+    st.divider()
+    from app.views import giam_sat_node
+    st.page_link(
+        st.Page(giam_sat_node.render, title="Giám sát node FL", icon="🖥️",
+                url_path="giam-sat-node"),
+        label="Xem giám sát Node trực tiếp (CareerBuilder · 9.116 node) →",
+        icon="🖥️",
     )

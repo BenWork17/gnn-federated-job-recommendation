@@ -59,32 +59,39 @@ from app.views import (do_thi_viec_lam, fl_sim, giam_sat_node,  # noqa: E402
 # Điều hướng
 # ---------------------------------------------------------------------
 PAGES = [
-    st.Page(tong_quan.render, title="Tổng quan", icon="🏠",
+    st.Page(tong_quan.render, title="Tổng quan", icon=None,
             url_path="tong-quan", default=True),
-    st.Page(do_thi_viec_lam.render, title="Đồ thị việc làm", icon="🕸️",
+    st.Page(do_thi_viec_lam.render, title="Đồ thị việc làm", icon=None,
             url_path="do-thi"),
-    st.Page(fl_sim.render, title="Federated Learning simulation", icon="🔄",
+    st.Page(fl_sim.render, title="Federated Learning simulation", icon=None,
             url_path="lien-bang"),
-    st.Page(goi_y.render, title="Gợi ý cho ứng viên", icon="🎯",
+    st.Page(goi_y.render, title="Gợi ý cho ứng viên", icon=None,
             url_path="goi-y"),
-    st.Page(giam_sat_node.render, title="Giám sát node FL", icon="🖥️",
+    st.Page(giam_sat_node.render, title="Giám sát node FL", icon=None,
             url_path="giam-sat-node", default=False),
-    st.Page(ket_luan.render, title="Kết luận & hạn chế", icon="📋",
+    st.Page(ket_luan.render, title="Kết luận & hạn chế", icon=None,
             url_path="ket-luan"),
 ]
 
 nav = st.navigation(PAGES, position="sidebar")
 
 with st.sidebar:
-    st.markdown("---")
-    st.caption(
-        "**Đồ án cuối kỳ — DSS**\n\n"
-        "Phan Gia Bảo · 102220265\n\n"
-        "Nguyễn Văn Chương · 102220267"
-    )
-    st.caption(
-        "Dữ liệu: MEDAJob (case study phương pháp) · "
-        "CareerBuilder (thực nghiệm chính — 9.116 nhà tuyển dụng)"
+    st.markdown(
+        """
+        <div class="sb-footer">
+          <div class="sb-footer-title">
+            <span class="sb-dot"></span>Đồ án cuối kỳ — DSS
+          </div>
+          <div class="sb-footer-authors">
+            Phan Gia Bảo · 102220265<br>
+            Nguyễn Văn Chương · 102220267
+          </div>
+          <div class="sb-footer-badge">
+            MEDAJob · CareerBuilder 9.116 nodes
+          </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
 nav.run()

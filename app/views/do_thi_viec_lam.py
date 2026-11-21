@@ -43,8 +43,8 @@ GRAPH_HEIGHT = 620
 _KIND_COLOR = {
     "Người dùng": "#7b241c",
     "Tin tuyển dụng": "#e8836b",
-    "Kỹ năng": "#2f6fb5",
-    "Ngành": "#27ae60",
+    "Kỹ năng": "#0EA5E9",
+    "Ngành": "#10B981",
 }
 _KIND_ORDER = ["Người dùng", "Tin tuyển dụng", "Kỹ năng", "Ngành"]
 _KIND_ALL = ["Tất cả", *_KIND_ORDER]
@@ -294,7 +294,6 @@ def render() -> None:
     # Cố ý KHÔNG gọi `header(...)`: hàm đó luôn in khối câu hỏi, mà yêu cầu
     # của người dùng là bỏ câu hỏi ở trang này. `header()` giữ nguyên hành vi
     # cho các trang khác (components/__init__.py không bị sửa).
-    st.caption("DỮ LIỆU MEDA JOB")
     st.markdown("<h1 class='gx-title'>Đồ thị việc làm</h1>",
                 unsafe_allow_html=True)
 
@@ -409,17 +408,6 @@ def render() -> None:
                                    highlight=_hit_positions),
                         height=GRAPH_HEIGHT + 4, scrolling=False)
 
-        st.caption(
-            f"Đang vẽ **{len(nodes):,} nút** và **{len(edges):,} cạnh** "
-            f"(đồ thị con): {n_kind.get('Người dùng', 0):,} người dùng · "
-            f"{n_kind.get('Tin tuyển dụng', 0):,} tin · "
-            f"{n_kind.get('Kỹ năng', 0):,} kỹ năng · "
-            f"{n_kind.get('Ngành', 0):,} ngành. "
-            "Kéo nút để dời (thả ra ghim tại chỗ, bấm đúp bỏ ghim), rê "
-            "chuột để làm nổi láng giềng, bấm nút để mở bảng chi tiết, "
-            "cuộn để zoom."
-        )
-
     # ---------- CỘT PHẢI: 4 thẻ nhỏ + tìm kiếm + chi tiết -----------
     with c_right:
         _mini_cards([
@@ -442,7 +430,7 @@ def render() -> None:
                     f"“{q.strip()}”. Thử từ khoá ngắn hơn hoặc đổi loại "
                     "nút.</div>", unsafe_allow_html=True)
             else:
-                st.caption(f"{len(hits):,} nút khớp — bấm để xem chi tiết.")
+                st.caption(f"{len(hits):,} nút khớp")
                 for i in hits.index[:12]:
                     row = nodes.iloc[i]
                     label = str(row["label"])
@@ -452,9 +440,6 @@ def render() -> None:
                                  help=f"{row['kind']} · "
                                       f"bậc {int(row['degree'])}"):
                         st.session_state["gx-sel"] = int(i)
-                if len(hits) > 12:
-                    st.caption(f"… và {len(hits) - 12:,} nút khác, "
-                               "gõ thêm để thu hẹp.")
 
         sel = st.session_state.get("gx-sel")
         if sel is not None and 0 <= int(sel) < len(nodes):
@@ -475,12 +460,8 @@ def render() -> None:
     # ---------------- Dưới hero: phát hiện + phần phụ trong expander -----
     finding(
         "Ranh giới rất rõ: máy chủ chỉ thấy cấu trúc nghề nghiệp",
-        f"{g['public_edges']:,} cạnh công khai nối tin tuyển dụng với kỹ năng "
-        f"và ngành — đây là thông tin đăng tuyển công khai. Toàn bộ "
-        f"{g['private_edges']:,} cạnh còn lại (ai biết kỹ năng gì, ai thích "
-        "tin nào) chỉ tồn tại bên trong khách hàng. Rê chuột vào một nút "
-        "công khai trong đồ thị: phần liên quan sáng lên, phần riêng tư "
-        "mờ đi — đó chính là đường ranh giới này.",
+        f"{g['public_edges']:,} cạnh công khai (tin – kỹ năng – ngành) nằm trên máy chủ; "
+        f"toàn bộ {g['private_edges']:,} cạnh riêng tư của người dùng chỉ ở lại khách hàng.",
         "good",
     )
 
@@ -541,11 +522,11 @@ def render() -> None:
             st.markdown("**Số tin theo ngành**")
             st.dataframe(ind, hide_index=True, width="stretch")
 
-    data_note(
-        f"Ngành được suy ra từ tiêu đề tin bằng từ điển khoá, không phải nhãn "
-        f"do con người gán. {meta['graph']['industry_counts'].get('Khác', 0):,} tin "
-        "rơi vào «Khác» vì tiêu đề không khớp từ khoá nào."
-    )
+        data_note(
+            f"Ngành được suy ra từ tiêu đề tin bằng từ điển khoá; "
+            f"{meta['graph']['industry_counts'].get('Khác', 0):,} tin "
+            "rơi vào «Khác» vì tiêu đề không khớp từ khoá nào."
+        )
 
 
 def alt_log(df: pd.DataFrame):

@@ -53,14 +53,14 @@ import streamlit as st
 
 ASSET = Path(__file__).resolve().parents[1] / "assets" / "3d-force-graph.min.js"
 
-# Màu khớp app/components/__init__.py và 15 hình trong báo cáo
+# Màu khớp app/components/__init__.py (White + Orange design system)
 _KIND_COLOR = {
     "Người dùng":     "#7b241c",
     "Tin tuyển dụng": "#e8836b",
-    "Kỹ năng":        "#2f6fb5",
-    "Ngành":          "#27ae60",
+    "Kỹ năng":        "#0EA5E9",
+    "Ngành":          "#10B981",
 }
-_EDGE_COLOR = {"Công khai": "#2f6fb5", "Riêng tư": "#c0392b"}
+_EDGE_COLOR = {"Công khai": "#F97316", "Riêng tư": "#EF4444"}
 
 # Bán kính mỗi cụm sau co giãn. Khoảng cách giữa các tâm cụm phải > 2*SPREAD,
 # nếu không các cụm chồng lên nhau và chế độ "tách cụm" không còn tác dụng.
@@ -579,41 +579,42 @@ def graph_html_3d(
            lớp, canvas WebGL thắng theo thứ tự vẽ.
      Sửa: đặt overlay SAU #g trong DOM **và** cho z-index cao. */
   #panel{{position:absolute;top:8px;left:8px;z-index:30;background:#ffffffF2;
-          border:1px solid #e3e8ef;border-radius:10px;padding:8px 10px;
-          font-size:12px;color:#1f2733;box-shadow:0 2px 10px #0000000f;
+          border:1px solid #E2E8F0;border-radius:10px;padding:8px 10px;
+          font-size:12px;color:#0F172A;box-shadow:0 2px 10px rgba(15,23,42,0.06);
           max-width:min(96%,560px)}}
   #panel .row{{display:flex;align-items:center;gap:6px;flex-wrap:wrap;
                margin-bottom:6px}}
   #panel .row:last-child{{margin-bottom:0}}
-  #panel .lab{{color:#5b6675;min-width:64px;font-weight:600}}
-  #panel button{{font:inherit;padding:3px 9px;border-radius:7px;
-                 border:1px solid #d7dee7;background:#fff;color:#1f2733;
+  #panel .lab{{color:#475569;min-width:64px;font-weight:600}}
+  #panel button{{font:inherit;padding:3px 9px;border-radius:8px;
+                 border:1px solid #E2E8F0;background:#fff;color:#0F172A;
                  cursor:pointer}}
-  #panel button:hover{{background:#f2f6fb}}
-  #panel button.on{{background:#2f6fb5;border-color:#2f6fb5;color:#fff;
+  #panel button:hover{{background:#FFF7ED;border-color:#FDBA74;color:#C2410C}}
+  #panel button.on{{background:#F97316;border-color:#F97316;color:#fff;
                     font-weight:600}}
   #panel input[type=range]{{width:120px}}
-  #panel .muted{{color:#7f8c8d}}
-  #hint{{position:absolute;left:10px;bottom:8px;font-size:11px;color:#5b6675;
+  #panel .muted{{color:#64748B}}
+  #hint{{position:absolute;left:10px;bottom:8px;font-size:11px;color:#475569;
          background:#ffffffdd;padding:3px 7px;border-radius:6px}}
-  #err{{display:none;font-size:14px;color:#c0392b;padding:18px;line-height:1.5}}
+  #err{{display:none;font-size:14px;color:#EF4444;padding:18px;line-height:1.5}}
   /* Chú giải màu — bản trước KHÔNG có, người xem không biết màu nghĩa là gì */
   #legend{{position:absolute;right:8px;top:8px;z-index:30;background:#ffffffF2;
-           border:1px solid #e3e8ef;border-radius:10px;padding:7px 10px;
-           font-size:11px;color:#1f2733;box-shadow:0 2px 10px #0000000f;
+           border:1px solid #E2E8F0;border-radius:10px;padding:7px 10px;
+           font-size:11px;color:#0F172A;box-shadow:0 2px 10px rgba(15,23,42,0.06);
            line-height:1.7}}
-  #legend .lg-title{{font-weight:700;font-size:11px;color:#5b6675;
+  #legend .lg-title{{font-weight:700;font-size:11px;color:#475569;
                      margin-bottom:3px}}
   #legend .lg-row{{display:flex;align-items:center;gap:6px;white-space:nowrap}}
   #legend .lg-dot{{width:9px;height:9px;border-radius:50%;flex:0 0 auto}}
   #legend .lg-line{{width:16px;height:0;border-top-width:2px;
                     border-top-style:solid;flex:0 0 auto}}
-  #legend .lg-sep{{height:1px;background:#eef2f7;margin:5px 0}}
+  #legend .lg-sep{{height:1px;background:#F1F5F9;margin:5px 0}}
   /* Tooltip tự viết: nền trắng, chữ đậm. Mặc định của thư viện là chữ
      lavender không nền -> vô hình trên nền trắng. */
   #tip{{position:fixed;display:none;z-index:9999;pointer-events:none;
-        background:#ffffff;border:1px solid #d7dee7;border-radius:8px;
-        padding:7px 10px;box-shadow:0 4px 16px #0000001f;
+        background:#ffffff;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+        border:1px solid #E2E8F0;border-radius:8px;
+        padding:7px 10px;box-shadow:0 8px 24px rgba(15,23,42,0.12);
         font:12px/1.5 system-ui,-apple-system,sans-serif;color:#1f2733;
         max-width:280px}}
   #tip .t-name{{font-weight:700;margin-bottom:3px;color:#111824}}

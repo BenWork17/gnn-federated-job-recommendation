@@ -81,6 +81,11 @@ _SHIM = """<script id="fl-api-shim">
 (function () {
   var api = "__FL_API_BASE__";
   if (!api || api.indexOf("__FL") === 0) return;      // chưa được chèn
+  document.documentElement.classList.add('is-embed');
+  document.addEventListener('DOMContentLoaded', function () {
+    var p = document.getElementById('ncWhatPanel');
+    if (p) p.removeAttribute('open');
+  });
   var Native = window.URLSearchParams;
   function Patched(init) {
     var inst = new Native(init);

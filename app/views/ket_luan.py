@@ -129,83 +129,66 @@ def render() -> None:
         with st.container():
             finding(
                 "FL thu hẹp khoảng cách với mô hình tập trung",
-                f"Recall@20: cục bộ {loc['recall@20']:.3f} → liên bang {fed['recall@20']:.3f} "
-                f"→ tập trung {cent['recall@20']:.3f}. FL lấy lại được "
-                f"{(fed['recall@20'] - loc['recall@20']) / (cent['recall@20'] - loc['recall@20']):.0%} "
-                "khoảng cách mà việc chia nhỏ dữ liệu đã làm mất, **mà không cần gửi "
-                "một dòng dữ liệu nào**.",
+                f"Recall@20: cục bộ {loc['recall@20']:.3f} → FedAvg {fed['recall@20']:.3f} "
+                f"→ tập trung {cent['recall@20']:.3f} (khôi phục "
+                f"{(fed['recall@20'] - loc['recall@20']) / (cent['recall@20'] - loc['recall@20']):.0%} mà không gửi dữ liệu gốc).",
                 "good",
             )
         with st.container():
             finding(
                 "Mô hình đồ thị vượt baseline rõ rệt",
-                f"Recall@20 của GNN ({cent['recall@20']:.3f}) so với Item-KNN "
-                f"({reco['systems']['item_knn']['recall@20']:.3f}), phổ biến "
-                f"({pop['recall@20']:.3f}) và content-based "
-                f"({reco['systems']['skill_cbf']['recall@20']:.3f}). Việc dựng đồ thị "
-                "có đóng góp thật, không phải trang trí.",
+                f"GNN đạt {cent['recall@20']:.3f} so với Item-KNN "
+                f"({reco['systems']['item_knn']['recall@20']:.3f}), phổ biến ({pop['recall@20']:.3f}) "
+                f"và content-based ({reco['systems']['skill_cbf']['recall@20']:.3f}).",
                 "good",
             )
 
     finding(
         "Đường ranh giới dữ liệu được kiểm bằng test tự động",
-        "Payload client gửi lên chỉ gồm chỉ số nút, vector float32 và trọng số "
-        "— không có user_id, job_id hay rating nào. Kích thước payload cũng "
-        "không phụ thuộc số bản ghi, nên số tương tác của một khách hàng không "
-        "bị suy ra từ kích thước gói tin.",
+        "Payload chỉ gồm chỉ số nút, vector float32 và trọng số — không chứa "
+        "`user_id`, `job_id` hay kích thước phụ thuộc số bản ghi.",
         "good",
     )
 
     # -----------------------------------------------------------------
-    # 3. Năm ô "chưa làm được": 2 + 2 cột, ô cuối full-width vì nói về
-    #    nhiễu ảnh hưởng tới MỌI phương pháp (phạm vi rộng hơn một ô).
+    # 3. Năm ô "chưa làm được": 2 + 2 cột, ô cuối full-width
     # -----------------------------------------------------------------
     st.subheader("3. Điều CHƯA làm được — nói thẳng")
 
     with theme.grid(2, "chua-lam-duoc-1"):
         with st.container():
             finding(
-                "FL không tiết kiệm băng thông ở quy mô dữ liệu này",
-                f"Gửi tham số tốn gấp {c['ratio_up_vs_raw']:,.0f} lần so với gửi dữ liệu "
-                f"thô. Chỉ rẻ hơn khi vượt khoảng {c['crossover_interactions']:,} tương "
-                "tác. Ở quy mô nhỏ, FL là lựa chọn vì **tuân thủ pháp lý**, không phải "
-                "vì hiệu quả kỹ thuật.",
+                "FL không tiết kiệm băng thông ở quy mô nhỏ",
+                f"Gửi tham số tốn gấp {c['ratio_up_vs_raw']:,.0f} lần dữ liệu thô "
+                f"(chỉ rẻ hơn khi vượt ~{c['crossover_interactions']:,} tương tác).",
                 "warn",
             )
         with st.container():
             finding(
                 "Cỡ mẫu đánh giá gợi ý rất nhỏ",
-                f"Chỉ {d['users_in_test']} ứng viên có mặt trong tập kiểm thử, "
-                f"{d['n_test']} tương tác. Khoảng tin cậy 95% rộng đến mức nhiều khác "
-                "biệt giữa các phương pháp chưa có ý nghĩa thống kê. Cần thu thập thêm "
-                "dữ liệu thật trước khi kết luận chắc chắn.",
+                f"Chỉ {d['users_in_test']} ứng viên / {d['n_test']} tương tác kiểm thử; "
+                "khoảng tin cậy 95% rộng nên chênh lệch nhỏ chưa có ý nghĩa thống kê.",
                 "warn",
             )
 
     with theme.grid(2, "chua-lam-duoc-2"):
         with st.container():
             finding(
-                "Chưa đo được mức độ hài lòng của người dùng",
-                "Đây là một yêu cầu của đề bài nhưng cần A/B test hoặc khảo sát trên "
-                "người dùng thật. Đồ án chỉ đo được chỉ số xếp hạng offline, nên "
-                "**không** tuyên bố đạt yêu cầu này.",
+                "Chưa đo được mức độ hài lòng người dùng",
+                "Đồ án chỉ đo chỉ số xếp hạng offline; cần A/B test hoặc khảo sát thực tế.",
                 "bad",
             )
         with st.container():
             finding(
-                "Chưa có bảo vệ riêng tư thật sự",
-                "FL hiện tại vẫn gửi tham số lên máy chủ. Kẻ tấn công kiểm "
-                "soát máy chủ có thể suy ngược một phần dữ liệu từ gradient. Cần "
-                "secure aggregation hoặc DP-SGD để chặn — chưa làm trong đồ án.",
+                "Chưa có secure aggregation / DP-SGD",
+                "Máy chủ vẫn nhận gradient thô; cần bổ sung để chống suy ngược dữ liệu.",
                 "bad",
             )
 
     finding(
         "Dữ liệu có nhiễu hệ thống",
         f"{d['quality']['template_jobs']} tin ({d['quality']['template_pct']}%) "
-        "dùng chung một tập kỹ năng mẫu, và một phần tin có link sinh tự động "
-        "không kiểm chứng được. Nhóm không loại bỏ vì sẽ mất khoảng hai phần ba "
-        "dữ liệu, nhưng ghi rõ đây là nhiễu ảnh hưởng đến mọi phương pháp.",
+        "dùng chung tập kỹ năng mẫu; nhóm giữ lại để tránh mất 2/3 dữ liệu.",
         "warn",
     )
 
@@ -262,8 +245,4 @@ python src/report/figures.py           # 9 hình cho báo cáo
 python src/report/make_facts.py        # docs/SO_LIEU_CHINH.md
 python src/report/build_docx.py        # xuất .docx""",
                 language="powershell",
-            )
-            st.caption(
-                "Toàn bộ chạy trên CPU, không cần GPU. Kết quả tất định theo seed "
-                "trong config.yaml nên chạy lại cho cùng số."
             )

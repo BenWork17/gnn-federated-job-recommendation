@@ -183,12 +183,7 @@ def render() -> None:
     user_skills = [x for x in str(urow.skills).split("|") if x]
 
     with c_note:
-        st.caption(
-            f"Tập kiểm thử chỉ có **{len(in_test)} ứng viên** (những người có ít "
-            "nhất một tin «liên quan» bị giấu đi). Đây là toàn bộ dữ liệu đánh "
-            "giá — cỡ mẫu nhỏ nên khoảng tin cậy rộng, đã ghi rõ trong báo cáo."
-        )
-        st.caption(f"**Kỹ năng**: {' · '.join(user_skills[:14]) or '—'}")
+        st.markdown(f"**Kỹ năng:** {' · '.join(user_skills[:14]) or '—'}")
 
     # -----------------------------------------------------------------
     # 2. DẢI METRIC NGANG DUY NHẤT, ngay trên bảng.
@@ -266,8 +261,6 @@ def render() -> None:
             .rename(columns={"id": "job_id", "job_title": "tiêu đề",
                              "company_name": "công ty", "industry": "ngành"}),
             use_container_width=True, hide_index=True)
-        st.caption("Danh sách trên chỉ để minh hoạ giao diện; xếp hạng thật "
-                   "theo số tương tác nằm trong bảng so sánh bên dưới.")
 
     st.divider()
     st.subheader("Chất lượng tổng thể, có khoảng tin cậy")
@@ -306,11 +299,6 @@ def render() -> None:
             "tập trung thì nằm trong sai số.",
             "warn",
         )
-
-    st.caption(
-        "Bảng trên tính trên toàn bộ tập kiểm thử, không riêng ứng viên đang chọn. "
-        "Danh sách gợi ý phía trên dùng lại đúng mô hình đã sinh ra các con số này."
-    )
 
 
 def _render_new_profile() -> None:
@@ -372,17 +360,9 @@ def _render_new_profile() -> None:
         .style.format({"điểm khớp": "{:.4f}"}, subset=["số kỹ năng khớp"]),
         use_container_width=True, hide_index=True)
 
-    st.caption(
-        "Xếp hạng theo **số kỹ năng trùng**, rồi theo độ tương đồng TF-IDF. "
-        "Cột «kỹ năng chung» nói vì sao tin đó được đề xuất."
-    )
-
-    finding(
-        "Vì sao hồ sơ mới không dùng mô hình GNN?",
-        "LightGCN học embedding theo **node id**, mà người dùng mới chưa có "
-        "node trong đồ thị đã dựng. Nên phần này dùng so khớp kỹ năng "
-        "(content-based cold-start) — trung thực và chạy được ngay. Muốn phục "
-        "vụ người mới bằng GNN thì phải học embedding trực tuyến từ vài tương "
-        "tác đầu tiên; đó là hướng phát triển đã ghi trong báo cáo.",
-        "info",
-    )
+    with st.expander("Vì sao hồ sơ mới dùng so khớp kỹ năng?", expanded=False):
+        st.markdown(
+            "LightGCN học embedding theo **node id**, mà người dùng mới chưa có "
+            "node trong đồ thị đã dựng. Phần này dùng so khớp kỹ năng "
+            "(content-based cold-start) để phục vụ tức thì."
+        )

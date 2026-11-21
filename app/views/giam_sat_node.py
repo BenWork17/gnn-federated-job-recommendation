@@ -41,7 +41,9 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from app.components import GREEN, ORANGE, RED, finding, header  # noqa: E402
+from app.components import (  # noqa: E402
+    GREEN, INK, ORANGE, ORANGE_DARK, RED, SKY, finding, header, metric_row,
+)
 
 # Mặc định khớp `API_BASE` trong ui/assets/app.js. Cho phép đổi khi cần:
 #   $env:DSS_API_BASE="http://127.0.0.1:8011"
@@ -55,8 +57,8 @@ PLACEHOLDER = "__FL_API_BASE__"
 RUN_UVICORN = "python -m uvicorn api.main:app --host 127.0.0.1 --port 8000"
 RUN_STREAMLIT = "python -m streamlit run app/streamlit_app.py"
 
-# Chiều cao iframe: console 2 cột cần nhiều chỗ; 1400 theo yêu cầu.
-IFRAME_HEIGHT = 1400
+# Chiều cao iframe: đủ cho console 2 cột + explainers bên dưới mà không cần scrollbar lồng.
+IFRAME_HEIGHT = 1180
 
 
 # =====================================================================
@@ -192,10 +194,6 @@ def _commands_block() -> None:
         f"{RUN_STREAMLIT}",
         language="powershell",
     )
-    st.caption(
-        f"Backend lắng nghe ở `{API_BASE}`. Nếu đã đổi cổng, đặt biến môi trường "
-        "`DSS_API_BASE` trước khi chạy Streamlit."
-    )
 
 
 def _backend_block(health: dict) -> str:
@@ -205,7 +203,7 @@ def _backend_block(health: dict) -> str:
     if state == "live":
         st.markdown(
             _badge("● Backend đang chạy", GREEN)
-            + f"&nbsp; <span style='color:#5a6273;font-size:0.85rem'>"
+            + f"&nbsp; <span style='color:#64748B;font-size:0.85rem'>"
               f"`{API_BASE}` · db: **{'bật' if health['db'] else 'tắt'}** · "
               f"artifacts: **{'có' if health['artifacts'] else 'không'}**</span>",
             unsafe_allow_html=True,
@@ -227,7 +225,7 @@ def _backend_block(health: dict) -> str:
     if state == "degraded":
         st.markdown(
             _badge("◐ Backend chạy nhưng thiếu dữ liệu", ORANGE)
-            + f"&nbsp;<span style='color:#5a6273;font-size:0.85rem'>"
+            + f"&nbsp;<span style='color:#64748B;font-size:0.85rem'>"
               f"`{API_BASE}` trả lời nhưng `db=false` và `artifacts=false`.</span>",
             unsafe_allow_html=True,
         )
@@ -245,7 +243,7 @@ def _backend_block(health: dict) -> str:
     # state == "down"
     st.markdown(
         _badge("○ Backend chưa chạy", RED)
-        + f"&nbsp;<span style='color:#5a6273;font-size:0.85rem'>"
+        + f"&nbsp;<span style='color:#64748B;font-size:0.85rem'>"
           f"{health['error']}</span>",
         unsafe_allow_html=True,
     )
@@ -271,23 +269,22 @@ def render() -> None:
         kicker="FL Node Console · nhúng từ ui/ (inline CSS/JS)",
     )
 
-    # --- Giải thích ngắn: vì sao có trang này --------------------------
-    st.markdown(
-        "Mỗi **nhà tuyển dụng** là một node giữ dữ liệu của riêng mình. Trong "
-        "một vòng huấn luyện, node nhận tham số mô hình từ máy chủ, học trên "
-        "dữ liệu **tại chỗ**, rồi chỉ gửi lên **phần tham số đã thay đổi**. "
-        "Dữ liệu thô — tin tuyển dụng, hồ sơ ứng viên — không bao giờ rời máy. "
-        "Bảng điều khiển bên dưới cho thấy từng node báo cáo gì và mất bao lâu."
-    )
+    # --- Giải thích ngắn: gập gọn để bảng điều khiển lên cao hơn -------
+    with st.expander("Cơ chế Federated Learning: dữ liệu ở lại máy như thế nào?", expanded=False):
+        st.markdown(
+            "Mỗi **nhà tuyển dụng** là một node giữ dữ liệu của riêng mình. Trong "
+            "một vòng huấn luyện, node nhận tham số mô hình từ máy chủ, học trên "
+            "dữ liệu **tại chỗ**, rồi chỉ gửi lên **phần tham số đã thay đổi**. "
+            "Dữ liệu thô — tin tuyển dụng, hồ sơ ứng viên — không bao giờ rời máy. "
+            "Bảng điều khiển bên dưới cho thấy từng node báo cáo gì và mất bao lâu."
+        )
 
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        st.metric("Node (nhà tuyển dụng)", "9.116")
-    with c2:
-        st.metric("Nút trong đồ thị", "264.995",
-                  help="Người dùng + tin tuyển dụng + kỹ năng + nghề O*NET")
-    with c3:
-        st.metric("Cạnh user–job", "764.364")
+    metric_row([
+        {"value": "9.116", "label": "Node (nhà tuyển dụng)", "color": ORANGE_DARK},
+        {"value": "264.995", "label": "Nút trong đồ thị",
+         "help": "Người dùng + tin tuyển dụng + kỹ năng + nghề O*NET", "color": INK},
+        {"value": "764.364", "label": "Cạnh user–job", "color": SKY},
+    ])
 
     st.divider()
 
@@ -309,11 +306,6 @@ def render() -> None:
 
     # --- Nhúng giao diện ----------------------------------------------
     st.subheader("Bảng điều khiển node")
-    st.caption(
-        "Bấm **Start Training** trong khung để chạy một lượt: mỗi ô vuông là một "
-        "client, màu ô là độ trễ vòng hiện tại (xanh < 50 ms, vàng < 200 ms, đỏ "
-        "≥ 200 ms). Panel bên phải là dòng chảy sự kiện WebSocket."
-    )
 
     html, err = _inline_html(API_BASE)
     if err or html is None:
@@ -323,14 +315,8 @@ def render() -> None:
             "```powershell\npython tools/build_ui_inline.py\n```"
         )
     else:
-        components.html(html, height=IFRAME_HEIGHT, scrolling=True)
-        size_kb = len(html.encode("utf-8")) / 1024
-        st.caption(
-            f"Bản inline: `ui/_inline/index_inline.html` · {size_kb:,.0f} KB "
-            f"(CSS + JS + font đã nhúng) · API base `{API_BASE}`. "
-            "File này sinh tự động — sửa giao diện ở `ui/` rồi chạy "
-            "`python tools/build_ui_inline.py`."
-        )
+        with st.container(key="gx-graph-card"):
+            components.html(html, height=IFRAME_HEIGHT, scrolling=False)
 
     with st.expander("WebSocket bị chặn trong iframe thì sao?"):
         st.markdown(
@@ -351,9 +337,3 @@ def render() -> None:
               `http://127.0.0.1:8080/`) — ở đó WebSocket không bị iframe chặn.
             """
         )
-
-    st.caption(
-        "Cùng nguồn dữ liệu với trang **Mô phỏng Federated Learning**: 9.116 "
-        "client là các nhà tuyển dụng có tối thiểu 10 lượt ứng tuyển; client "
-        "lớn nhất là randstad (4.745 applications / 4.215 users / 603 jobs)."
-    )

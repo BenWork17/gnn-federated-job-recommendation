@@ -180,7 +180,7 @@
       <span class="nc-key nc-key-stay"><span class="nc-key-sw"></span>xanh = ở lại máy</span>
       <span class="nc-key nc-key-send"><span class="nc-key-sw"></span>cam = truyền đi</span>
       <span class="spacer"></span>
-      <span class="nc-flow-note">Một vòng: node chỉ gửi Δ embedding vài chục KB, không gửi application / user_id / job_id.</span>
+      <span class="nc-flow-note">Mỗi vòng chỉ gửi Δ embedding vài chục KB; không gửi dữ liệu thô.</span>
     </div>
   </section>
 
@@ -277,7 +277,7 @@
               <span>Loss <b id="roLoss">—</b></span>
             </div>
             <div class="nc-sim-note">
-              Đường cong <b>mô phỏng</b> để minh hoạ vòng lặp FedAvg — không phải kết quả huấn luyện thật. Kết quả thật ở notebook Kaggle: LightGCN 0,7151 (vũ trụ FL).
+              Đường cong <b>mô phỏng</b> minh hoạ FedAvg; kết quả thật ở trang FL simulation (LightGCN 0,7151).
             </div>
           </div>
         </section>
