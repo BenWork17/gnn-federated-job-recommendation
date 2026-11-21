@@ -1,0 +1,146 @@
+{
+  "n_items": 3511,
+  "pages": 15,
+  "slug": {
+    "fill_pct": 100.0,
+    "example": "staff-software-engineer-agentic-platform-berlin-386674"
+  },
+  "company_name": {
+    "fill_pct": 100.0,
+    "example": "tide"
+  },
+  "title": {
+    "fill_pct": 100.0,
+    "example": "Staff Software Engineer, Agentic Platform"
+  },
+  "description": {
+    "fill_pct": 100.0,
+    "example": "&lt;div class=&quot;content-intro&quot;&gt;&lt;h3&gt;&lt;strong&gt;A&lt;/strong&gt;&lt;strong&gt;BOUT TIDE&lt;/strong&gt"
+  },
+  "remote": {
+    "fill_pct": 100.0,
+    "example": "False"
+  },
+  "url": {
+    "fill_pct": 100.0,
+    "example": "https://www.arbeitnow.com/jobs/companies/tide/staff-software-engineer-agentic-platform-berlin-386674"
+  },
+  "tags": {
+    "fill_pct": 96.5,
+    "example": "['One Platform']"
+  },
+  "job_types": [
+    [
+      "Full Time",
+      1176
+    ],
+    [
+      "Unbefristeter arbeitsvertrag",
+      512
+    ],
+    [
+      "berufserfahren",
+      335
+    ],
+    [
+      "fulltime permanent",
+      292
+    ],
+    [
+      "Mid",
+      166
+    ],
+    [
+      "internship",
+      154
+    ],
+    [
+      "Experienced",
+      137
+    ],
+    [
+      "Cdi - contrat à durée indéterminée",
+      84
+    ],
+    [
+      "fulltime fixed term",
+      82
+    ],
+    [
+      "Entry",
+      74
+    ]
+  ],
+  "location": {
+    "fill_pct": 97.1,
+    "example": "Berlin"
+  },
+  "created_at": {
+    "fill_pct": 100.0,
+    "example": "1794110132"
+  },
+  "distinct_tags": 896,
+  "top_tags": [
+    [
+      "Remote",
+      187
+    ],
+    [
+      "Engineering",
+      171
+    ],
+    [
+      "Sales",
+      140
+    ],
+    [
+      "Customer Success",
+      87
+    ],
+    [
+      "Operations",
+      81
+    ],
+    [
+      "Finance",
+      76
+    ],
+    [
+      "Management",
+      70
+    ],
+    [
+      "Marketing",
+      66
+    ],
+    [
+      "Team Leader",
+      65
+    ],
+    [
+      "Customer Service",
+      60
+    ],
+    [
+      "IT",
+      56
+    ],
+    [
+      "Product",
+      56
+    ],
+    [
+      "Software Development",
+      54
+    ],
+    [
+      "Business Development",
+      52
+    ],
+    [
+      "Development",
+      46
+    ]
+  ],
+  "distinct_companies": 1399
+}

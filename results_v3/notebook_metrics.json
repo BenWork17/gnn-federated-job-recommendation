@@ -1,0 +1,745 @@
+{
+  "notebook": "01_gnn_fl.ipynb",
+  "version": "v3",
+  "generated_at": "2026-11-09T03:25:35+0000",
+  "environment": {
+    "scale": "small",
+    "device": "cuda",
+    "python": "3.13.16",
+    "numpy": "2.1.3",
+    "torch": "2.11.0+cu130",
+    "artifacts_dir": "/kaggle/input/datasets/baohoanhao/dss-gnn-fl-v3",
+    "output_dir": "/kaggle/working/results_v3"
+  },
+  "config": {
+    "dim": 32,
+    "layers": 2,
+    "n_clients": 50,
+    "rounds": 6,
+    "local_epochs": 1,
+    "lr": 0.05,
+    "seed": 42,
+    "eval_users_sample": 800,
+    "eval_users_clean_sample": 800
+  },
+  "graph": {
+    "n_nodes": 264995,
+    "n_users": 171807,
+    "n_jobs": 84845,
+    "n_occ": 583,
+    "n_skill": 7760,
+    "n_edges": 764364,
+    "edges_by_type": {
+      "0": 436893,
+      "1": 26678,
+      "2": 25866,
+      "3": 274927
+    },
+    "n_train_total": 726407,
+    "n_test_total": 37957,
+    "n_train_uj": 398936,
+    "n_test_uj": 37957,
+    "offsets": [
+      0,
+      171807,
+      256652,
+      257235
+    ]
+  },
+  "split": {
+    "pct_test_of_all_uj": 8.6879,
+    "pct_test_of_eligible": 19.095,
+    "pct_test_before_clean": 8.688,
+    "n_test_clean": 37077,
+    "n_test_leak": 880,
+    "pct_test_leak": 2.318,
+    "clean_source": "file có sẵn: /kaggle/input/datasets/baohoanhao/dss-gnn-fl-v3/test_clean_index.npz",
+    "n_jobs_cold_start": 1969,
+    "pct_jobs_cold_start": 2.321,
+    "n_eval_users": 800,
+    "n_eval_users_clean": 800,
+    "n_users_lost_after_clean": 348
+  },
+  "cross_silo": {
+    "pct_same_client_train": 45.711,
+    "pct_same_client_test": 16.292,
+    "pct_same_client_all": 43.155,
+    "pct_users_multi_client": 44.58,
+    "mean_clients_per_user": 2.41,
+    "n_clients": 9116,
+    "assignment_rule": "cạnh (u,j) thuộc client_of_job[j] — KHÔNG dùng client_of_user[u]",
+    "clients_with_zero_train_edges": 0
+  },
+  "eda": {
+    "n_users_in_train": 171807,
+    "n_jobs_in_train": 82876,
+    "app_per_user_median": 1.0,
+    "app_per_job_median": 2.0,
+    "sparsity_pct": 99.99726,
+    "n_jobs_with_occ": 26678,
+    "pct_jobs_with_occ": 31.44,
+    "n_occ_with_skill": 564,
+    "client_apps_median": 23.0,
+    "train_edges_per_client_min": 5,
+    "train_edges_per_client_median": 22.0,
+    "clients_ge10_train": 8745,
+    "clients_ge50_train": 1895
+  },
+  "models": {
+    "Popularity": {
+      "name": "Popularity",
+      "kind": "baseline",
+      "recall@10": 0.009792,
+      "recall@20": 0.015417,
+      "ndcg@20": 0.005952,
+      "mrr@20": 0.003879,
+      "coverage@10": 2.4e-05,
+      "recall@10_ci95": [
+        0.0037,
+        0.0167
+      ],
+      "recall@20_ci95": [
+        0.0079,
+        0.0242
+      ],
+      "ndcg@20_ci95": [
+        0.003,
+        0.0095
+      ],
+      "mrr@20_ci95": [
+        0.0017,
+        0.0067
+      ],
+      "clean_recall20": 0.005061,
+      "clean_ndcg20": 0.002229,
+      "clean_mrr20": 0.002356,
+      "clean_recall10": 0.001506,
+      "recall20_with_cold_as_miss": 0.015417,
+      "n_cold_positives_in_eval": 58,
+      "seconds": 1.65,
+      "R20_FlUniverse": 0.0529
+    },
+    "Item-KNN": {
+      "recall@10": 0.4265,
+      "recall@20": 0.540847,
+      "ndcg@20": 0.314715,
+      "mrr@20": 0.285003,
+      "coverage@10": 0.008748,
+      "recall@20_ci95": [
+        0.5119,
+        0.5702
+      ],
+      "clean_recall20": 0.544944,
+      "clean_ndcg20": 0.317151,
+      "clean_mrr20": 0.279679,
+      "clean_recall10": 0.419226,
+      "seconds": 4.5,
+      "R20_FlUniverse": 0.4909
+    },
+    "BPR-MF": {
+      "name": "BPR-MF",
+      "kind": "baseline",
+      "recall@10": 0.016222,
+      "recall@20": 0.02216,
+      "ndcg@20": 0.01177,
+      "mrr@20": 0.01134,
+      "coverage@10": 0.007385,
+      "recall@10_ci95": [
+        0.0094,
+        0.0249
+      ],
+      "recall@20_ci95": [
+        0.0135,
+        0.0318
+      ],
+      "ndcg@20_ci95": [
+        0.0071,
+        0.0177
+      ],
+      "mrr@20_ci95": [
+        0.0061,
+        0.0182
+      ],
+      "clean_recall20": 0.015696,
+      "clean_ndcg20": 0.008357,
+      "clean_mrr20": 0.010432,
+      "clean_recall10": 0.010154,
+      "recall20_with_cold_as_miss": 0.02216,
+      "n_cold_positives_in_eval": 58,
+      "seconds": 6.6,
+      "R20_FlUniverse": 0.085
+    },
+    "LightGCN": {
+      "name": "LightGCN",
+      "kind": "graph",
+      "recall@10": 0.315196,
+      "recall@20": 0.400151,
+      "ndcg@20": 0.235093,
+      "mrr@20": 0.217346,
+      "coverage@10": 0.004573,
+      "recall@10_ci95": [
+        0.2884,
+        0.3442
+      ],
+      "recall@20_ci95": [
+        0.3712,
+        0.4319
+      ],
+      "ndcg@20_ci95": [
+        0.2144,
+        0.2569
+      ],
+      "mrr@20_ci95": [
+        0.1948,
+        0.2404
+      ],
+      "clean_recall20": 0.401663,
+      "clean_ndcg20": 0.240878,
+      "clean_mrr20": 0.224231,
+      "clean_recall10": 0.310261,
+      "recall20_with_cold_as_miss": 0.396301,
+      "n_cold_positives_in_eval": 58,
+      "seconds": 64.09,
+      "R20_FlUniverse": 0.7151
+    },
+    "GraphSAGE": {
+      "name": "GraphSAGE",
+      "kind": "graph",
+      "recall@10": 0.081495,
+      "recall@20": 0.1376,
+      "ndcg@20": 0.063303,
+      "mrr@20": 0.052512,
+      "coverage@10": 0.004332,
+      "recall@10_ci95": [
+        0.0663,
+        0.0982
+      ],
+      "recall@20_ci95": [
+        0.1183,
+        0.1592
+      ],
+      "ndcg@20_ci95": [
+        0.0535,
+        0.0744
+      ],
+      "mrr@20_ci95": [
+        0.0416,
+        0.0643
+      ],
+      "clean_recall20": 0.174687,
+      "clean_ndcg20": 0.077815,
+      "clean_mrr20": 0.059793,
+      "clean_recall10": 0.103466,
+      "recall20_with_cold_as_miss": 0.137259,
+      "n_cold_positives_in_eval": 58,
+      "seconds": 33.96,
+      "R20_FlUniverse": 0.5113
+    },
+    "GAT": {
+      "name": "GAT",
+      "kind": "graph",
+      "recall@10": 0.104041,
+      "recall@20": 0.141438,
+      "ndcg@20": 0.083477,
+      "mrr@20": 0.082771,
+      "coverage@10": 0.003934,
+      "recall@10_ci95": [
+        0.0849,
+        0.1235
+      ],
+      "recall@20_ci95": [
+        0.1189,
+        0.1634
+      ],
+      "ndcg@20_ci95": [
+        0.0689,
+        0.0978
+      ],
+      "mrr@20_ci95": [
+        0.0668,
+        0.0991
+      ],
+      "clean_recall20": 0.155766,
+      "clean_ndcg20": 0.0877,
+      "clean_mrr20": 0.084238,
+      "clean_recall10": 0.116668,
+      "recall20_with_cold_as_miss": 0.141133,
+      "n_cold_positives_in_eval": 58,
+      "seconds": 77.53,
+      "R20_FlUniverse": 0.3739
+    },
+    "FedAvg": {
+      "recall@10": 0.040224,
+      "recall@20": 0.047515,
+      "ndcg@20": 0.036495,
+      "mrr@20": 0.047074,
+      "coverage@10": 0.005164,
+      "recall@10_ci95": [
+        0.0296,
+        0.0525
+      ],
+      "recall@20_ci95": [
+        0.0353,
+        0.0608
+      ],
+      "ndcg@20_ci95": [
+        0.0269,
+        0.0466
+      ],
+      "mrr@20_ci95": [
+        0.0348,
+        0.0609
+      ],
+      "name": "FedAvg",
+      "kind": "federated",
+      "seconds": 73.99,
+      "universe_jobs": 9270,
+      "universe_catalog": 9058,
+      "R20_FlUniverse": 0.3905,
+      "NDCG20_FlUniverse": 0.2615,
+      "MRR20_FlUniverse": 0.2338,
+      "R20_FlUniverse_ci95": [
+        0.3577,
+        0.4258
+      ]
+    }
+  },
+  "fedavg_main": {
+    "recall20": 0.0475,
+    "recall20_ci95": [
+      0.0353,
+      0.0608
+    ],
+    "ndcg20": 0.0365,
+    "mrr20": 0.0471,
+    "coverage": 0.0052,
+    "n_shards": 50,
+    "history": [
+      {
+        "round": 1,
+        "loss": 0.000251,
+        "round_seconds": 12.59,
+        "n_clients": 50,
+        "recall20": 0.034122,
+        "ndcg20": 0.027664
+      },
+      {
+        "round": 2,
+        "loss": 0.000125,
+        "round_seconds": 12.45,
+        "n_clients": 50,
+        "recall20": 0.042147,
+        "ndcg20": 0.034399
+      },
+      {
+        "round": 3,
+        "loss": 0.000407,
+        "round_seconds": 12.34,
+        "n_clients": 50,
+        "recall20": 0.045432,
+        "ndcg20": 0.037288
+      },
+      {
+        "round": 4,
+        "loss": 0.000295,
+        "round_seconds": 12.24,
+        "n_clients": 50,
+        "recall20": 0.045224,
+        "ndcg20": 0.036928
+      },
+      {
+        "round": 5,
+        "loss": 0.000482,
+        "round_seconds": 12.08,
+        "n_clients": 50,
+        "recall20": 0.046057,
+        "ndcg20": 0.036258
+      },
+      {
+        "round": 6,
+        "loss": 0.000221,
+        "round_seconds": 12.29,
+        "n_clients": 50,
+        "recall20": 0.047515,
+        "ndcg20": 0.036495
+      }
+    ]
+  },
+  "sweep": [
+    {
+      "dim": 16,
+      "layers": 2,
+      "n_clients": 10,
+      "local_epochs": 1,
+      "recall10": 0.0176,
+      "recall20": 0.0198,
+      "ndcg20": 0.0136,
+      "mrr20": 0.0157,
+      "coverage": 0.0037,
+      "seconds": 23.2,
+      "n_shards": 10
+    },
+    {
+      "dim": 32,
+      "layers": 2,
+      "n_clients": 10,
+      "local_epochs": 1,
+      "recall10": 0.019,
+      "recall20": 0.0221,
+      "ndcg20": 0.0178,
+      "mrr20": 0.0225,
+      "coverage": 0.0046,
+      "seconds": 19.5,
+      "n_shards": 10
+    },
+    {
+      "dim": 64,
+      "layers": 2,
+      "n_clients": 10,
+      "local_epochs": 1,
+      "recall10": 0.0242,
+      "recall20": 0.0265,
+      "ndcg20": 0.0218,
+      "mrr20": 0.0284,
+      "coverage": 0.0041,
+      "seconds": 25.7,
+      "n_shards": 10
+    },
+    {
+      "dim": 32,
+      "layers": 1,
+      "n_clients": 10,
+      "local_epochs": 1,
+      "recall10": 0.0208,
+      "recall20": 0.0219,
+      "ndcg20": 0.0162,
+      "mrr20": 0.0197,
+      "coverage": 0.0044,
+      "seconds": 12.6,
+      "n_shards": 10
+    },
+    {
+      "dim": 32,
+      "layers": 3,
+      "n_clients": 10,
+      "local_epochs": 1,
+      "recall10": 0.0194,
+      "recall20": 0.0221,
+      "ndcg20": 0.0176,
+      "mrr20": 0.0226,
+      "coverage": 0.0047,
+      "seconds": 25.6,
+      "n_shards": 10
+    },
+    {
+      "dim": 32,
+      "layers": 2,
+      "n_clients": 5,
+      "local_epochs": 1,
+      "recall10": 0.0102,
+      "recall20": 0.0127,
+      "ndcg20": 0.0106,
+      "mrr20": 0.0161,
+      "coverage": 0.0038,
+      "seconds": 11.0,
+      "n_shards": 5
+    },
+    {
+      "dim": 32,
+      "layers": 2,
+      "n_clients": 20,
+      "local_epochs": 1,
+      "recall10": 0.0326,
+      "recall20": 0.0353,
+      "ndcg20": 0.0291,
+      "mrr20": 0.037,
+      "coverage": 0.0047,
+      "seconds": 34.6,
+      "n_shards": 20
+    },
+    {
+      "dim": 32,
+      "layers": 2,
+      "n_clients": 10,
+      "local_epochs": 5,
+      "recall10": 0.0168,
+      "recall20": 0.0187,
+      "ndcg20": 0.0164,
+      "mrr20": 0.021,
+      "coverage": 0.0044,
+      "seconds": 89.0,
+      "n_shards": 10
+    }
+  ],
+  "ablation": [
+    {
+      "biến_thể": "(base) đầy đủ",
+      "ghi_chú": "nghề + kỹ năng, FedAvg weighted",
+      "R10": 0.4445,
+      "R20": 0.4833,
+      "NDCG20": 0.3469,
+      "MRR20": 0.315,
+      "coverage": 0.0794,
+      "giây": 23.2,
+      "n_shard": 20,
+      "n_catalog": 4511,
+      "universe": "cố định"
+    },
+    {
+      "biến_thể": "(a) bỏ lớp skill",
+      "ghi_chú": "không đưa nút kỹ năng vào đồ thị con",
+      "R10": 0.4076,
+      "R20": 0.4589,
+      "NDCG20": 0.3307,
+      "MRR20": 0.299,
+      "coverage": 0.0851,
+      "giây": 7.7,
+      "n_shard": 20,
+      "n_catalog": 4511,
+      "universe": "cố định"
+    },
+    {
+      "biến_thể": "(b) bỏ lớp occupation",
+      "ghi_chú": "không đưa nút nghề (kéo theo cả kỹ năng)",
+      "R10": 0.3332,
+      "R20": 0.3933,
+      "NDCG20": 0.2657,
+      "MRR20": 0.2343,
+      "coverage": 0.0856,
+      "giây": 6.1,
+      "n_shard": 20,
+      "n_catalog": 4511,
+      "universe": "cố định"
+    },
+    {
+      "biến_thể": "(c) n_clients=5",
+      "ghi_chú": "5 client lớn nhất",
+      "R10": 0.23,
+      "R20": 0.2398,
+      "NDCG20": 0.19,
+      "MRR20": 0.1799,
+      "coverage": 0.0718,
+      "giây": 6.9,
+      "n_shard": 5,
+      "n_catalog": 4511,
+      "universe": "cố định"
+    },
+    {
+      "biến_thể": "(c) n_clients=10",
+      "ghi_chú": "10 client lớn nhất",
+      "R10": 0.3159,
+      "R20": 0.3512,
+      "NDCG20": 0.2546,
+      "MRR20": 0.232,
+      "coverage": 0.0778,
+      "giây": 12.4,
+      "n_shard": 10,
+      "n_catalog": 4511,
+      "universe": "cố định"
+    },
+    {
+      "biến_thể": "(c) n_clients=20",
+      "ghi_chú": "20 client lớn nhất",
+      "R10": 0.4445,
+      "R20": 0.4833,
+      "NDCG20": 0.3469,
+      "MRR20": 0.315,
+      "coverage": 0.0794,
+      "giây": 23.5,
+      "n_shard": 20,
+      "n_catalog": 4511,
+      "universe": "cố định"
+    },
+    {
+      "biến_thể": "(d) FedAvg",
+      "ghi_chú": "trung bình có trọng số",
+      "R10": 0.4445,
+      "R20": 0.4833,
+      "NDCG20": 0.3469,
+      "MRR20": 0.315,
+      "coverage": 0.0794,
+      "giây": 23.6,
+      "n_shard": 20,
+      "n_catalog": 4511,
+      "universe": "cố định"
+    },
+    {
+      "biến_thể": "(d) FedProx (mu=0.01)",
+      "ghi_chú": "thêm phạt ||E - E_global||^2",
+      "R10": 0.4167,
+      "R20": 0.4627,
+      "NDCG20": 0.3334,
+      "MRR20": 0.3026,
+      "coverage": 0.0802,
+      "giây": 24.7,
+      "n_shard": 20,
+      "n_catalog": 4511,
+      "universe": "cố định"
+    },
+    {
+      "biến_thể": "(e) local_epochs=1",
+      "ghi_chú": "1 epoch cục bộ/vòng",
+      "R10": 0.4445,
+      "R20": 0.4833,
+      "NDCG20": 0.3469,
+      "MRR20": 0.315,
+      "coverage": 0.0794,
+      "giây": 23.2,
+      "n_shard": 20,
+      "n_catalog": 4511,
+      "universe": "cố định"
+    },
+    {
+      "biến_thể": "(e) local_epochs=5",
+      "ghi_chú": "5 epoch cục bộ/vòng",
+      "R10": 0.3943,
+      "R20": 0.4565,
+      "NDCG20": 0.3055,
+      "MRR20": 0.2703,
+      "coverage": 0.0776,
+      "giây": 112.4,
+      "n_shard": 20,
+      "n_catalog": 4511,
+      "universe": "cố định"
+    },
+    {
+      "biến_thể": "(g) FedAvg weighted",
+      "ghi_chú": "trọng số = số cạnh user-job",
+      "R10": 0.4445,
+      "R20": 0.4833,
+      "NDCG20": 0.3469,
+      "MRR20": 0.315,
+      "coverage": 0.0794,
+      "giây": 22.9,
+      "n_shard": 20,
+      "n_catalog": 4511,
+      "universe": "cố định"
+    },
+    {
+      "biến_thể": "(g) FedAvg unweighted",
+      "ghi_chú": "mọi client trọng số 1",
+      "R10": 0.4385,
+      "R20": 0.4716,
+      "NDCG20": 0.3369,
+      "MRR20": 0.304,
+      "coverage": 0.0822,
+      "giây": 22.8,
+      "n_shard": 20,
+      "n_catalog": 4511,
+      "universe": "cố định"
+    },
+    {
+      "biến_thể": "(f1) base: nghề + kỹ năng",
+      "ghi_chú": "cùng catalog 956 job có nghề",
+      "R10": 0.5121,
+      "R20": 0.5756,
+      "NDCG20": 0.4303,
+      "MRR20": 0.391,
+      "coverage": 0.2008,
+      "giây": 23.6,
+      "n_shard": 20,
+      "n_catalog": 956,
+      "universe": "cố định"
+    },
+    {
+      "biến_thể": "(f2) bỏ skill",
+      "ghi_chú": "cùng catalog 956 job có nghề",
+      "R10": 0.477,
+      "R20": 0.527,
+      "NDCG20": 0.3982,
+      "MRR20": 0.3635,
+      "coverage": 0.2218,
+      "giây": 8.0,
+      "n_shard": 20,
+      "n_catalog": 956,
+      "universe": "cố định"
+    },
+    {
+      "biến_thể": "(f3) bỏ occupation+skill",
+      "ghi_chú": "cùng catalog 956 job có nghề",
+      "R10": 0.4517,
+      "R20": 0.5066,
+      "NDCG20": 0.3753,
+      "MRR20": 0.339,
+      "coverage": 0.2071,
+      "giây": 6.5,
+      "n_shard": 20,
+      "n_catalog": 956,
+      "universe": "cố định"
+    }
+  ],
+  "per_client": {
+    "n_clients_with_test": 7076,
+    "n_clients_without_test": 2040,
+    "pct_clients_without_test": 22.38,
+    "n_clients_ge10_jobs": 2027,
+    "recall20_ge10_jobs": 0.0215,
+    "recall20_lt10_jobs": 0.0153,
+    "n_ge10": 1716,
+    "n_lt10": 5262
+  },
+  "latency": {
+    "n_samples": 300,
+    "p50_ms": 236.492,
+    "p95_ms": 315.455,
+    "mean_ms": 245.578,
+    "max_ms": 531.548,
+    "min_ms": 159.974,
+    "p95_over_p50": 1.33
+  },
+  "figma_files": [
+    "F01_eda_phan_bo.png",
+    "F02_sweep_tham_so.png",
+    "F03_so_sanh_va_hoi_tu.png",
+    "F04_ablation.png",
+    "F05_do_tre_p50_p95.png",
+    "F06_r20_theo_nhom_client.png"
+  ],
+  "timings": [
+    {
+      "section": "[3] EDA",
+      "seconds": 1.12,
+      "note": ""
+    },
+    {
+      "section": "[4] Kiến trúc + chia client",
+      "seconds": 1.17,
+      "note": ""
+    },
+    {
+      "section": "[5] Phân tích tham số",
+      "seconds": 242.57,
+      "note": "8 cấu hình"
+    },
+    {
+      "section": "[6] Môi trường",
+      "seconds": 0.0,
+      "note": ""
+    },
+    {
+      "section": "[7] Đánh giá",
+      "seconds": 278.0,
+      "note": "7 hệ"
+    },
+    {
+      "section": "[7f] Tách nhóm client",
+      "seconds": 55.55,
+      "note": "6,978 client có test"
+    },
+    {
+      "section": "[8] Ablation",
+      "seconds": 354.76,
+      "note": "15 biến thể"
+    },
+    {
+      "section": "[9] WebAPI + PostgreSQL",
+      "seconds": 0.0,
+      "note": ""
+    },
+    {
+      "section": "[10] UI + độ trễ",
+      "seconds": 0.45,
+      "note": ""
+    }
+  ]
+}

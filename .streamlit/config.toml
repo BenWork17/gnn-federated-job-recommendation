@@ -1,0 +1,38 @@
+# =====================================================================
+# Theme SÁNG cho app demo.
+#
+# Lưu ý: Streamlit đọc file này từ thư mục `.streamlit/` trong CWD, nên phải
+# chạy `streamlit run` từ gốc dự án (như README hướng dẫn).
+#
+# Vì sao đặt tay từng màu thay vì dùng theme mặc định: bảng màu của app phải
+# khớp với 15 hình trong báo cáo (matplotlib) để người xem không thấy hai
+# "ngôn ngữ màu" khác nhau giữa slide và báo cáo.
+# =====================================================================
+
+[theme]
+base = "light"
+
+primaryColor = "#2f6fb5"            # xanh chủ đạo (giống C_BLUE trong figures.py)
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f6f8fb"  # nền phụ, rất nhẹ
+textColor = "#1f2733"
+borderColor = "#e3e8ef"
+
+font = "sans serif"
+baseFontSize = 16
+baseRadius = "10px"
+buttonRadius = "8px"
+
+# Bảng màu cho biểu đồ Streamlit tự vẽ (dataframe, v.v.)
+chartCategoricalColors = [
+    "#2f6fb5", "#c0392b", "#27ae60", "#e67e22", "#8e44ad", "#7f8c8d",
+]
+
+codeBackgroundColor = "#f6f8fb"
+codeFont = "monospace"
+codeFontSize = "13px"
+
+[server]
+headless = true
+[browser]
+gatherUsageStats = false

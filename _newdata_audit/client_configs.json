@@ -1,0 +1,158 @@
+{
+ "G0_raw_state": {
+  "n_clients": 189,
+  "apps": {
+   "min": 1,
+   "p25": 2,
+   "median": 11,
+   "p75": 472,
+   "max": 169760
+  },
+  "top5_share_pct": 44.0,
+  "clients_lt_1000": 145,
+  "clients_lt_100": 128
+ },
+ "G1_topK_state_plus_rest": {
+  "4": {
+   "n_clients": 5,
+   "apps": {
+    "min": 102840,
+    "p25": 115472,
+    "median": 153765,
+    "p75": 169760,
+    "max": 875677
+   },
+   "top1_share_pct": 61.8,
+   "jsd": 0.0007
+  },
+  "6": {
+   "n_clients": 7,
+   "apps": {
+    "min": 66326,
+    "p25": 81763,
+    "median": 115472,
+    "p75": 169760,
+    "max": 727588
+   },
+   "top1_share_pct": 51.3,
+   "jsd": 0.0014
+  },
+  "8": {
+   "n_clients": 9,
+   "apps": {
+    "min": 55571,
+    "p25": 66326,
+    "median": 102840,
+    "p75": 153765,
+    "max": 615355
+   },
+   "top1_share_pct": 43.4,
+   "jsd": 0.0016
+  },
+  "10": {
+   "n_clients": 11,
+   "apps": {
+    "min": 50691,
+    "p25": 55571,
+    "median": 81763,
+    "p75": 153765,
+    "max": 511466
+   },
+   "top1_share_pct": 36.1,
+   "jsd": 0.0018
+  },
+  "12": {
+   "n_clients": 13,
+   "apps": {
+    "min": 48194,
+    "p25": 53198,
+    "median": 66326,
+    "p75": 115472,
+    "max": 414140
+   },
+   "top1_share_pct": 29.2,
+   "jsd": 0.002
+  },
+  "16": {
+   "n_clients": 17,
+   "apps": {
+    "min": 28122,
+    "p25": 48194,
+    "median": 55571,
+    "p75": 102840,
+    "max": 269229
+   },
+   "top1_share_pct": 19.0,
+   "jsd": 0.0025
+  },
+  "20": {
+   "n_clients": 21,
+   "apps": {
+    "min": 20702,
+    "p25": 30120,
+    "median": 50691,
+    "p75": 81763,
+    "max": 173006
+   },
+   "top1_share_pct": 12.2,
+   "jsd": 0.0027
+  }
+ },
+ "G2_census_region": {
+  "n_clients": 5,
+  "apps": {
+   "min": 5891,
+   "p25": 208970,
+   "median": 231328,
+   "p75": 325056,
+   "max": 646269
+  },
+  "top1_share_pct": 45.6,
+  "jsd": 0.0007,
+  "sizes": {
+   "South": 646269,
+   "Midwest": 325056,
+   "Northeast": 231328,
+   "West": 208970,
+   "Other/NonUS": 5891
+  }
+ },
+ "G3_region_plus_topK": {
+  "8": {
+   "n_clients": 13,
+   "apps": {
+    "min": 5891,
+    "p25": 56662,
+    "median": 93498,
+    "p75": 153765,
+    "max": 256418
+   },
+   "top1_share_pct": 18.1,
+   "jsd": 0.002
+  },
+  "12": {
+   "n_clients": 17,
+   "apps": {
+    "min": 5891,
+    "p25": 49132,
+    "median": 56662,
+    "p75": 115472,
+    "max": 203220
+   },
+   "top1_share_pct": 14.3,
+   "jsd": 0.0023
+  },
+  "16": {
+   "n_clients": 21,
+   "apps": {
+    "min": 5891,
+    "p25": 45041,
+    "median": 50691,
+    "p75": 81763,
+    "max": 169760
+   },
+   "top1_share_pct": 12.0,
+   "jsd": 0.0027
+  }
+ }
+}

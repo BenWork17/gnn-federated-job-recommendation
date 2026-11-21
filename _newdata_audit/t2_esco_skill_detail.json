@@ -1,0 +1,68 @@
+{
+  "n_skill_concepts_collected": 500,
+  "hierarchy_on_60_sample": {
+    "has_broader": 38,
+    "has_narrower": 10,
+    "has_skill_group": 60
+  },
+  "skillType_distribution": {
+    "skill": 49,
+    "knowledge": 11
+  },
+  "reuseLevel_distribution": {
+    "occupation-specific": 12,
+    "cross-sector": 18,
+    "sector-specific": 29,
+    "transversal": 1
+  },
+  "isInScheme_distribution": {
+    "member-skills": 60,
+    "skills": 60,
+    "skill-language-groups": 1
+  },
+  "hierarchy_examples": [
+    {
+      "title": "advise food industry",
+      "narrower": [
+        "advise on food preservation"
+      ],
+      "broaderHierarchyConcept": [
+        "advising on business or operational matters"
+      ]
+    },
+    {
+      "title": "analyse business plans",
+      "narrower": [
+        "analyse transport business networks"
+      ],
+      "broaderHierarchyConcept": [
+        "analysing business operations"
+      ]
+    },
+    {
+      "title": "adapt fitness exercises",
+      "narrower": [
+        "adapt Pilates exercises"
+      ],
+      "broaderHierarchyConcept": [
+        "practising sports"
+      ]
+    }
+  ],
+  "skill_group_probe": {
+    "http://data.europa.eu/esco/skill/S": {
+      "title": "skills",
+      "keys": [
+        "_embedded",
+        "_links",
+        "classId",
+        "className",
+        "preferredLabel",
+        "title",
+        "uri"
+      ],
+      "n_narrower": 0
+    },
+    "http://data.europa.eu/esco/skill/2.A.1": "HTTP Error 404: "
+  }
+}

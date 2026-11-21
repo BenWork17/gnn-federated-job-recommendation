@@ -1,0 +1,101 @@
+{
+ "careerbuilder": {
+  "apps": 1603111,
+  "jobs": 365668,
+  "users": 321235,
+  "distinct_titles": 411737
+ },
+ "data_jobs": {
+  "titles": 199684,
+  "title_short": 10,
+  "title_short_values": [
+   "business analyst",
+   "cloud engineer",
+   "data analyst",
+   "data engineer",
+   "data scientist",
+   "machine learning engineer",
+   "senior data analyst",
+   "senior data engineer",
+   "senior data scientist",
+   "software engineer"
+  ],
+  "loose_titles": 159426
+ },
+ "arshkon": {
+  "titles": 70387,
+  "loose_titles": 61289
+ },
+ "join_levels": {
+  "dj_exact": {
+   "apps": 183994,
+   "pct_apps": 11.477,
+   "users": 91956,
+   "pct_users": 28.626,
+   "jobs": 38382,
+   "pct_jobs": 10.496
+  },
+  "dj_loose": {
+   "apps": 180888,
+   "pct_apps": 11.284,
+   "users": 95408,
+   "jobs": 33836,
+   "pct_jobs": 9.253
+  },
+  "dj_short": {
+   "apps": 4708,
+   "pct_apps": 0.294,
+   "users": 3302,
+   "jobs": 1847,
+   "pct_jobs": 0.505
+  },
+  "ar_exact": {
+   "apps": 306092,
+   "pct_apps": 19.094,
+   "users": 145312,
+   "jobs": 68395,
+   "pct_jobs": 18.704
+  },
+  "ar_loose": {
+   "apps": 91090,
+   "pct_apps": 5.682,
+   "users": 63794,
+   "jobs": 20887,
+   "pct_jobs": 5.712
+  },
+  "none": {
+   "apps": 836339,
+   "pct_apps": 52.17,
+   "jobs": 202321,
+   "pct_jobs": 55.329
+  }
+ },
+ "cumulative": {
+  "data_jobs_any": {
+   "apps": 369590,
+   "pct_apps": 23.055,
+   "users": 146126,
+   "jobs": 74065
+  },
+  "arshkon_any": {
+   "apps": 397182,
+   "pct_apps": 24.776,
+   "users": 170230,
+   "jobs": 89282
+  },
+  "either": {
+   "apps": 766772,
+   "pct_apps": 47.83,
+   "users": 73370,
+   "jobs": 163347
+  }
+ },
+ "notes": {
+  "dj_exact": "title CB == title data_jobs sau chuan hoa manh",
+  "dj_loose": "bo phan sau -/ va bo token cuoi (seniority) roi so",
+  "dj_short": "title CB chua TOAN BO token dac trung (>=4 ky tu) cua 1 gia tri job_title_short",
+  "ar_exact": "title CB == title arshkon sau chuan hoa",
+  "ar_loose": "title arshkon sau khi bo duoi -/ va token cuoi",
+  "none": "khong khop muc nao"
+ }
+}

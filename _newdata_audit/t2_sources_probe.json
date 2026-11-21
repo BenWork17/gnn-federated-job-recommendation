@@ -1,0 +1,206 @@
+{
+  "asaniczka_linkedin": {
+    "title": "1.3M Linkedin Jobs & Skills (2024)",
+    "license": "ODC Attribution License (ODC-By)",
+    "totalBytes": 6190063069,
+    "lastUpdated": "2024-02-08T19:11:36.473Z",
+    "subtitle": "Scraped Jobs from Linkedin. Augmented with Job Skills",
+    "voteCount": 303,
+    "downloadCount": 23827,
+    "usabilityRating": 1.0,
+    "datalist_err": 404
+  },
+  "ravindra_jd": {
+    "title": "Job Dataset",
+    "license": "CC0: Public Domain",
+    "totalBytes": 1743166140,
+    "lastUpdated": "2023-09-17T15:52:08.697Z",
+    "subtitle": "A Comprehensive Job Dataset for Data Science, Research, and Analysis",
+    "voteCount": 239,
+    "downloadCount": 27352,
+    "usabilityRating": 1.0,
+    "datalist_err": 404
+  },
+  "jobhop": {
+    "id": "aida-ugent/JobHop",
+    "license": [
+      "license:cc-by-4.0"
+    ],
+    "cardData": {
+      "license": "cc-by-4.0",
+      "language": [
+        "nl",
+        "fr",
+        "en"
+      ],
+      "tags": [
+        "labor_market",
+        "ESCO",
+        "Job_transition",
+        "career_trajectories",
+        "resumes"
+      ],
+      "size_categories": [
+        "1M<n<10M"
+      ]
+    },
+    "downloads": 378,
+    "lastModified": "2026-08-27T09:49:17.000Z",
+    "n_siblings": 9,
+    "siblings_sample": [
+      ".gitattributes",
+      "ESCO Groups",
+      "JobHop_test.csv",
+      "JobHop_train.csv",
+      "JobHop_v2_test.parquet",
+      "JobHop_v2_train.parquet",
+      "JobHop_v2_val.parquet",
+      "JobHop_val.csv",
+      "README.md"
+    ],
+    "info_ok": true,
+    "info": {
+      "dataset_info": {
+        "default": {
+          "description": "",
+          "citation": "",
+          "homepage": "",
+          "license": "",
+          "features": {
+            "resume_id": {
+              "dtype": "int64",
+              "_type": "Value"
+            },
+            "matched_code": {
+              "dtype": "large_string",
+              "_type": "Value"
+            },
+            "start_date": {
+              "dtype": "large_string",
+              "_type": "Value"
+            },
+            "end_date": {
+              "dtype": "large_string",
+              "_type": "Value"
+            },
+            "university_level": {
+              "dtype": "large_string",
+              "_type": "Value"
+            }
+          },
+          "builder_name": "parquet",
+          "dataset_name": "job_hop",
+          "config_name": "default",
+          "version": {
+            "version_str": "0.0.0",
+            "major": 0,
+            "minor": 0,
+            "patch": 0
+          },
+          "splits": {
+            "train": {
+              "name": "train",
+              "num_bytes": 12727936,
+              "num_examples": 1594827,
+              "dataset_name": null
+            },
+            "validation": {
+              "name": "validation",
+              "num_bytes": 1392465,
+              "num_examples": 199587,
+              "dataset_name": null
+            },
+            "test": {
+              "name": "test",
+              "num_bytes": 1389959,
+              "num_examples": 198877,
+              "dataset_name": null
+            }
+          },
+          "download_size": 11572872,
+          "dataset_size": 15510360
+        }
+      },
+      "pending": [],
+      "failed": [],
+      "partial": false
+    }
+  },
+  "resume_fit": {
+    "id": "cnamuangtoun/resume-job-description-fit",
+    "license": [],
+    "cardData": null,
+    "downloads": 1057,
+    "lastModified": "2024-07-25T01:49:17.000Z",
+    "n_siblings": 3,
+    "siblings_sample": [
+      ".gitattributes",
+      "test.csv",
+      "train.csv"
+    ],
+    "info_ok": true,
+    "info": {
+      "dataset_info": {
+        "default": {
+          "description": "",
+          "citation": "",
+          "homepage": "",
+          "license": "",
+          "features": {
+            "resume_text": {
+              "dtype": "string",
+              "_type": "Value"
+            },
+            "job_description_text": {
+              "dtype": "string",
+              "_type": "Value"
+            },
+            "label": {
+              "dtype": "string",
+              "_type": "Value"
+            }
+          },
+          "builder_name": "csv",
+          "dataset_name": "resume-job-description-fit",
+          "config_name": "default",
+          "version": {
+            "version_str": "0.0.0",
+            "major": 0,
+            "minor": 0,
+            "patch": 0
+          },
+          "splits": {
+            "train": {
+              "name": "train",
+              "num_bytes": 53465449,
+              "num_examples": 6241,
+              "dataset_name": "resume-job-description-fit"
+            },
+            "test": {
+              "name": "test",
+              "num_bytes": 15185705,
+              "num_examples": 1759,
+              "dataset_name": "resume-job-description-fit"
+            }
+          },
+          "download_checksums": {
+            "hf://datasets/cnamuangtoun/resume-job-description-fit@08978e21714984bb417547d2c0f9b477f5298163/train.csv": {
+              "num_bytes": 53437783,
+              "checksum": null
+            },
+            "hf://datasets/cnamuangtoun/resume-job-description-fit@08978e21714984bb417547d2c0f9b477f5298163/test.csv": {
+              "num_bytes": 15178234,
+              "checksum": null
+            }
+          },
+          "download_size": 68616017,
+          "dataset_size": 68651154,
+          "size_in_bytes": 137267171
+        }
+      },
+      "pending": [],
+      "failed": [],
+      "partial": false
+    }
+  }
+}

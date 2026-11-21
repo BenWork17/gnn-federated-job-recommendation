@@ -1,0 +1,39 @@
+{
+ "zip_bytes": 13301357,
+ "n_entries": 42,
+ "skills_txt": {
+  "rows": 61530,
+  "occupations": 879,
+  "distinct_elements": 35,
+  "skills_per_occ_min": 35,
+  "skills_per_occ_median": 35,
+  "skills_per_occ_max": 35,
+  "occupations_with_all_elements": 879,
+  "occupation_share_of_rarest_element_pct": 100.0
+ },
+ "technology_skills_txt": {
+  "rows": 32681,
+  "occupations": 923,
+  "distinct_tools": 8775,
+  "tools_per_occ_min": 1,
+  "tools_per_occ_median": 22,
+  "tools_per_occ_mean": 35.41,
+  "tools_per_occ_max": 426,
+  "occupations_with_all_tools": 0,
+  "tools_covering_le_5pct_of_occ": 8677,
+  "top3": [
+   {
+    "tool": "Microsoft Excel",
+    "n_occ": 859
+   },
+   {
+    "tool": "Microsoft Office software",
+    "n_occ": 813
+   },
+   {
+    "tool": "Microsoft Word",
+    "n_occ": 784
+   }
+  ]
+ }
+}

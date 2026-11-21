@@ -1,0 +1,56 @@
+# =====================================================================
+# Cấu hình toàn bộ thực nghiệm.
+# Sửa ở đây, không sửa rải rác trong code.
+# =====================================================================
+
+seed: 42
+
+paths:
+  # Dữ liệu MEDAJob gốc (export từ website môn học, đặt ở Lab03)
+  medajob_raw: "E:/2026/DUT/DSS/SauGK/Lab03"
+  artifacts: "artifacts"
+  results: "results"
+  figures: "results/figures"
+  # Thư mục tạm nội bộ (tránh %TEMP% bị sandbox chặn)
+  tmp: "artifacts/.tmp"
+
+# ---------------------------------------------------------------------
+# Bài toán: GNN + Federated Learning cho gợi ý việc làm
+# ---------------------------------------------------------------------
+medajob:
+  test_ratio: 0.2          # 20% tương tác mỗi user đưa vào test
+  min_ratings_for_test: 5  # user ít hơn 5 rating thì giữ toàn bộ ở train
+  relevant_threshold: 4    # rating >= 4 coi là "liên quan"
+  k_list: [10, 20]
+  graph:
+    layers: 2              # số tầng lan truyền LightGCN
+    dim: 32                # số chiều embedding
+  train:
+    epochs: 200            # centralized
+    lr: 0.02
+    reg: 1.0e-5
+  federated:
+    n_clients: [5, 8, 12]  # số client mô phỏng (chia theo employer_id)
+    rounds: 20
+    # 10 epoch cục bộ/vòng là điểm cân bằng: đủ để client học hết dữ liệu
+    # riêng, không quá lâu. Với 2 epoch, FedAvg chỉ đạt 0.40; với 10 epoch
+    # đạt 0.50-0.54, sát mô hình tập trung (0.50).
+    local_epochs: 10
+    lr: 0.02
+    fedprox_mu: 0.01
+    sample_rate: 1.0       # tỉ lệ client tham gia mỗi vòng
+  bootstrap:
+    n_boot: 1000
+    alpha: 0.05
+
+# ---------------------------------------------------------------------
+# Báo cáo
+# ---------------------------------------------------------------------
+report:
+  template: "E:/2026/DUT/DSS/KhoaCNTT - Mau baocao do an chuyen nganh -PBL6.docx"
+  output: "docs/BAO_CAO_GNN_FL.docx"
+  student1: "Phan Gia Bảo - 102220265"
+  student2: "Nguyễn Văn Chương - 102220267"
+  course: "DSS - Hệ hỗ trợ quyết định"
+  figure_width_cm: 16.4
+  dpi: 400

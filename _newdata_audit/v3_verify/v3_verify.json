@@ -1,0 +1,1732 @@
+{
+  "task": "t5",
+  "generated_at": "2026-11-08T23:52:50.914849+07:00",
+  "artifacts": {
+    "clients.json": 1130985,
+    "graph.npz": 3742974,
+    "job_titles.json": 12483703,
+    "meta.json": 10974,
+    "user_titles.json": 10837394
+  },
+  "verdict": "PASS",
+  "n_checks": 87,
+  "n_pass": 84,
+  "n_warn": 3,
+  "n_fail": 0,
+  "fails": [],
+  "warnings_need_declaration": [
+    {
+      "item": "6.12b users with non-vocab code have no user-occ edge (dangling metadata only)",
+      "expected": "0",
+      "actual": 1217,
+      "pass": false,
+      "warn_only": true,
+      "severity": "medium",
+      "detail": "1.217 user vừa mang mã ngoài vocab ở metadata vừa có cạnh user-occ; nguyên nhân: metadata lấy nghề của title sequence LỚN NHẤT (nghề đó không có job nào -> không thành nút), còn cạnh lấy TOÀN BỘ nghề trong history. Không phải trộn cấp; trùng đúng số conflict ở 6.17."
+    },
+    {
+      "item": "10.1b no test-only JOB (eval item with zero training interaction)",
+      "expected": "0",
+      "actual": 1969,
+      "pass": false,
+      "warn_only": true,
+      "severity": "low",
+      "detail": "chia theo user nen job chỉ có 1 tương tác (của user có test) sẽ rơi toàn bộ vào test; không phải rò rỉ nhưng phải khai báo khi tính R@20 vì job đó chưa từng xuất hiện trong train"
+    },
+    {
+      "item": "10.3 no indirect leakage via shared occupation (u->occ->j in train)",
+      "expected": "0",
+      "actual": "880 (2.32% test edges)",
+      "pass": false,
+      "warn_only": true,
+      "severity": "medium",
+      "detail": "RÒ RỈ GIÁN TIẾP CÓ THẬT: 880 cạnh test (2,32%) có u và j cùng nối tới một nút nghề qua các cạnh TRAIN, nên mô hình có thể chấm đúng cạnh này mà không học từ nhãn test. Không phải lỗi schema (occupation là đặc trưng công khai của job), nhưng R@20 bị phồng -> bắt buộc khai báo trong notebook và báo cả metric trên tập con không có đường vòng."
+    }
+  ],
+  "blocking_findings": [],
+  "overall_pass": true,
+  "deltas_vs_captain_baseline": {
+    "skills_per_occ_min": {
+      "baseline": 2,
+      "actual": 0,
+      "resolution": "khác do mẫu số: baseline tính trên 564 nghề CÓ skill; tôi tính trên 583 nghề (gồm 19 nghề 0 skill). Trên cùng mẫu số 564 thì KHỚP tuyệt đối."
+    },
+    "skills_per_occ_median": {
+      "baseline": 24,
+      "actual": 23.0,
+      "resolution": "khác do mẫu số: baseline tính trên 564 nghề CÓ skill; tôi tính trên 583 nghề (gồm 19 nghề 0 skill). Trên cùng mẫu số 564 thì KHỚP tuyệt đối."
+    },
+    "skills_per_occ_mean": {
+      "baseline": 45.9,
+      "actual": 44.37,
+      "resolution": "khác do mẫu số: baseline tính trên 564 nghề CÓ skill; tôi tính trên 583 nghề (gồm 19 nghề 0 skill). Trên cùng mẫu số 564 thì KHỚP tuyệt đối."
+    }
+  },
+  "array_shapes": {
+    "n_nodes": {
+      "shape": [],
+      "dtype": "int64",
+      "value": 264995
+    },
+    "n_users": {
+      "shape": [],
+      "dtype": "int64",
+      "value": 171807
+    },
+    "n_jobs": {
+      "shape": [],
+      "dtype": "int64",
+      "value": 84845
+    },
+    "n_skills": {
+      "shape": [],
+      "dtype": "int64",
+      "value": 7760
+    },
+    "n_occupations": {
+      "shape": [],
+      "dtype": "int64",
+      "value": 583
+    },
+    "offsets": {
+      "shape": [
+        4
+      ],
+      "dtype": "int64"
+    },
+    "edge_index": {
+      "shape": [
+        2,
+        764364
+      ],
+      "dtype": "int64"
+    },
+    "edge_type": {
+      "shape": [
+        764364
+      ],
+      "dtype": "int16"
+    },
+    "train_mask": {
+      "shape": [
+        764364
+      ],
+      "dtype": "bool"
+    },
+    "test_mask": {
+      "shape": [
+        764364
+      ],
+      "dtype": "bool"
+    },
+    "is_public": {
+      "shape": [
+        264995
+      ],
+      "dtype": "int8"
+    },
+    "user_ids": {
+      "shape": [
+        171807
+      ],
+      "dtype": "<U7"
+    },
+    "job_ids": {
+      "shape": [
+        84845
+      ],
+      "dtype": "<U7"
+    },
+    "client_of_job": {
+      "shape": [
+        84845
+      ],
+      "dtype": "int32"
+    },
+    "client_of_user": {
+      "shape": [
+        171807
+      ],
+      "dtype": "int32"
+    },
+    "occ_ids": {
+      "shape": [
+        583
+      ],
+      "dtype": "<U7"
+    },
+    "skill_names": {
+      "shape": [
+        7760
+      ],
+      "dtype": "<U111"
+    },
+    "edge_type_names": {
+      "shape": [
+        4
+      ],
+      "dtype": "<U9"
+    },
+    "node_order": {
+      "shape": [
+        4
+      ],
+      "dtype": "<U10"
+    },
+    "is_symmetric": {
+      "shape": [],
+      "dtype": "bool",
+      "value": true
+    },
+    "edge_convention": {
+      "shape": [],
+      "dtype": "<U115",
+      "value": "one_row_per_undirected_edge: edge_type.shape[0] == edge_index.shape[1] == train_mask.shape[0] == test_mask.shape[0]"
+    }
+  },
+  "metrics": {
+    "array_shapes": {
+      "n_nodes": {
+        "shape": [],
+        "dtype": "int64",
+        "value": 264995
+      },
+      "n_users": {
+        "shape": [],
+        "dtype": "int64",
+        "value": 171807
+      },
+      "n_jobs": {
+        "shape": [],
+        "dtype": "int64",
+        "value": 84845
+      },
+      "n_skills": {
+        "shape": [],
+        "dtype": "int64",
+        "value": 7760
+      },
+      "n_occupations": {
+        "shape": [],
+        "dtype": "int64",
+        "value": 583
+      },
+      "offsets": {
+        "shape": [
+          4
+        ],
+        "dtype": "int64"
+      },
+      "edge_index": {
+        "shape": [
+          2,
+          764364
+        ],
+        "dtype": "int64"
+      },
+      "edge_type": {
+        "shape": [
+          764364
+        ],
+        "dtype": "int16"
+      },
+      "train_mask": {
+        "shape": [
+          764364
+        ],
+        "dtype": "bool"
+      },
+      "test_mask": {
+        "shape": [
+          764364
+        ],
+        "dtype": "bool"
+      },
+      "is_public": {
+        "shape": [
+          264995
+        ],
+        "dtype": "int8"
+      },
+      "user_ids": {
+        "shape": [
+          171807
+        ],
+        "dtype": "<U7"
+      },
+      "job_ids": {
+        "shape": [
+          84845
+        ],
+        "dtype": "<U7"
+      },
+      "client_of_job": {
+        "shape": [
+          84845
+        ],
+        "dtype": "int32"
+      },
+      "client_of_user": {
+        "shape": [
+          171807
+        ],
+        "dtype": "int32"
+      },
+      "occ_ids": {
+        "shape": [
+          583
+        ],
+        "dtype": "<U7"
+      },
+      "skill_names": {
+        "shape": [
+          7760
+        ],
+        "dtype": "<U111"
+      },
+      "edge_type_names": {
+        "shape": [
+          4
+        ],
+        "dtype": "<U9"
+      },
+      "node_order": {
+        "shape": [
+          4
+        ],
+        "dtype": "<U10"
+      },
+      "is_symmetric": {
+        "shape": [],
+        "dtype": "bool",
+        "value": true
+      },
+      "edge_convention": {
+        "shape": [],
+        "dtype": "<U115",
+        "value": "one_row_per_undirected_edge: edge_type.shape[0] == edge_index.shape[1] == train_mask.shape[0] == test_mask.shape[0]"
+      }
+    },
+    "edge_type_counts": {
+      "user-job": 436893,
+      "job-occ": 26678,
+      "occ-skill": 25866,
+      "user-occ": 274927
+    },
+    "leakage": {
+      "test_user_job_edges": 37957,
+      "train_user_job_edges": 398936,
+      "test_pairs_in_train": 0,
+      "note": "edge_index chứa cạnh test là ĐÚNG thiết kế mask theo cạnh; rò rỉ thật = cùng cặp (u,j) vừa train vừa test.",
+      "test_users_seen_in_train": 20067,
+      "test_jobs_seen_in_train": 18131,
+      "transductive_note": "Chia theo CẠNH chứ không theo nút: 20067/20067 user test đều có cạnh train (transductive hợp lệ, nhãn cạnh test không nằm trong train). Phía job thì KHÔNG hoàn toàn: chỉ 18131/20100 job test xuất hiện trong train — phần còn lại là test-only job, xem 10.1b.",
+      "users_with_test_edges": 20067,
+      "users_with_train_edges": 171807,
+      "users_with_test_but_no_train": 0,
+      "jobs_with_test_edges": 20100,
+      "jobs_with_test_but_no_train_edge": 1969,
+      "pct_jobs_test_only": 2.32,
+      "user_nodes_with_zero_user_job_edge": 0,
+      "test_edges_indirect_via_occupation": 880,
+      "pct_test_edges_indirect_via_occupation": 2.32,
+      "indirect_examples": [
+        {
+          "user": 293,
+          "job": 176542,
+          "occ": 256706
+        },
+        {
+          "user": 377,
+          "job": 172036,
+          "occ": 257030
+        },
+        {
+          "user": 505,
+          "job": 173138,
+          "occ": 256706
+        },
+        {
+          "user": 1034,
+          "job": 185514,
+          "occ": 256676
+        },
+        {
+          "user": 1346,
+          "job": 173179,
+          "occ": 256707
+        }
+      ],
+      "indirect_note": "Canh test (u,j) ma u va j cung noi toi cung mot nut occupation qua cac canh TRAIN: duong di u-occ-j ton tai trong train nen mo hinh co the suy ra lien ket nay ma khong can nhan test. Day la ro ri GIAN TIEP co that, lam R@20 phong len; can khai bao trong notebook."
+    },
+    "clients": {
+      "n_clients": 9116,
+      "n_apps_total": 436893,
+      "n_users_total_meta": 171807,
+      "n_jobs_total_meta": 84845,
+      "size_min": 10,
+      "size_p25": 15,
+      "size_median": 23.0,
+      "size_p75": 47,
+      "size_max": 4745,
+      "size_mean": 47.93,
+      "n_clients_with_lt_10": 0,
+      "gini": 0.5532
+    },
+    "occupation_codes": {
+      "occ_node_len_hist": {
+        "7": 583
+      },
+      "occ_node_sample": [
+        "11-1011",
+        "11-1021",
+        "11-2011",
+        "11-2021",
+        "11-2022"
+      ],
+      "occ_node_unique": 583,
+      "user_titles_codes_not_in_occ_vocab": [
+        "11-1031",
+        "11-9071",
+        "13-2022",
+        "13-2082",
+        "15-2099",
+        "17-1012",
+        "17-2161",
+        "17-3019",
+        "19-1011",
+        "19-1012",
+        "19-2012",
+        "19-2099",
+        "19-3034",
+        "19-3091",
+        "19-3094",
+        "19-4044",
+        "19-4092",
+        "21-2011",
+        "23-1021",
+        "23-1023",
+        "25-1031",
+        "25-1032",
+        "25-1043",
+        "25-1065",
+        "25-1081",
+        "25-1122",
+        "25-1192",
+        "25-2012",
+        "25-2023",
+        "25-2055",
+        "25-2056",
+        "25-2057",
+        "25-2058",
+        "25-3011",
+        "25-3099",
+        "25-9021",
+        "25-9043",
+        "25-9049",
+        "25-9099",
+        "27-1019",
+        "27-1022",
+        "27-1023",
+        "27-1027",
+        "27-2011",
+        "27-2022",
+        "27-2023",
+        "27-2032",
+        "27-2041",
+        "27-2042",
+        "27-2091",
+        "27-3091",
+        "27-3099",
+        "27-4014",
+        "27-4099",
+        "29-1011",
+        "29-1022",
+        "29-1041",
+        "29-1081",
+        "29-1212",
+        "29-1218",
+        "29-1221",
+        "29-1222",
+        "29-1242",
+        "29-1243",
+        "29-2033",
+        "29-2056",
+        "29-2091",
+        "29-2092",
+        "31-1133",
+        "31-2012",
+        "31-9095",
+        "31-9096",
+        "33-1011",
+        "33-1012",
+        "33-1021",
+        "33-1099",
+        "33-2022",
+        "33-3012",
+        "33-3052",
+        "33-9031",
+        "33-9091",
+        "33-9092",
+        "33-9093",
+        "35-2014",
+        "35-2019",
+        "35-3041",
+        "35-9099",
+        "37-2021",
+        "39-2011",
+        "39-3011",
+        "39-3012",
+        "39-3019",
+        "39-3021",
+        "39-3092",
+        "39-4031",
+        "39-5011",
+        "39-5091",
+        "39-5092",
+        "39-5093",
+        "41-2012",
+        "41-9012",
+        "41-9091",
+        "43-5052",
+        "45-2091",
+        "45-2093",
+        "45-4011",
+        "47-2022",
+        "47-2042",
+        "47-2043",
+        "47-2051",
+        "47-2053",
+        "47-2081",
+        "47-2121",
+        "47-2132",
+        "47-2142",
+        "47-2221",
+        "47-3011",
+        "47-3012",
+        "47-3014",
+        "47-3016",
+        "47-3019",
+        "47-4041",
+        "47-4061",
+        "47-4071",
+        "47-4099",
+        "47-5011",
+        "47-5012",
+        "47-5013",
+        "47-5099",
+        "49-3022",
+        "49-3051",
+        "49-3091",
+        "49-9011",
+        "49-9061",
+        "49-9069",
+        "49-9081",
+        "49-9092",
+        "49-9094",
+        "49-9095",
+        "49-9097",
+        "51-2021",
+        "51-2051",
+        "51-3011",
+        "51-3022",
+        "51-3093",
+        "51-4051",
+        "51-4071",
+        "51-4122",
+        "51-4194",
+        "51-6021",
+        "51-6031",
+        "51-6052",
+        "51-6062",
+        "51-6063",
+        "51-6064",
+        "51-6099",
+        "51-7011",
+        "51-7031",
+        "51-7041",
+        "51-7042",
+        "51-8012",
+        "51-8092",
+        "51-9021",
+        "51-9031",
+        "51-9041",
+        "51-9071",
+        "51-9123",
+        "51-9161",
+        "51-9162",
+        "51-9191",
+        "51-9193",
+        "51-9195",
+        "51-9196",
+        "51-9197",
+        "53-1041",
+        "53-2011",
+        "53-2012",
+        "53-2021",
+        "53-2031",
+        "53-3054",
+        "53-4011",
+        "53-4022",
+        "53-5011",
+        "53-5021",
+        "53-5031",
+        "53-6011",
+        "53-7031",
+        "53-7081",
+        "53-7199",
+        "55-1012",
+        "55-1014",
+        "55-1016",
+        "55-1019",
+        "55-2011",
+        "55-2013",
+        "55-3011",
+        "55-3013",
+        "55-3014",
+        "55-3015",
+        "55-3016",
+        "55-3018",
+        "55-3019"
+      ],
+      "n_users_with_code_not_in_vocab": 1655,
+      "user_codes_not_in_vocab_are_valid_onet": 202,
+      "user_codes_not_in_vocab_with_tech_skill": 173,
+      "n_jobs_with_occ_edge": 26678,
+      "n_jobs_meta_with_occ": 26678,
+      "pct_jobs_with_occ_edge": 31.44,
+      "meta_n_jobs_with_occupation_edge": 26678,
+      "user_occ_edges_per_user_max": 10,
+      "n_users_with_user_occ_edge": 136264,
+      "n_users_multi_occ_edge": 82887,
+      "user_meta_occ_agrees_with_edge": 72497,
+      "user_meta_occ_conflicts_with_edge": 1217,
+      "user_meta_occ_but_no_edge": 438,
+      "user_edge_but_meta_empty": 62550,
+      "pct_user_meta_occ_agree": 98.35
+    },
+    "skills": {
+      "n_skill_nodes": 7760,
+      "n_occ_nodes": 583,
+      "n_occ_with_skill": 564,
+      "n_occ_without_skill": 19,
+      "n_occ_with_ALL_skills": 0,
+      "pct_occ_with_all_skills": 0.0,
+      "skills_per_occ_min": 0,
+      "skills_per_occ_p25": 11,
+      "skills_per_occ_median": 23.0,
+      "skills_per_occ_p75": 50,
+      "skills_per_occ_p90": 106,
+      "skills_per_occ_max": 594,
+      "skills_per_occ_mean": 44.37,
+      "n_occ_skill_edges": 25866,
+      "n_edges_expected_from_deg": 25866,
+      "skill_usage_min": 1,
+      "n_skills_used": 7760,
+      "skills_per_occ_median_with_skill": 24.0,
+      "skills_per_occ_mean_with_skill": 45.86,
+      "skills_per_occ_min_with_skill": 2
+    },
+    "sparsity": {
+      "meta_sparsity_pct": 0.002997,
+      "user_job_edges_over_users_x_jobs_pct": 0.002997,
+      "all_edges_over_n_nodes_sq_pct": 0.001088,
+      "definition_guess": "meta dùng #cạnh user-job / (n_users*n_jobs) * 100"
+    },
+    "jobs": {
+      "n_jobs": 84845,
+      "n_jobs_with_occ_edge": 26678,
+      "pct_jobs_with_occ_edge": 31.44,
+      "n_jobs_zero_user_job_edge": 0
+    },
+    "split": {
+      "train_edges": 726407,
+      "test_edges": 37957,
+      "test_ratio_of_all_edges": 0.0497,
+      "test_user_job_edges": 37957,
+      "test_ratio_of_all_user_job_edges": 0.0869,
+      "n_users_eligible_min_apps_5": 20067,
+      "user_job_edges_eligible": 194172,
+      "test_edges_on_eligible": 37957,
+      "test_ratio_on_eligible_edges": 0.1955,
+      "test_type_breakdown": {
+        "user-job": 37957,
+        "job-occ": 0,
+        "occ-skill": 0,
+        "user-occ": 0
+      }
+    },
+    "cross_silo": {
+      "client_of_user_definition": "client co nhieu application nhat cua user (nhan SUY RA, khong phai membership doc quyen)",
+      "n_user_job_edges": 436893,
+      "edges_where_primary_client_of_user == client_of_job": 188541,
+      "pct_primary_client_match_all": 43.15,
+      "pct_primary_client_match_train": 45.71,
+      "edges_outside_primary_client": 248352,
+      "client_of_user_argmax_mismatches": 0,
+      "n_users_multi_client_measured": 76584,
+      "pct_users_multi_client_measured": 44.58,
+      "clients_edges_exceeding_n_apps": 0
+    },
+    "deltas_vs_captain_baseline": {
+      "skills_per_occ_min": {
+        "baseline": 2,
+        "actual": 0,
+        "resolution": "khác do mẫu số: baseline tính trên 564 nghề CÓ skill; tôi tính trên 583 nghề (gồm 19 nghề 0 skill). Trên cùng mẫu số 564 thì KHỚP tuyệt đối."
+      },
+      "skills_per_occ_median": {
+        "baseline": 24,
+        "actual": 23.0,
+        "resolution": "khác do mẫu số: baseline tính trên 564 nghề CÓ skill; tôi tính trên 583 nghề (gồm 19 nghề 0 skill). Trên cùng mẫu số 564 thì KHỚP tuyệt đối."
+      },
+      "skills_per_occ_mean": {
+        "baseline": 45.9,
+        "actual": 44.37,
+        "resolution": "khác do mẫu số: baseline tính trên 564 nghề CÓ skill; tôi tính trên 583 nghề (gồm 19 nghề 0 skill). Trên cùng mẫu số 564 thì KHỚP tuyệt đối."
+      }
+    },
+    "baseline_table": [
+      {
+        "item": "edge_index_shape",
+        "baseline": "(2, 764364)",
+        "actual": "(2, 764364)",
+        "match": true
+      },
+      {
+        "item": "n_nodes",
+        "baseline": 264995,
+        "actual": 264995,
+        "match": true
+      },
+      {
+        "item": "n_users",
+        "baseline": 171807,
+        "actual": 171807,
+        "match": true
+      },
+      {
+        "item": "n_jobs",
+        "baseline": 84845,
+        "actual": 84845,
+        "match": true
+      },
+      {
+        "item": "n_occupations",
+        "baseline": 583,
+        "actual": 583,
+        "match": true
+      },
+      {
+        "item": "n_skills",
+        "baseline": 7760,
+        "actual": 7760,
+        "match": true
+      },
+      {
+        "item": "offsets",
+        "baseline": [
+          0,
+          171807,
+          256652,
+          257235
+        ],
+        "actual": [
+          0,
+          171807,
+          256652,
+          257235
+        ],
+        "match": true
+      },
+      {
+        "item": "index_min",
+        "baseline": 0,
+        "actual": 0,
+        "match": true
+      },
+      {
+        "item": "index_max",
+        "baseline": 264994,
+        "actual": 264994,
+        "match": true
+      },
+      {
+        "item": "edge_type_0_user_job",
+        "baseline": 436893,
+        "actual": 436893,
+        "match": true
+      },
+      {
+        "item": "edge_type_1_job_occ",
+        "baseline": 26678,
+        "actual": 26678,
+        "match": true
+      },
+      {
+        "item": "edge_type_2_occ_skill",
+        "baseline": 25866,
+        "actual": 25866,
+        "match": true
+      },
+      {
+        "item": "edge_type_3_user_occ",
+        "baseline": 274927,
+        "actual": 274927,
+        "match": true
+      },
+      {
+        "item": "train_user_job",
+        "baseline": 398936,
+        "actual": 398936,
+        "match": true
+      },
+      {
+        "item": "test_user_job",
+        "baseline": 37957,
+        "actual": 37957,
+        "match": true
+      },
+      {
+        "item": "n_clients",
+        "baseline": 9116,
+        "actual": 9116,
+        "match": true
+      },
+      {
+        "item": "client_min_apps",
+        "baseline": 10,
+        "actual": 10,
+        "match": true
+      },
+      {
+        "item": "client_median_apps",
+        "baseline": 23,
+        "actual": 23.0,
+        "match": true
+      },
+      {
+        "item": "client_max_apps",
+        "baseline": 4745,
+        "actual": 4745,
+        "match": true
+      },
+      {
+        "item": "clients_with_lt_10",
+        "baseline": 0,
+        "actual": 0,
+        "match": true
+      },
+      {
+        "item": "occ_with_skill",
+        "baseline": 564,
+        "actual": 564,
+        "match": true
+      },
+      {
+        "item": "skills_used",
+        "baseline": 7760,
+        "actual": 7760,
+        "match": true
+      },
+      {
+        "item": "skills_per_occ_min",
+        "baseline": 2,
+        "actual": 0,
+        "match": true
+      },
+      {
+        "item": "skills_per_occ_median",
+        "baseline": 24,
+        "actual": 23.0,
+        "match": true
+      },
+      {
+        "item": "skills_per_occ_mean",
+        "baseline": 45.9,
+        "actual": 44.37,
+        "match": true
+      },
+      {
+        "item": "skills_per_occ_max",
+        "baseline": 594,
+        "actual": 594,
+        "match": true
+      },
+      {
+        "item": "n_jobs_with_occ_edge",
+        "baseline": 26678,
+        "actual": 26678,
+        "match": true
+      },
+      {
+        "item": "n_jobs_without_occ_edge",
+        "baseline": 58167,
+        "actual": 58167,
+        "match": true
+      }
+    ],
+    "notes_on_numbers": {
+      "index_max": "captain ghi max 264994 = n_nodes-1, dung cho mien gia tri; gia tri LON NHAT thuc te xuat hien trong edge_index la 264994 -> khop.",
+      "skills_per_occ_median": "captain ghi median 24, đo lại = 23.0 (tính trên 583 nghề gồm cả 19 nghề 0 skill); nếu chỉ tính 564 nghề có skill thì median = xem skills_per_occ_median_with_skill",
+      "skills_per_occ_mean": "captain ghi mean 45.9, đo lại = 44.37",
+      "n_jobs_without_occ_edge": "captain ghi 58.167 (68,6%), đo lại = 58167 (68.56%)"
+    },
+    "determinism": {
+      "runs_present": true,
+      "files": {
+        "graph.npz": {
+          "artifacts_v3": "6c956541f0553969870cb71e63d17525",
+          "run_a": "6c956541f0553969870cb71e63d17525",
+          "run_b": "6c956541f0553969870cb71e63d17525",
+          "bit_identical": true,
+          "size_match": true
+        },
+        "clients.json": {
+          "artifacts_v3": "408916517a749e421c2c670eed73054b",
+          "run_a": "408916517a749e421c2c670eed73054b",
+          "run_b": "408916517a749e421c2c670eed73054b",
+          "bit_identical": true,
+          "size_match": true
+        },
+        "job_titles.json": {
+          "artifacts_v3": "9dd0aeb639d19fffbfe696ba6742c58a",
+          "run_a": "9dd0aeb639d19fffbfe696ba6742c58a",
+          "run_b": "9dd0aeb639d19fffbfe696ba6742c58a",
+          "bit_identical": true,
+          "size_match": true
+        },
+        "user_titles.json": {
+          "artifacts_v3": "1bd0d5c9fdaadde5cc6574b919d17e8e",
+          "run_a": "1bd0d5c9fdaadde5cc6574b919d17e8e",
+          "run_b": "1bd0d5c9fdaadde5cc6574b919d17e8e",
+          "bit_identical": true,
+          "size_match": true
+        },
+        "meta.json": {
+          "artifacts_v3": "6416cbe033d5e48016eaa0d8717f6a52",
+          "run_a": "b5f1fc444dea5a6f03f780c1e8bbe6d2",
+          "run_b": "38d02d39669d7d4f9ec23e5f9224373a",
+          "bit_identical": false,
+          "size_match": false
+        }
+      },
+      "meta_json_diff_fields": {
+        "/generated_at": {
+          "run_a": "2026-11-08T23:50:11+07:00",
+          "run_b": "2026-11-08T23:50:15+07:00",
+          "artifacts_v3": "2026-11-08T23:32:56+07:00"
+        },
+        "/memory_peak_gb": {
+          "run_a": 0.34,
+          "run_b": 0.34,
+          "artifacts_v3": 0.33
+        },
+        "/memory_peak_mb": {
+          "run_a": 348.6,
+          "run_b": 347.1,
+          "artifacts_v3": 341.3
+        },
+        "/paths/artifacts": {
+          "run_a": "_newdata_audit\\v3_verify\\run_a",
+          "run_b": "_newdata_audit\\v3_verify\\run_b",
+          "artifacts_v3": "E:\\2026\\DUT\\DSS\\SauGK\\CuoiKi\\artifacts\\v3"
+        },
+        "/runtime_seconds": {
+          "run_a": 933.4,
+          "run_b": 934.3,
+          "artifacts_v3": 821.6
+        }
+      },
+      "meta_json_only_volatile_fields": true,
+      "run_a_runtime_seconds": 933.4,
+      "run_b_runtime_seconds": 934.3,
+      "run_a_memory_peak_mb": 348.6,
+      "run_b_memory_peak_mb": 347.1
+    }
+  },
+  "checks": [
+    {
+      "item": "1.1 graph.npz edge_index shape == (2, meta n_edges)",
+      "expected": "(2, 764364)",
+      "actual": "[2, 764364]",
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "1.2 meta.nodes.n_nodes == graph.npz",
+      "expected": 264995,
+      "actual": 264995,
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "1.2 meta.nodes.n_users == graph.npz",
+      "expected": 171807,
+      "actual": 171807,
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "1.2 meta.nodes.n_jobs == graph.npz",
+      "expected": 84845,
+      "actual": 84845,
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "1.2 meta.nodes.n_occupations == graph.npz",
+      "expected": 583,
+      "actual": 583,
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "1.2 meta.nodes.n_skills == graph.npz",
+      "expected": 7760,
+      "actual": 7760,
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "1.3 n_nodes == n_users+n_jobs+n_occ+n_skills",
+      "expected": 264995,
+      "actual": 264995,
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "1.4 offsets == [0,n_users,n_users+n_jobs,n_users+n_jobs+n_occ]",
+      "expected": "[0, 171807, 256652, 257235]",
+      "actual": "[0, 171807, 256652, 257235]",
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "1.5 all mask/type arrays have length E",
+      "expected": "764364",
+      "actual": "764364/764364/764364",
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "1.6 user_ids/job_ids/occ_ids/skill_names lengths match node counts",
+      "expected": "171807/84845/583/7760",
+      "actual": "171807/84845/583/7760",
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "1.7 is_symmetric flag True",
+      "expected": "True",
+      "actual": true,
+      "pass": true,
+      "warn_only": false,
+      "severity": "low",
+      "detail": ""
+    },
+    {
+      "item": "2.1 src within [0,n_nodes)",
+      "expected": "0..264994",
+      "actual": "0..257233",
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "2.2 dst within [0,n_nodes)",
+      "expected": "0..264994",
+      "actual": "171807..264994",
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "2.3 no self-loops (src==dst)",
+      "expected": "0",
+      "actual": 0,
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "2.4 no duplicated undirected edge (unique (min,max) pairs)",
+      "expected": "0 dups, 764364 unique",
+      "actual": "0 dups, 764364 unique",
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "2.5 no duplicated directed row (src,dst)",
+      "expected": "0",
+      "actual": 0,
+      "pass": true,
+      "warn_only": false,
+      "severity": "low",
+      "detail": ""
+    },
+    {
+      "item": "3.1 train_mask & test_mask intersection == 0",
+      "expected": "0",
+      "actual": 0,
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": ""
+    },
+    {
+      "item": "3.2 train_mask non-empty",
+      "expected": ">0",
+      "actual": 726407,
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": ""
+    },
+    {
+      "item": "3.3 union of masks covers every edge",
+      "expected": 764364,
+      "actual": 764364,
+      "pass": true,
+      "warn_only": false,
+      "severity": "medium",
+      "detail": ""
+    },
+    {
+      "item": "3.4a meta split test count == test_mask.sum()",
+      "expected": 37957,
+      "actual": 37957,
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "3.4b meta split train == user-job edges in train_mask",
+      "expected": 398936,
+      "actual": 398936,
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "3.4c every non-user-job edge is in train_mask (never test)",
+      "expected": 327471,
+      "actual": 327471,
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": ""
+    },
+    {
+      "item": "3.5 test_mask only on user-job edges (edge_type==0)",
+      "expected": "all 37957 are type 0",
+      "actual": "0 off-type",
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": ""
+    },
+    {
+      "item": "3.6 edge_type 0 (user-job) count == meta[0_user_job]",
+      "expected": 436893,
+      "actual": 436893,
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "3.6 edge_type 1 (job-occ) count == meta[1_job_occupation]",
+      "expected": 26678,
+      "actual": 26678,
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "3.6 edge_type 2 (occ-skill) count == meta[2_occupation_skill]",
+      "expected": 25866,
+      "actual": 25866,
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "3.6 edge_type 3 (user-occ) count == meta[3_user_occupation]",
+      "expected": 274927,
+      "actual": 274927,
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "4.1 no test user-job pair also present as train user-job edge",
+      "expected": "0",
+      "actual": 0,
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": "test_mask marks rows of edge_index by design (edge-level split); overlap of the SAME pair between train and test would be real leakage"
+    },
+    {
+      "item": "4.2 each test user's test edges are excluded from train (label leakage)",
+      "expected": "0 overlapping pairs",
+      "actual": 0,
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": ""
+    },
+    {
+      "item": "5.1 client_id contiguous 0..N-1",
+      "expected": "0..9115",
+      "actual": "min=0 max=9115 n=9116",
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "5.2 no client with <10 apps",
+      "expected": ">=10",
+      "actual": "min=10",
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": ""
+    },
+    {
+      "item": "5.3 sum(client.n_apps) == meta.n_apps_covered == #user-job edges",
+      "expected": "436893 / 436893",
+      "actual": "436893 / 436893",
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "5.4 all clients have n_users>0 and n_jobs>0",
+      "expected": "min > 0",
+      "actual": "min_users=5 min_jobs=1",
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": ""
+    },
+    {
+      "item": "5.5 unique employer names",
+      "expected": 9116,
+      "actual": 9116,
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "5.6 n_clients == meta.clients.n_clients",
+      "expected": 9116,
+      "actual": 9116,
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "5.7 client_id in graph arrays within [0, n_clients)",
+      "expected": "0..9115",
+      "actual": "job:0..9115 user:0..9115",
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "5.8 per-client n_apps recomputed from graph match clients.json",
+      "expected": "0 mismatches",
+      "actual": "0 mismatches",
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": "[]"
+    },
+    {
+      "item": "5.9 per-client n_jobs recomputed from graph match clients.json",
+      "expected": "0 mismatches",
+      "actual": "0 mismatches",
+      "pass": true,
+      "warn_only": false,
+      "severity": "medium",
+      "detail": "[]"
+    },
+    {
+      "item": "6.1 occupation node codes all SAME length 7 (soc[:7] -> '11-1011')",
+      "expected": "100% len 7",
+      "actual": "{'7': 583}",
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": "meta ghi 'soc[:7] (6 ky tu goc)' la cau chu SAI: soc[:7] cho 7 ky tu ('11-1011'). Do dai thuc te phai la 7 va phai DONG NHAT; '6 ky tu' trong meta/contract la nham lan."
+    },
+    {
+      "item": "6.2 occupation node codes unique",
+      "expected": 583,
+      "actual": 583,
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "6.3 job-occ edges: src in job range",
+      "expected": "[171807,256652)",
+      "actual": "171808..256651",
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "6.4 job-occ edges: dst in occupation range",
+      "expected": "[256652,257235)",
+      "actual": "256652..257234",
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "6.5 user-occ edges: src in user range",
+      "expected": "[0,171807)",
+      "actual": "0..171806",
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "6.6 user-occ edges: dst in occupation range",
+      "expected": "[256652,257235)",
+      "actual": "256652..257234",
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "6.7 occ-skill edges: src in occupation range",
+      "expected": "[256652,257235)",
+      "actual": "256652..257233",
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "6.8 occ-skill edges: dst in skill range",
+      "expected": "[257235,264995)",
+      "actual": "257235..264994",
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "6.9 job_titles occupation codes are 7 chars",
+      "expected": "100% len 7",
+      "actual": "{'7': 583}",
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": ""
+    },
+    {
+      "item": "6.10 user_titles occupation codes are 7 chars",
+      "expected": "100% len 7",
+      "actual": "{'7': 766}",
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": ""
+    },
+    {
+      "item": "6.11 job_titles occupation codes ⊆ occ node vocab",
+      "expected": "0 unknown",
+      "actual": 0,
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": "[]"
+    },
+    {
+      "item": "6.12 user_titles codes not in graph vocab are still valid O*NET codes (no mixed level)",
+      "expected": "0 invalid O*NET codes",
+      "actual": "202 codes, all valid O*NET=True",
+      "pass": true,
+      "warn_only": false,
+      "severity": "medium",
+      "detail": "1655 users mang ma khong phai nut do thi (nghề không có job nào map tới); mọi mã vẫn dài 7 ký tự và có thật trong O*NET -> KHÔNG trộn cấp, nhưng là dangling reference: join user_titles.occupation -> occ node sẽ miss 202 mã"
+    },
+    {
+      "item": "6.12b users with non-vocab code have no user-occ edge (dangling metadata only)",
+      "expected": "0",
+      "actual": 1217,
+      "pass": false,
+      "warn_only": true,
+      "severity": "medium",
+      "detail": "1.217 user vừa mang mã ngoài vocab ở metadata vừa có cạnh user-occ; nguyên nhân: metadata lấy nghề của title sequence LỚN NHẤT (nghề đó không có job nào -> không thành nút), còn cạnh lấy TOÀN BỘ nghề trong history. Không phải trộn cấp; trùng đúng số conflict ở 6.17."
+    },
+    {
+      "item": "6.13 jobs with job-occ edge == jobs whose metadata has occupation",
+      "expected": "26678 jobs",
+      "actual": "26678 edge-jobs",
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": "only_in_edges=0 only_in_meta=0"
+    },
+    {
+      "item": "6.14 each job has at most one occupation edge",
+      "expected": "1",
+      "actual": 1,
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": ""
+    },
+    {
+      "item": "6.15 user-occ edges per user bounded (<=20, đa nghề là hợp lệ)",
+      "expected": "<=20",
+      "actual": 10,
+      "pass": true,
+      "warn_only": false,
+      "severity": "low",
+      "detail": ""
+    },
+    {
+      "item": "6.16 no (user,occ) pair duplicated",
+      "expected": "0 dups",
+      "actual": 0,
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": ""
+    },
+    {
+      "item": "6.17 user metadata occupation ∈ edge occupation targets (when both present)",
+      "expected": ">=95% agree (khai báo lệch)",
+      "actual": "98.35% agree, 1217 conflicts",
+      "pass": true,
+      "warn_only": false,
+      "severity": "low",
+      "detail": "metadata lấy 'nghề của title có sequence lớn nhất'; edge lấy TOÀN BỘ nghề trong history -> lệch 1.217 user đa nghề là KỲ VỌNG, đã đo vào JSON; không ảnh hưởng mask/split"
+    },
+    {
+      "item": "7.1 skill layer not degenerate: not 100% of occupations have all skills",
+      "expected": "<100%",
+      "actual": "0.0%",
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": ""
+    },
+    {
+      "item": "7.2 occ-skill edge count == sum of per-occ degrees",
+      "expected": 25866,
+      "actual": 25866,
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "7.3 occ-skill edges have distinct (occ,skill) pairs",
+      "expected": "0 dups",
+      "actual": 0,
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "7.4 every skill node used at least once",
+      "expected": 7760,
+      "actual": 7760,
+      "pass": true,
+      "warn_only": false,
+      "severity": "low",
+      "detail": ""
+    },
+    {
+      "item": "7.5 median skills/occupation in healthy range (5..500)",
+      "expected": "5 <= median <= 500",
+      "actual": 23.0,
+      "pass": true,
+      "warn_only": false,
+      "severity": "low",
+      "detail": ""
+    },
+    {
+      "item": "8.1 is_public length == n_nodes",
+      "expected": 264995,
+      "actual": 264995,
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    },
+    {
+      "item": "8.2 n_public_nodes == meta (jobs+occ+skill)",
+      "expected": 8343,
+      "actual": 8343,
+      "pass": true,
+      "warn_only": false,
+      "severity": "low",
+      "detail": ""
+    },
+    {
+      "item": "8.3 is_public=1 exactly for occ+skill nodes (metadata-bearing nodes)",
+      "expected": 1,
+      "actual": 1,
+      "pass": true,
+      "warn_only": false,
+      "severity": "low",
+      "detail": "is_public CHI bat cho occ+skill (=8.343). Job khong bat du co employer metadata; ten 'is_public' de hieu nham, nen doc la 'is_catalog_node'."
+    },
+    {
+      "item": "8.4 user_ids unique (nodes are distinct users)",
+      "expected": 171807,
+      "actual": 171807,
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": ""
+    },
+    {
+      "item": "8.5 job_ids unique",
+      "expected": 84845,
+      "actual": 84845,
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": ""
+    },
+    {
+      "item": "8.6 skill_names unique",
+      "expected": 7760,
+      "actual": 7760,
+      "pass": true,
+      "warn_only": false,
+      "severity": "medium",
+      "detail": ""
+    },
+    {
+      "item": "8.7 sparsity matches meta with user-job/(users*jobs) formula",
+      "expected": "0.002997%",
+      "actual": 0.002997,
+      "pass": true,
+      "warn_only": false,
+      "severity": "low",
+      "detail": ""
+    },
+    {
+      "item": "8.8 every job node has >=1 user-job edge",
+      "expected": "0 orphan jobs",
+      "actual": 0,
+      "pass": true,
+      "warn_only": false,
+      "severity": "medium",
+      "detail": ""
+    },
+    {
+      "item": "9.1 test ratio on eligible user-job edges ~= 0.2 (0.15..0.25)",
+      "expected": "0.15..0.25",
+      "actual": 0.1955,
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": "trên TOÀN BỘ cạnh user-job chỉ 0.0869 do user <5 app bị loại khỏi split (min_apps_for_test=5) chứ không phải chia sai"
+    },
+    {
+      "item": "9.2 test edges only belong to users with >=5 apps (min_apps_for_test)",
+      "expected": "0 violations",
+      "actual": 0,
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": ""
+    },
+    {
+      "item": "10.1 no test-only USER (cold-start user)",
+      "expected": "0",
+      "actual": 0,
+      "pass": true,
+      "warn_only": false,
+      "severity": "medium",
+      "detail": "user co canh test nhung 0 canh train -> cold start, phai khai bao neu >0"
+    },
+    {
+      "item": "10.1b no test-only JOB (eval item with zero training interaction)",
+      "expected": "0",
+      "actual": 1969,
+      "pass": false,
+      "warn_only": true,
+      "severity": "low",
+      "detail": "chia theo user nen job chỉ có 1 tương tác (của user có test) sẽ rơi toàn bộ vào test; không phải rò rỉ nhưng phải khai báo khi tính R@20 vì job đó chưa từng xuất hiện trong train"
+    },
+    {
+      "item": "10.2 every user node has >=1 user-job edge",
+      "expected": "0",
+      "actual": 0,
+      "pass": true,
+      "warn_only": false,
+      "severity": "low",
+      "detail": ""
+    },
+    {
+      "item": "10.3 no indirect leakage via shared occupation (u->occ->j in train)",
+      "expected": "0",
+      "actual": "880 (2.32% test edges)",
+      "pass": false,
+      "warn_only": true,
+      "severity": "medium",
+      "detail": "RÒ RỈ GIÁN TIẾP CÓ THẬT: 880 cạnh test (2,32%) có u và j cùng nối tới một nút nghề qua các cạnh TRAIN, nên mô hình có thể chấm đúng cạnh này mà không học từ nhãn test. Không phải lỗi schema (occupation là đặc trưng công khai của job), nhưng R@20 bị phồng -> bắt buộc khai báo trong notebook và báo cả metric trên tập con không có đường vòng."
+    },
+    {
+      "item": "10.4 no duplicated (src,dst,type) triple",
+      "expected": "0 dups",
+      "actual": "0 dups",
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": ""
+    },
+    {
+      "item": "10.5 client_of_job well defined (0 <= id < n_clients) for every job",
+      "expected": "0 anomalies",
+      "actual": 0,
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": ""
+    },
+    {
+      "item": "10.5b per-client app totals from edges never exceed clients.json n_apps",
+      "expected": "0 over",
+      "actual": 0,
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": ""
+    },
+    {
+      "item": "10.5c client_of_user == argmax apps per user (ties -> smaller client_id)",
+      "expected": "0 mismatches",
+      "actual": 0,
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": ""
+    },
+    {
+      "item": "10.6 pct edges where user's PRIMARY client == job's client (informational)",
+      "expected": "khong phai tieu chi PASS",
+      "actual": "43.15% match / 56.85% mismatch",
+      "pass": true,
+      "warn_only": false,
+      "severity": "low",
+      "detail": "mismatch la BINH THUONG: client_of_user chi la nhan 'client nhieu app nhat', khong phai membership doc quyen. Kiem tra silo that nam o 10.5/10.5b/10.5c."
+    },
+    {
+      "item": "10.7 measured multi-client user share matches meta (44.58%)",
+      "expected": 44.58,
+      "actual": 44.58,
+      "pass": true,
+      "warn_only": false,
+      "severity": "low",
+      "detail": ""
+    },
+    {
+      "item": "10.8 multi-client users are NOT cross-silo leakage (declared semantics)",
+      "expected": "khai bao dung",
+      "actual": "76584 users (44.58%) aps ở >=2 employer",
+      "pass": true,
+      "warn_only": false,
+      "severity": "low",
+      "detail": "moi canh user-job van nam trong silo cua client so huu job; user xuat hien o nhieu silo vi ung tuyen o nhieu employer — dung ban chat FL theo employer, khong phai chia se du lieu"
+    },
+    {
+      "item": "11.1 every captain baseline number reproduced (deltas only from denominator choice)",
+      "expected": "0 unresolved deltas",
+      "actual": "3 deltas, 0 unresolved",
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": "{\"skills_per_occ_min\": {\"baseline\": 2, \"over_all_583\": 0, \"over_564_with_skill\": 2}, \"skills_per_occ_median\": {\"baseline\": 24, \"over_all_583\": 23.0, \"over_564_with_skill\": 24.0}, \"skills_per_occ_mean\": {\"baseline\": 45.9, \"over_all_583\": 44.37, \"over_564_with_skill\": 45.86}}"
+    },
+    {
+      "item": "12.1 graph.npz byte-identical across 3 independent runs",
+      "expected": "same md5",
+      "actual": "6c956541f0553969870cb71e63d17525",
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": ""
+    },
+    {
+      "item": "12.2 clients.json + titles files byte-identical",
+      "expected": "same md5",
+      "actual": "{'graph.npz': True, 'clients.json': True, 'job_titles.json': True, 'user_titles.json': True, 'meta.json': False}",
+      "pass": true,
+      "warn_only": false,
+      "severity": "blocker",
+      "detail": ""
+    },
+    {
+      "item": "12.3 meta.json differs only in timestamp/runtime/memory/path fields",
+      "expected": "volatile only",
+      "actual": "['/generated_at', '/memory_peak_gb', '/memory_peak_mb', '/paths/artifacts', '/runtime_seconds']",
+      "pass": true,
+      "warn_only": false,
+      "severity": "medium",
+      "detail": ""
+    },
+    {
+      "item": "12.4 rerun runtime and peak RAM stay within the 3.9 GB budget",
+      "expected": "<3900 MB",
+      "actual": "A=348.6 MB B=347.1 MB",
+      "pass": true,
+      "warn_only": false,
+      "severity": "high",
+      "detail": ""
+    }
+  ]
+}

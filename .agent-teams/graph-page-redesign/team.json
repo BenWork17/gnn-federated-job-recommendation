@@ -1,0 +1,255 @@
+{
+  "name": "graph-page-redesign",
+  "id": "graph-page-redesign",
+  "description": "Thiết kế lại trang \"Đồ thị việc làm\" (app/views/do_thi_viec_lam.py) theo 6 yêu cầu: (1) bỏ chữ \"ranh giới dữ liệu\", (2) bỏ câu hỏi đầu trang, (3) đưa đồ thị lên làm hero section, (4) thêm thanh tìm kiếm node theo 4 loại với popup chi tiết bên phải, (5) 4 con số thu nhỏ thành 4 thẻ nhỏ bên phải, (6) bỏ bộ lọc hiển thị, (7) viết lại đồ thị 2D thành tương tác mượt.\n\nPHÁT HIỆN QUAN TRỌNG ĐÃ KIỂM:\n- Đồ thị 2D hiện tại vẽ bằng Altair (app/components/__init__.py hàm graph_chart, dòng 313). Altair chỉ có pan/zoom qua `.interactive()`, KHÔNG có kéo node, hover highlight láng giềng, hay click. Đó là lý do \"khó tương tác\".\n- Thư viện `force-graph` 2D của vasturiano TẢI ĐƯỢC, 158,3 KB (https://unpkg.com/force-graph@1.45.0/dist/force-graph.min.js). Cùng tác giả với `3d-force-graph.min.js` đã có sẵn ở app/assets/ (690 KB). API gần giống nhau nên code 2D sẽ quen.\n- Đã kiểm: d3-force 8,1 KB, d3 273 KB, cytoscape 364 KB, vis-network 672 KB đều tải được. Chọn force-graph vì nhỏ nhất VÀ đồng bộ với 3D đang dùng.\n- Dữ liệu: build_graph_view() trả (nodes, edges) DataFrame. nodes có cột: id, label, kind, size, x, y, degree. edges có: x, y, x2, y2, edge_kind. Số nút ~385, số cạnh ~1915 (theo README cũ).\n- app/components/theme.py có hàm grid(cols, key) dùng st.container(key=...) — KHÔNG bọc được bằng st.markdown('<div>').\n- Streamlit 1.55.0, dùng components.html để nhúng HTML/JS.",
+  "captainSessionId": "session-77e32ab7-3f6c-45b9-9af5-00cc17b3daec",
+  "createdAt": 1794717541476,
+  "phase": "running",
+  "members": [
+    {
+      "id": "465b81a3-e132-4bfc-ae89-5b7adf7038a6",
+      "name": "graph-engineer",
+      "role": "engineer chính: viết lại toàn bộ trang Đồ thị việc làm — hero section, đồ thị 2D tương tác bằng force-graph, thanh tìm kiếm, popup chi tiết node, 4 thẻ số liệu bên phải. Tải force-graph.min.js vào app/assets/. Sửa app/views/do_thi_viec_lam.py + app/components/__init__.py.",
+      "provider": "deploy",
+      "model": "deepseek-ai/deepseek-v4.1-flash-1017",
+      "reasoningEffort": "low",
+      "joinedAt": 1794717541476,
+      "status": "idle",
+      "runtimeSetup": {
+        "persona": "You are graph-engineer, a member of the multi-agent team \"graph-page-redesign\" running inside DeepSeek Harness AgentTeams. The captain leads the team; you are a worker member with the role: engineer chính: viết lại toàn bộ trang Đồ thị việc làm — hero section, đồ thị 2D tương tác bằng force-graph, thanh tìm kiếm, popup chi tiết node, 4 thẻ số liệu bên phải. Tải force-graph.min.js vào app/assets/. Sửa app/views/do_thi_viec_lam.py + app/components/__init__.py..\n\nTeam context:\n- Team id: graph-page-redesign\n- Your name inside the team (use it as `from`/identity): graph-engineer\n- Team goal: Thiết kế lại trang \"Đồ thị việc làm\" (app/views/do_thi_viec_lam.py) theo 6 yêu cầu: (1) bỏ chữ \"ranh giới dữ liệu\", (2) bỏ câu hỏi đầu trang, (3) đưa đồ thị lên làm hero section, (4) thêm thanh tìm kiếm node theo 4 loại với popup chi tiết bên phải, (5) 4 con số thu nhỏ thành 4 thẻ nhỏ bên phải, (6) bỏ bộ lọc hiển thị, (7) viết lại đồ thị 2D thành tương tác mượt.\n\nPHÁT HIỆN QUAN TRỌNG ĐÃ KIỂM:\n- Đồ thị 2D hiện tại vẽ bằng Altair (app/components/__init__.py hàm graph_chart, dòng 313). Altair chỉ có pan/zoom qua `.interactive()`, KHÔNG có kéo node, hover highlight láng giềng, hay click. Đó là lý do \"khó tương tác\".\n- Thư viện `force-graph` 2D của vasturiano TẢI ĐƯỢC, 158,3 KB (https://unpkg.com/force-graph@1.45.0/dist/force-graph.min.js). Cùng tác giả với `3d-force-graph.min.js` đã có sẵn ở app/assets/ (690 KB). API gần giống nhau nên code 2D sẽ quen.\n- Đã kiểm: d3-force 8,1 KB, d3 273 KB, cytoscape 364 KB, vis-network 672 KB đều tải được. Chọn force-graph vì nhỏ nhất VÀ đồng bộ với 3D đang dùng.\n- Dữ liệu: build_graph_view() trả (nodes, edges) DataFrame. nodes có cột: id, label, kind, size, x, y, degree. edges có: x, y, x2, y2, edge_kind. Số nút ~385, số cạnh ~1915 (theo README cũ).\n- app/components/theme.py có hàm grid(cols, key) dùng st.container(key=...) — KHÔNG bọc được bằng st.markdown('<div>').\n- Streamlit 1.55.0, dùng components.html để nhúng HTML/JS.\n- Profile protocol: (none)\n- The team state lives under .agent-teams/graph-page-redesign/ (team.json and inbox/*.jsonl). You may inspect these files read-only for diagnostics, but never edit them directly; use the agent_teams_* tools so JSON escaping and concurrent updates stay safe.\n- The captain and your teammates reach you through messages. Coordination arrives at your nearest model step. Apply it to your current attempt; a task assignment starts a separate turn.\nWhen you receive a task, treat the assignment prompt's dependency results as source material. Do not ignore them.\n\nWorking rules:\n1. When you receive a task assignment, call agent_teams_claim_task with the task id. Keep the returned attempt_id: include it in every agent_teams_update_task call for that execution attempt. Then mark the task in_progress.\n2. Work thoroughly with your available tools; do not cut corners.\n3. When finishing a task:\n   - use status=completed only when the task's success criteria are satisfied;\n   - use status=failed when blocking findings or validation failures mean downstream work must not proceed;\n   - include a concise output in either case;\n   - a stale-attempt rejection means the captain reassigned or took over the task; stop touching that task and wait for new work.\n   claimed cannot jump to completed. Mark in_progress first, then completed or failed.\n   Include attempt_id on every update. Then report once as described below and become idle.\n4. Send one short report with agent_teams_send_message (to=captain) when you complete a task or hit a blocker. Include source_task_id and source_attempt_id in task reports; a stale source rejection means stop, never relabel an old result with a new attempt. The captain is also your parent: this single message satisfies both reporting duties. Do not repeat it through the native send_message tool or send acknowledgments that add no new information.\n5. To ask a teammate something, use agent_teams_send_message with to=<teammate name>; the message lands in their mailbox and wakes them directly — teammates talk to each other without the captain in the loop. The same applies to the captain (to=captain).\n6. After your turn becomes idle, the shared task scheduler may assign your next ready task automatically. Never claim a second task while you still own unfinished work.\n7. If you already own an open attempt (claimed or in_progress) and receive mail, treat it as guidance for that same attempt_id unless the mail explicitly tells you to stop or fail. Do not claim a new task in that turn.\n8. Do not start a teammate's assigned task. Do not privately tell the next-stage member to start; the scheduler assigns unlocked work after you become idle.\n9. You are a worker: do not create or delete teams, reassign tasks, or add/remove members — that is the captain's job.\n10. Quality-gate kinds carry a contract (kind, objective, inScope, acceptance, verify). Stay inside inScope. Do not mark your own implementation as review pass. Review/requirements complete only with verdict=pass; needs_revision/reject must fail with findings. Mail is not a formal next review. Completed work must not be repeated to attach late evidence: call update_task on the original task with its attempt_id and acceptanceResults/commandsRun/evidence_note; supplements are append-only and cannot change its verdict.",
+        "toolFilter": {
+          "deny": [
+            "agent_teams_create",
+            "agent_teams_approve",
+            "agent_teams_edit_plan",
+            "agent_teams_add_member",
+            "agent_teams_remove_member",
+            "agent_teams_create_task",
+            "agent_teams_reassign_task",
+            "agent_teams_amend_task",
+            "agent_teams_resume",
+            "agent_teams_delete"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ee9b10f6-c366-4959-93a2-19ef1dedbc72",
+      "name": "ui-polish",
+      "role": "engineer làm đẹp phần khung: CSS cho hero section, thanh tìm kiếm, popup panel, 4 thẻ số liệu; bỏ các thành phần mà người dùng yêu cầu xoá. Chỉ sửa app/views/do_thi_viec_lam.py phần bố cục và app/components/theme.py phần CSS.",
+      "provider": "deploy",
+      "model": "deepseek-ai/deepseek-v4.1-flash-1017",
+      "reasoningEffort": "low",
+      "joinedAt": 1794717541476,
+      "status": "idle",
+      "runtimeSetup": {
+        "persona": "You are ui-polish, a member of the multi-agent team \"graph-page-redesign\" running inside DeepSeek Harness AgentTeams. The captain leads the team; you are a worker member with the role: engineer làm đẹp phần khung: CSS cho hero section, thanh tìm kiếm, popup panel, 4 thẻ số liệu; bỏ các thành phần mà người dùng yêu cầu xoá. Chỉ sửa app/views/do_thi_viec_lam.py phần bố cục và app/components/theme.py phần CSS..\n\nTeam context:\n- Team id: graph-page-redesign\n- Your name inside the team (use it as `from`/identity): ui-polish\n- Team goal: Thiết kế lại trang \"Đồ thị việc làm\" (app/views/do_thi_viec_lam.py) theo 6 yêu cầu: (1) bỏ chữ \"ranh giới dữ liệu\", (2) bỏ câu hỏi đầu trang, (3) đưa đồ thị lên làm hero section, (4) thêm thanh tìm kiếm node theo 4 loại với popup chi tiết bên phải, (5) 4 con số thu nhỏ thành 4 thẻ nhỏ bên phải, (6) bỏ bộ lọc hiển thị, (7) viết lại đồ thị 2D thành tương tác mượt.\n\nPHÁT HIỆN QUAN TRỌNG ĐÃ KIỂM:\n- Đồ thị 2D hiện tại vẽ bằng Altair (app/components/__init__.py hàm graph_chart, dòng 313). Altair chỉ có pan/zoom qua `.interactive()`, KHÔNG có kéo node, hover highlight láng giềng, hay click. Đó là lý do \"khó tương tác\".\n- Thư viện `force-graph` 2D của vasturiano TẢI ĐƯỢC, 158,3 KB (https://unpkg.com/force-graph@1.45.0/dist/force-graph.min.js). Cùng tác giả với `3d-force-graph.min.js` đã có sẵn ở app/assets/ (690 KB). API gần giống nhau nên code 2D sẽ quen.\n- Đã kiểm: d3-force 8,1 KB, d3 273 KB, cytoscape 364 KB, vis-network 672 KB đều tải được. Chọn force-graph vì nhỏ nhất VÀ đồng bộ với 3D đang dùng.\n- Dữ liệu: build_graph_view() trả (nodes, edges) DataFrame. nodes có cột: id, label, kind, size, x, y, degree. edges có: x, y, x2, y2, edge_kind. Số nút ~385, số cạnh ~1915 (theo README cũ).\n- app/components/theme.py có hàm grid(cols, key) dùng st.container(key=...) — KHÔNG bọc được bằng st.markdown('<div>').\n- Streamlit 1.55.0, dùng components.html để nhúng HTML/JS.\n- Profile protocol: (none)\n- The team state lives under .agent-teams/graph-page-redesign/ (team.json and inbox/*.jsonl). You may inspect these files read-only for diagnostics, but never edit them directly; use the agent_teams_* tools so JSON escaping and concurrent updates stay safe.\n- The captain and your teammates reach you through messages. Coordination arrives at your nearest model step. Apply it to your current attempt; a task assignment starts a separate turn.\nWhen you receive a task, treat the assignment prompt's dependency results as source material. Do not ignore them.\n\nWorking rules:\n1. When you receive a task assignment, call agent_teams_claim_task with the task id. Keep the returned attempt_id: include it in every agent_teams_update_task call for that execution attempt. Then mark the task in_progress.\n2. Work thoroughly with your available tools; do not cut corners.\n3. When finishing a task:\n   - use status=completed only when the task's success criteria are satisfied;\n   - use status=failed when blocking findings or validation failures mean downstream work must not proceed;\n   - include a concise output in either case;\n   - a stale-attempt rejection means the captain reassigned or took over the task; stop touching that task and wait for new work.\n   claimed cannot jump to completed. Mark in_progress first, then completed or failed.\n   Include attempt_id on every update. Then report once as described below and become idle.\n4. Send one short report with agent_teams_send_message (to=captain) when you complete a task or hit a blocker. Include source_task_id and source_attempt_id in task reports; a stale source rejection means stop, never relabel an old result with a new attempt. The captain is also your parent: this single message satisfies both reporting duties. Do not repeat it through the native send_message tool or send acknowledgments that add no new information.\n5. To ask a teammate something, use agent_teams_send_message with to=<teammate name>; the message lands in their mailbox and wakes them directly — teammates talk to each other without the captain in the loop. The same applies to the captain (to=captain).\n6. After your turn becomes idle, the shared task scheduler may assign your next ready task automatically. Never claim a second task while you still own unfinished work.\n7. If you already own an open attempt (claimed or in_progress) and receive mail, treat it as guidance for that same attempt_id unless the mail explicitly tells you to stop or fail. Do not claim a new task in that turn.\n8. Do not start a teammate's assigned task. Do not privately tell the next-stage member to start; the scheduler assigns unlocked work after you become idle.\n9. You are a worker: do not create or delete teams, reassign tasks, or add/remove members — that is the captain's job.\n10. Quality-gate kinds carry a contract (kind, objective, inScope, acceptance, verify). Stay inside inScope. Do not mark your own implementation as review pass. Review/requirements complete only with verdict=pass; needs_revision/reject must fail with findings. Mail is not a formal next review. Completed work must not be repeated to attach late evidence: call update_task on the original task with its attempt_id and acceptanceResults/commandsRun/evidence_note; supplements are append-only and cannot change its verdict.",
+        "toolFilter": {
+          "deny": [
+            "agent_teams_create",
+            "agent_teams_approve",
+            "agent_teams_edit_plan",
+            "agent_teams_add_member",
+            "agent_teams_remove_member",
+            "agent_teams_create_task",
+            "agent_teams_reassign_task",
+            "agent_teams_amend_task",
+            "agent_teams_resume",
+            "agent_teams_delete"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ca298d78-7613-4300-8424-e7bfdaf1b5b1",
+      "name": "verifier",
+      "role": "analyst kiểm chứng bằng Selenium: đo xem 6 yêu cầu đã đạt chưa, đồ thị có kéo được không, tìm kiếm có ra popup không, có lỗi console không. Chụp ảnh trước/sau.",
+      "provider": "deploy",
+      "model": "deepseek-ai/deepseek-v4.1-flash-1017",
+      "reasoningEffort": "low",
+      "joinedAt": 1794717541476,
+      "status": "idle",
+      "runtimeSetup": {
+        "persona": "You are verifier, a member of the multi-agent team \"graph-page-redesign\" running inside DeepSeek Harness AgentTeams. The captain leads the team; you are a worker member with the role: analyst kiểm chứng bằng Selenium: đo xem 6 yêu cầu đã đạt chưa, đồ thị có kéo được không, tìm kiếm có ra popup không, có lỗi console không. Chụp ảnh trước/sau..\n\nTeam context:\n- Team id: graph-page-redesign\n- Your name inside the team (use it as `from`/identity): verifier\n- Team goal: Thiết kế lại trang \"Đồ thị việc làm\" (app/views/do_thi_viec_lam.py) theo 6 yêu cầu: (1) bỏ chữ \"ranh giới dữ liệu\", (2) bỏ câu hỏi đầu trang, (3) đưa đồ thị lên làm hero section, (4) thêm thanh tìm kiếm node theo 4 loại với popup chi tiết bên phải, (5) 4 con số thu nhỏ thành 4 thẻ nhỏ bên phải, (6) bỏ bộ lọc hiển thị, (7) viết lại đồ thị 2D thành tương tác mượt.\n\nPHÁT HIỆN QUAN TRỌNG ĐÃ KIỂM:\n- Đồ thị 2D hiện tại vẽ bằng Altair (app/components/__init__.py hàm graph_chart, dòng 313). Altair chỉ có pan/zoom qua `.interactive()`, KHÔNG có kéo node, hover highlight láng giềng, hay click. Đó là lý do \"khó tương tác\".\n- Thư viện `force-graph` 2D của vasturiano TẢI ĐƯỢC, 158,3 KB (https://unpkg.com/force-graph@1.45.0/dist/force-graph.min.js). Cùng tác giả với `3d-force-graph.min.js` đã có sẵn ở app/assets/ (690 KB). API gần giống nhau nên code 2D sẽ quen.\n- Đã kiểm: d3-force 8,1 KB, d3 273 KB, cytoscape 364 KB, vis-network 672 KB đều tải được. Chọn force-graph vì nhỏ nhất VÀ đồng bộ với 3D đang dùng.\n- Dữ liệu: build_graph_view() trả (nodes, edges) DataFrame. nodes có cột: id, label, kind, size, x, y, degree. edges có: x, y, x2, y2, edge_kind. Số nút ~385, số cạnh ~1915 (theo README cũ).\n- app/components/theme.py có hàm grid(cols, key) dùng st.container(key=...) — KHÔNG bọc được bằng st.markdown('<div>').\n- Streamlit 1.55.0, dùng components.html để nhúng HTML/JS.\n- Profile protocol: (none)\n- The team state lives under .agent-teams/graph-page-redesign/ (team.json and inbox/*.jsonl). You may inspect these files read-only for diagnostics, but never edit them directly; use the agent_teams_* tools so JSON escaping and concurrent updates stay safe.\n- The captain and your teammates reach you through messages. Coordination arrives at your nearest model step. Apply it to your current attempt; a task assignment starts a separate turn.\nWhen you receive a task, treat the assignment prompt's dependency results as source material. Do not ignore them.\n\nWorking rules:\n1. When you receive a task assignment, call agent_teams_claim_task with the task id. Keep the returned attempt_id: include it in every agent_teams_update_task call for that execution attempt. Then mark the task in_progress.\n2. Work thoroughly with your available tools; do not cut corners.\n3. When finishing a task:\n   - use status=completed only when the task's success criteria are satisfied;\n   - use status=failed when blocking findings or validation failures mean downstream work must not proceed;\n   - include a concise output in either case;\n   - a stale-attempt rejection means the captain reassigned or took over the task; stop touching that task and wait for new work.\n   claimed cannot jump to completed. Mark in_progress first, then completed or failed.\n   Include attempt_id on every update. Then report once as described below and become idle.\n4. Send one short report with agent_teams_send_message (to=captain) when you complete a task or hit a blocker. Include source_task_id and source_attempt_id in task reports; a stale source rejection means stop, never relabel an old result with a new attempt. The captain is also your parent: this single message satisfies both reporting duties. Do not repeat it through the native send_message tool or send acknowledgments that add no new information.\n5. To ask a teammate something, use agent_teams_send_message with to=<teammate name>; the message lands in their mailbox and wakes them directly — teammates talk to each other without the captain in the loop. The same applies to the captain (to=captain).\n6. After your turn becomes idle, the shared task scheduler may assign your next ready task automatically. Never claim a second task while you still own unfinished work.\n7. If you already own an open attempt (claimed or in_progress) and receive mail, treat it as guidance for that same attempt_id unless the mail explicitly tells you to stop or fail. Do not claim a new task in that turn.\n8. Do not start a teammate's assigned task. Do not privately tell the next-stage member to start; the scheduler assigns unlocked work after you become idle.\n9. You are a worker: do not create or delete teams, reassign tasks, or add/remove members — that is the captain's job.\n10. Quality-gate kinds carry a contract (kind, objective, inScope, acceptance, verify). Stay inside inScope. Do not mark your own implementation as review pass. Review/requirements complete only with verdict=pass; needs_revision/reject must fail with findings. Mail is not a formal next review. Completed work must not be repeated to attach late evidence: call update_task on the original task with its attempt_id and acceptanceResults/commandsRun/evidence_note; supplements are append-only and cannot change its verdict.",
+        "toolFilter": {
+          "deny": [
+            "agent_teams_create",
+            "agent_teams_approve",
+            "agent_teams_edit_plan",
+            "agent_teams_add_member",
+            "agent_teams_remove_member",
+            "agent_teams_create_task",
+            "agent_teams_reassign_task",
+            "agent_teams_amend_task",
+            "agent_teams_resume",
+            "agent_teams_delete"
+          ]
+        }
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "id": "t1",
+      "profileSeedId": "t1",
+      "subject": "Đồ thị 2D tương tác: tải force-graph, viết graph_html() với kéo/hover/click/zoom",
+      "description": "Viết lại trang Đồ thị việc làm. Đây là task chính, làm trước để ui-polish và verifier bám theo.\n\n## VIỆC 1 — Tải thư viện (làm đầu tiên)\nTải https://unpkg.com/force-graph@1.45.0/dist/force-graph.min.js về `app/assets/force-graph.min.js` (158 KB).\nDùng python urllib.request, KHÔNG dùng curl (curl hỏng trên máy này).\nKiểm tra file tải được có kích thước ~158 KB và không rỗng.\n\n## VIỆC 2 — Hàm sinh HTML đồ thị tương tác\nViết hàm mới `graph_html(nodes: pd.DataFrame, edges: pd.DataFrame, height: int = 620) -> str` trong `app/components/__init__.py` (đặt cạnh graph_chart cũ, KHÔNG xoá graph_chart để không phá test).\n\nHàm trả về một chuỗi HTML hoàn chỉnh, nhúng bằng `components.html(html, height=..., scrolling=False)`.\n\nYÊU CẦU TƯƠNG TÁC (đây là phần người dùng muốn nhất — \"tương tác được rất mượt\"):\n1. **Kéo node được**: `nodeRelSize`, `onNodeDrag`, node cố định khi thả (`onNodeDragEnd` gán `node.fx = node.x`). Thả tự do thì bấm đúp để bỏ ghim.\n2. **Hover làm nổi láng giềng**: khi hover một node, mọi node/cạnh không liên quan mờ đi (opacity 0.08), láng giềng giữ nguyên 1.0. Dùng `linkColor`/`linkWidth` động.\n3. **Click node mở panel chi tiết** ngay trong iframe, bên phải: hiện label, kind, degree, và danh sách láng giềng (tối đa 20, kèm kind). Có nút ✕ để đóng.\n4. **Zoom/pan mượt**: `graph.enableZoomInteraction()`, có nút \"⤢ Vừa khung\" để gọi `graph.zoomToFit(400)`.\n5. **Màu theo loại nút**: Người dùng `#7b241c`, Tin tuyển dụng `#e8836b`, Kỹ năng `#2f6fb5`, Ngành `#27ae60`. Kích thước theo degree, giới hạn 4–14px.\n6. **Cạnh**: công khai xanh `#2f6fb5` opacity 0.35, riêng tư đỏ `#c0392b` opacity 0.30. Độ dày 0.8–1.6.\n7. **Nhãn**: chỉ hiện nhãn khi zoom đủ lớn (khi `globalScale > 1.6`) hoặc khi hover, để không rối.\n\n**DỮ LIỆU TRUYỀN VÀO JS**: serialize nodes/edges ra JSON bằng `json.dumps`. Node cần: id, label, kind, degree. Edge cần: source, target, kind. Không cần x, y (force-graph tự tính layout).\nLưu ý: cột trong DataFrame là `id`, `label`, `kind`, `degree`; edges dùng cột nào chứa source/target thì phải đọc từ code hiện tại của `build_graph_view` để biết chính xác.\n\n**QUAN TRỌNG — nhúng JS an toàn**: thư viện phải nhúng INLINE vào HTML (đọc file `app/assets/force-graph.min.js` và chèn vào thẻ `<script>`), không dùng `<script src>` vì components.html dùng srcdoc, đường dẫn tương đối sẽ vỡ. Cache nội dung file bằng `@st.cache_data` để không đọc lại mỗi lần render.\n\n## VIỆC 3 — Không phá test cũ\nTest `tests/test_graph_view.py` kiểm tra `build_graph_view` và `spring_layout`. KHÔNG sửa hai hàm đó, KHÔNG đổi chữ ký. Chạy `python -m pytest tests/test_graph_view.py -q` phải pass.\n\n## RÀNG BUỘC\n- Chỉ sửa: `app/components/__init__.py` (thêm hàm), tải file mới vào `app/assets/`.\n- KHÔNG sửa `app/views/do_thi_viec_lam.py` (ui-polish làm).\n- KHÔNG sửa `theme.py` (ui-polish làm).\n- Mọi chữ trên đồ thị phải TIẾNG VIỆT.\n\n## BÁO CÁO\nKích thước file JS tải được, tên hàm mới, số nút/số cạnh truyền vào, và xác nhận test_graph_view pass.",
+      "status": "completed",
+      "assignee": "graph-engineer",
+      "dependencies": [],
+      "attempt": 1,
+      "createdAt": 1794717541476,
+      "updatedAt": 1794721540816,
+      "attemptId": "d8b9c4f9-8c25-442f-9998-4837aa66bbdf",
+      "reassigning": false,
+      "output": "VIỆC 1 — Tải thư viện: ĐÃ XONG\n- `app/assets/force-graph.min.js` = 162.070 bytes (158,3 KB), header \"// Version 1.45.0 force-graph\". Tải bằng python urllib.request. Không rỗng, không cụt.\n\nVIỆC 2 — Hàm mới: `graph_html(nodes, edges, height=620, *, show_search=True) -> str`\nThêm vào `app/components/__init__.py`, CẠNH graph_chart cũ (graph_chart, spring_layout, build_graph_view GIỮ NGUYÊN, không đổi chữ ký).\nKèm 3 hàm phụ: `_force_graph_lib()` (@st.cache_data, đọc bundle 1 lần), `_graph_payload_2d()`, `render_graph_2d()`.\n\nDỮ LIỆU THỰC TẾ: 385 nút / 1.915 cạnh — Người dùng 68, Tin tuyển dụng 200, Kỹ năng 108, Ngành 9; cạnh Công khai 1.479 / Riêng tư 436. 0 cạnh gãy.\n\n7 YÊU CẦU TƯƠNG TÁC — KIỂM BẰNG CHROME THẬT, PASS 45/45:\n1. Kéo nút: dời 254,6 đơn vị; thả ra fx/fy = x/y (ghim). Kéo lại nút đã ghim vẫn dời. Bấm đúp -> bỏ ghim.\n2. Hover nổi láng giềng: alpha nút xa 0.08 / láng giềng 1.0 / focus 1.0. ĐO ẢNH CHỤP THẬT: nút xa 77,9 -> 219,7 độ sáng (mờ hẳn); láng giềng 113,0 -> 113,0.\n3. Click mở panel phải: left=924/1264, có nhãn/loại/bậc/láng giềng kèm loại, tối đa 20 mục, ✕ đóng được, bấm láng giềng đổi nút chọn.\n4. Zoom/pan: lăn chuột 0,722->1,094; kéo nền pan được; \"⤢ Vừa khung\" 1,800->0,722.\n5. Màu nút đúng 4 mã; kích thước 4,7–14 px.\n6. Cạnh: công khai 0.35 / riêng tư 0.30; dày 0,90–1,60.\n7. Nhãn ẩn khi globalScale < 1,6 và không rê; hiện khi > 1,6 hoặc khi rê/chọn.\nThêm: ô tìm kiếm trong iframe lọc đúng 4 loại, chọn kết quả mở panel; tìm không thấy có thông báo tiếng Việt. Toàn bộ chữ TIẾNG VIỆT.\n\n4 LỖI THẬT ĐÃ TÌM VÀ SỬA (không phải lỗi harness):\n(a) `new ForceGraph(el)` không gắn canvas (canvasCount=0) — API là curried `ForceGraph()(el)`.\n(b) Nút \"⤢ Vừa khung\" có trong HTML nhưng CHƯA gắn listener -> bấm không tác dụng.\n(c) Hover do code đặt bị thư viện ghi đè null mỗi frame -> thêm `hoverLock` (cần cho verifier).\n(d) `isEngineRunning` không tồn tại trên đối tượng trả về -> thêm `onEngineTick` + hàm `status()`.\n\nĐÃ KIỂM TRONG IFRAME SRCDOC THẬT CỦA STREAMLIT (không chỉ file HTML rời): server tạm cổng 8599, PASS 12/12. Bundle nhúng INLINE nên chạy offline.\n\nVIỆC 3 — KHÔNG PHÁ TEST CŨ: tests/test_graph_view.py -> 15 passed. Toàn suite -> 72 passed.\n\nAPI CHO UI-POLISH: `components.html(graph_html(nodes, edges, height=620), height=624, scrolling=False)` hoặc `render_graph_2d(nodes, edges, height=620)`.\nCHO VERIFIER (Selenium): `window.__GRAPH2D__` phơi `graph, nodes, links, kinds, colors, radius(), alpha(), labelVisible(), neighbors(), state, setHover() (có khoá), select(), close(), search(), screenPos(id), counts(), status()`. LƯU Ý: d3-drag BỎ QUA sự kiện do JS phát — phải dùng CDP `Input.dispatchMouseEvent`; ActionChains của Selenium đặt offset sai trên Chrome 157.",
+      "changedPaths": [
+        "app/components/__init__.py",
+        "app/assets/force-graph.min.js"
+      ],
+      "acceptanceResults": [
+        {
+          "criterion": "VIỆC 1: tải force-graph.min.js (~158 KB) bằng python urllib.request, không rỗng",
+          "status": "passed",
+          "evidence": "162.070 bytes = 158,3 KB; header '// Version 1.45.0 force-graph'"
+        },
+        {
+          "criterion": "VIỆC 2: hàm graph_html(nodes, edges, height=620) -> str trong app/components/__init__.py, cạnh graph_chart cũ",
+          "status": "passed",
+          "evidence": "signature (nodes, edges, height: int = 620, *, show_search: bool = True) -> str; graph_chart vẫn còn, không đổi"
+        },
+        {
+          "criterion": "Kéo node được, thả ra ghim, bấm đúp bỏ ghim",
+          "status": "passed",
+          "evidence": "dời 254,6 đơn vị đồ thị; fx/fy = x/y sau khi thả; bấm đúp -> fx/fy undefined"
+        },
+        {
+          "criterion": "Hover làm nổi láng giềng, nút khác mờ 0.08",
+          "status": "passed",
+          "evidence": "alpha xa 0.08 / láng giềng 1.0 / focus 1.0; ảnh chụp thật: nút xa 77,9 -> 219,7 độ sáng, láng giềng 113,0 -> 113,0"
+        },
+        {
+          "criterion": "Click node mở panel chi tiết bên phải có nhãn/loại/bậc/láng giềng và nút ✕",
+          "status": "passed",
+          "evidence": "panel left=924/1264; 4 mục láng giềng kèm loại; ✕ đóng được; bấm láng giềng đổi nút chọn"
+        },
+        {
+          "criterion": "Zoom/pan mượt + nút '⤢ Vừa khung' gọi zoomToFit",
+          "status": "passed",
+          "evidence": "lăn chuột 0,722->1,094; kéo nền pan được camera; nút vừa khung 1,800->0,722"
+        },
+        {
+          "criterion": "Màu nút theo 4 loại, kích thước theo degree giới hạn 4–14px",
+          "status": "passed",
+          "evidence": "màu đúng 4 mã #7b241c/#e8836b/#2f6fb5/#27ae60; radius 4,72–14,0"
+        },
+        {
+          "criterion": "Cạnh công khai xanh 0.35, riêng tư đỏ 0.30, dày 0.8–1.6",
+          "status": "passed",
+          "evidence": "opacity đo được 0.35 và 0.30; width 0,90–1,60"
+        },
+        {
+          "criterion": "Nhãn chỉ hiện khi globalScale > 1.6 hoặc khi hover",
+          "status": "passed",
+          "evidence": "labelVisible(far,1.0)=False, labelVisible(near,1.0)=True, labelVisible(far,1.7)=True"
+        },
+        {
+          "criterion": "Thư viện nhúng INLINE, cache bằng @st.cache_data",
+          "status": "passed",
+          "evidence": "_force_graph_lib() @st.cache_data; HTML 322,9 KB chứa bundle inline; chạy đúng trong iframe srcdoc của Streamlit (12/12 PASS)"
+        },
+        {
+          "criterion": "VIỆC 3: pytest tests/test_graph_view.py -q pass",
+          "status": "passed",
+          "evidence": "15 passed in 6.97s; toàn bộ suite: 72 passed"
+        },
+        {
+          "criterion": "Mọi chữ trên đồ thị TIẾNG VIỆT",
+          "status": "passed",
+          "evidence": "hint/legend/panel/search placeholder đều tiếng Việt; đã kiểm bằng assertion"
+        }
+      ],
+      "commandsRun": [
+        {
+          "command": "python _tmp/verify_graph2d.py (Chrome thật, CDP trusted input, 45 kiểm tra)",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "ALL PASS — 45/45; kéo/ghim/bấm đúp/hover-mờ/panel/tìm kiếm 4 loại/zoom/pan/vừa khung đều đạt"
+        },
+        {
+          "command": "python _tmp/verify_iframe.py (Streamlit server cổng 8599, components.html srcdoc)",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "ALL PASS — 12/12 trong iframe srcdoc thật: 385 nút/1915 cạnh, kéo nút, ghim, panel phải, tìm kiếm, vừa khung, 0 lỗi console"
+        },
+        {
+          "command": "python -m pytest tests/test_graph_view.py -q",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "15 passed in 6.97s"
+        },
+        {
+          "command": "python -m pytest tests -q",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "72 passed in 28.31s"
+        },
+        {
+          "command": "python _tmp/check_api.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "TẤT CẢ KIỂM API ĐỀU ĐẠT: chữ ký đúng, graph_chart/spring_layout còn, rỗng báo tiếng Việt, height tuỳ biến, show_search=False, đường source/target dự phòng, bundle cache 158,3 KB"
+        }
+      ]
+    },
+    {
+      "id": "t2",
+      "profileSeedId": "t2",
+      "subject": "Bố cục trang Đồ thị: hero, bỏ câu hỏi/bộ lọc/ranh giới, thanh tìm kiếm, 4 thẻ nhỏ bên phải",
+      "description": "Thiết kế lại bố cục trang Đồ thị việc làm theo đúng 6 yêu cầu người dùng. Chỉ sửa `app/views/do_thi_viec_lam.py` và phần CSS trong `app/components/theme.py`.\n\n## SÁU YÊU CẦU BẮT BUỘC\n\n**1. BỎ chữ \"ranh giới dữ liệu\"**\nĐang có trong `header(...)` dòng ~142: title \"Đồ thị việc làm: ranh giới dữ liệu\". Đổi thành chỉ \"Đồ thị việc làm\".\nCũng bỏ câu \"Đường ranh giới dữ liệu được kiểm bằng test tự động\" trong phần finding nếu có trên trang này.\n\n**2. BỎ câu hỏi đầu trang**\n`header(title, question, kicker)` in ra khối \"Câu hỏi của trang này: ...\". Trang này phải KHÔNG hiện khối đó. Cách làm: gọi header với question=\"\" hoặc viết một biến thể `hero_header()` chỉ in tiêu đề. Nếu sửa `header()` trong components thì phải giữ hành vi cũ khi question rỗng (các trang khác vẫn dùng).\n\n**3. ĐỒ THỊ LÀM HERO SECTION — lên đầu trang**\nThứ tự mới từ trên xuống:\n  a. Tiêu đề \"Đồ thị việc làm\" (gọn, không câu hỏi)\n  b. **ĐỒ THỊ — chiếm gần hết chiều cao màn hình đầu tiên**, height=620px\n  c. Thanh tìm kiếm đặt NGAY TRÊN đồ thị (cùng khối hero), không phải dưới\n\n**4. THANH TÌM KIẾM + POPUP CHI TIẾT**\nThêm ô tìm kiếm phía trên đồ thị, cho phép tìm theo 4 loại node: Người dùng, Tin tuyển dụng, Kỹ năng, Ngành.\nCách làm trong Streamlit:\n```python\nc_q, c_kind = st.columns([3, 1], gap=\"small\")\nwith c_q:\n    q = st.text_input(\"Tìm trong đồ thị\", placeholder=\"gõ tên, kỹ năng, ngành...\", label_visibility=\"collapsed\")\nwith c_kind:\n    kind_filter = st.selectbox(\"Loại\", [\"Tất cả\", \"Người dùng\", \"Tin tuyển dụng\", \"Kỹ năng\", \"Ngành\"], label_visibility=\"collapsed\")\n```\nKhi có q: lọc nodes, hiện kết quả bằng `st.dataframe` nhỏ hoặc danh sách nút bấm. Bấm một kết quả → mở `st.expander` hoặc panel bên phải hiện thông tin node đó: label, kind, degree, danh sách láng giềng.\n**Popup nằm BÊN PHẢI** (theo yêu cầu): dùng `st.columns([3,1])` — trái là đồ thị, phải là panel thông tin.\n\n**5. BỐN CON SỐ THU NHỎ THÀNH 4 THẺ BÊN PHẢI**\nHiện dùng `metric_row(...)` chiếm một dải ngang lớn. Đổi thành 4 thẻ div nhỏ xếp dọc ở cột phải, dùng HTML/CSS thuần:\n```html\n<div class=\"gx-mini-card\"><div class=\"gx-mini-val\">1.697</div><div class=\"gx-mini-lab\">Nút</div></div>\n```\nThêm CSS `.gx-mini-card` vào theme.py: nền trắng, viền nhạt, bo góc 8px, padding 8px 10px, số 18px đậm, nhãn 11px xám.\n\n**6. BỎ BỘ LỌC HIỂN THỊ**\nXoá toàn bộ hàng control hiện tại: multiselect \"Loại nút\", radio 2D/3D, toggle \"Hiện cạnh riêng tư\". Người dùng nói rõ \"xóa phần bộ lọc hiển thị\".\nĐồ thị luôn hiển thị đủ 4 loại nút và cả hai loại cạnh (tương tác hover sẽ tự làm nổi phần liên quan).\nNếu cần giữ 2D/3D thì để một nút nhỏ \"Xem 3D\" mở tab khác — NHƯNG ưu tiên bỏ hẳn theo yêu cầu. Bỏ hẳn.\n\n## BỐ CỤC CUỐI CÙNG\n```\n[ Tiêu đề: Đồ thị việc làm ]\n[ Thanh tìm kiếm ................................ ] [ Loại ▼ ]\n[                                    ] [ 4 thẻ số liệu ]\n[        ĐỒ THỊ 2D TƯƠNG TÁC             ] [ (dọc)          ]\n[        (hero, 620px)                    ] [ panel chi tiết ]\n[                                  ] [ khi bấm node    ]\n[ Hai biểu đồ cột phụ + bảng số liệu — đưa vào expander ]\n```\nCột phải rộng khoảng 280–320px. Đồ thị chiếm phần còn lại.\n\n## RÀNG BUỘC\n- Chỉ sửa `app/views/do_thi_viec_lam.py` + phần CSS thêm vào `.theme.py` (chỉ THÊM class mới, không sửa rule cũ).\n- KHÔNG sửa `app/components/__init__.py` (graph-engineer làm).\n- Giữ hai biểu đồ cột phụ (số nút theo loại, số tin theo ngành) — người dùng không yêu cầu xoá, chỉ cần đẩy xuống dưới trong expander.\n- `python -m pytest tests/test_app_smoke.py tests/test_graph_view.py -q` phải pass.\n\n## BÁO CÁO\nTrước/sau: chiều cao trang, số khối control, vị trí đồ thị (dòng thứ mấy trong code).",
+      "status": "failed",
+      "assignee": "ui-polish",
+      "dependencies": [
+        "t1"
+      ],
+      "attempt": 1,
+      "createdAt": 1794717541476,
+      "updatedAt": 1794722926557,
+      "attemptId": "7d99d0b3-d276-4fa5-8334-b5a708f42ddc",
+      "reassigning": false,
+      "output": "Decode transfer failed for request rank=0 decode_req.req.rid='02471a1f-e0bb-11f1-9246-9395387f7dbb' decode_req.req.bootstrap_room=2232593199386123621 with exception KVTransferError(bootstrap_room=2232593199386123621): NIXL_ERR_REMOTE_DISCONNECT (code PI_AI_ERROR)"
+    },
+    {
+      "id": "t3",
+      "profileSeedId": "t3",
+      "subject": "Kiểm chứng 7 yêu cầu trang Đồ thị bằng Selenium + kiểm tương tác canvas",
+      "description": "Kiểm chứng 7 yêu cầu bằng Selenium. KHÔNG tin báo cáo agent.\n\n## CHUẨN BỊ\n```powershell\npython -m streamlit run app/streamlit_app.py --server.headless=true --server.port 8610\n```\nMở `http://127.0.0.1:8610/do-thi` bằng Selenium Chrome headless, window 1920x1080.\n\n**LƯU Ý KỸ THUẬT QUAN TRỌNG**: Streamlit render theo viewport (lazy). Phải cuộn xuống từng đoạn rồi đợi text ổn định (4 lần liên tiếp không đổi) trước khi đo. Đừng chụp ngay sau khi get().\n\n## KIỂM TRA TỪNG YÊU CẦU\n\n1. **Bỏ \"ranh giới dữ liệu\"**: `document.body.innerText` KHÔNG được chứa \"ranh giới dữ liệu\".\n2. **Bỏ câu hỏi đầu trang**: innerText KHÔNG chứa \"Câu hỏi của trang này\".\n3. **Đồ thị là hero**: phần tử canvas/svg của đồ thị phải nằm trong 700px đầu tiên của trang (đo `getBoundingClientRect().top` của iframe chứa đồ thị, phải < 400).\n4. **Thanh tìm kiếm**: có `input` với placeholder chứa \"tìm\" (không phân biệt hoa thường) trong 400px đầu.\n5. **4 thẻ số liệu nhỏ**: đếm `.gx-mini-card`, phải = 4. Mỗi thẻ phải rộng < 350px.\n6. **Bỏ bộ lọc**: KHÔNG còn `[data-testid=\"stMultiSelect\"]`, không còn radio \"2D/3D\", không còn toggle \"Hiện cạnh riêng tư\".\n7. **Đồ thị tương tác**: tìm `iframe` của components.html, switch_to.frame, kiểm trong đó có `<canvas>` (force-graph vẽ bằng canvas). Đếm số canvas. Nếu là SVG thì ghi rõ.\n\n## KIỂM TRA TƯƠNG TÁC (quan trọng nhất)\nTrong iframe:\n- Đếm `canvas` ≥ 1.\n- Kiểm tra có global object `ForceGraph` hoặc `window.ForceGraph`: `return typeof ForceGraph`.\n- Mô phỏng click vào giữa canvas, chờ 1s, kiểm tra có panel chi tiết hiện ra (đếm element có class chứa 'detail' hoặc text chứa \"degree\").\n\n## CONSOLE\nĐếm SEVERE log. Ghi rõ nội dung 3 lỗi đầu nếu có. Lỗi `_stcore/health 404` và `_stcore/host-config 404` là BÌNH THƯỜNG (do Selenium poll), bỏ qua.\n\n## ẢNH\nChụp: `ui/screenshots/graph-hero-1920.png` (sidebar đóng, toàn trang), `graph-search.png` (sau khi gõ từ khoá), `graph-click-node.png` (sau khi bấm node).\n\n## BÁO CÁO\nBảng: yêu cầu | kỳ vọng | thực tế | PASS/FAIL. Nếu FAIL thì nêu số đo thực tế và vị trí.",
+      "status": "pending",
+      "assignee": "verifier",
+      "dependencies": [
+        "t1",
+        "t2"
+      ],
+      "attempt": 0,
+      "createdAt": 1794717541476,
+      "updatedAt": 1794717541476
+    },
+    {
+      "id": "t4",
+      "subject": "Sửa lỗi zoomToFit không chạy lần đầu: resize() bắn onZoom đặt userMoved=true",
+      "description": "UI-POLISH phát hiện lỗi trong `app/components/__init__.py` (file của bạn). Tôi đã XÁC NHẬN bằng cách đọc code — lỗi thật, không phải hiểu nhầm.\n\n## TRIỆU CHỨNG\nĐồ thị hiện ra RẤT NHỎ khi lần đầu tải: zoom lúc yên = **0,5498**, trong khi `zoomToFit(0, 40)` cho **0,8075**. Thừa trắng hai bên rõ trong ảnh.\n\n## NGUYÊN NHÂN (đã xác nhận từng dòng)\n1. `resize()` tại **L843-847** gọi `Graph.width(w).height(h)`.\n2. `Graph.width()` BẮN sự kiện `onZoom`.\n3. Handler `.onZoom(function () { userMoved = true; redraw(); })` tại **L830-833** đặt `userMoved = true`.\n4. `resize()` được gọi tại **L852**, NGAY SAU `graphData(...)` ở L839.\n5. Nên khi `onEngineStop` chạy (L854), điều kiện `if (!firstFit && !userMoved)` tại **L858** = false → **chưa từng canh khung lần đầu**.\n6. Bằng chứng phụ: hook `zoomToFit` qua `add_init_script` (chạy trước bundle) → log RỖNG. Gọi `zoomToFit` tay thì ra 0,8075 ngay.\n\n## CÁCH SỬA (ui-polish đã thử, 1 dòng)\nThêm cờ `progResize` bao quanh lời gọi resize có chủ đích của code, và bỏ qua trong `onZoom`:\n\n```javascript\nvar userMoved = false, firstFit = false, engineRunning = false, progResize = false;\n```\n\nTrong `onZoom`:\n```javascript\n.onZoom(function () {\n  if (progResize) return;   // <-- THÊM: zoom do code tự đổi kích thước, không phải người dùng\n  userMoved = true;\n  redraw();\n})\n```\n\nTrong `resize()`:\n```javascript\nfunction resize() {\n  var w = host.clientWidth || window.innerWidth || 800;\n  var h = host.clientHeight || __HEIGHT__ || 620;\n  progResize = true;\n  try { Graph.width(w).height(h); } finally { progResize = false; }\n}\n```\n\n**Lưu ý**: ResizeObserver cũng gọi `resize()` — khi người dùng thật sự đổi cửa sổ, `progResize` sẽ chặn `userMoved`, nghĩa là nếu engine dừng lại sau đó thì có thể canh khung lại. Đó là hành vi MONG MUỐN (đổi cửa sổ thì canh lại hợp lý). Nhưng nếu bạn thấy không ổn, chỉ cần canh lại khi `firstFit` = false.\n\n## SAU KHI SỬA — KIỂM CHỨNG BẮT BUỘC\n1. Mở trang Đồ thị ở 1920px, sidebar đóng.\n2. Chờ engine dừng (`window.__GRAPH2D__.status()['engineRunning'] === false`).\n3. Đọc `status()['zoom']` → **phải ≥ 0,75** (kỳ vọng ~0,80). Nếu vẫn 0,55 là chưa sửa đúng.\n4. Kéo 1 node bằng CDP → xác nhận SAU khi kéo, `userMoved` = true và đồ thị KHÔNG tự canh lại (đây là hành vi đúng: người dùng đã di chuyển thì đừng canh lại).\n5. Chạy lại `python -m pytest tests/test_graph_view.py -q` → phải 15 passed.\n\n## RÀNG BUỘC\n- Chỉ sửa `app/components/__init__.py`. KHÔNG sửa `do_thi_viec_lam.py` (ui-polish đang giữ), không sửa `theme.py`.\n- Đừng đổi API `window.__GRAPH2D__` — verifier và các test đang dùng.\n- Báo lại: zoom trước/sau khi sửa, số dòng đã đổi, và xác nhận kéo node vẫn chạy.",
+      "status": "failed",
+      "assignee": "graph-engineer",
+      "dependencies": [],
+      "attempt": 1,
+      "createdAt": 1794722531588,
+      "updatedAt": 1794722600178,
+      "kind": "work",
+      "reassigning": false,
+      "attemptId": "eebe4c52-a895-4902-90d7-23c17fc70958",
+      "output": "Decode transfer failed for request rank=2 decode_req.req.rid='4071a9e6-e0ba-11f1-99c9-827ab333e1fc' decode_req.req.bootstrap_room=1380382648057571229 with exception KVTransferError(bootstrap_room=1380382648057571229): NIXL_ERR_REMOTE_DISCONNECT (code PI_AI_ERROR)"
+    }
+  ],
+  "taskSeq": 4,
+  "approvedAt": 1794717572839
+}

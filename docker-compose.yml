@@ -1,0 +1,57 @@
+# =====================================================================
+# PostgreSQL cho đồ án DSS — GNN + FL gợi ý việc làm
+#
+# Dùng port 5433 (KHÔNG phải 5432) vì máy đã có PostgreSQL native
+# chiếm 5432. Hai cái chạy song song, không đụng nhau.
+#
+# Khởi động:  docker compose up -d
+# Xem log :  docker compose logs -f postgres
+# Dừng    :  docker compose down
+# Xoá hết :  docker compose down -v   (XOÁ DỮ LIỆU)
+# =====================================================================
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: dss-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: dss
+      POSTGRES_PASSWORD: dss_dev_2026
+      POSTGRES_DB: dss_jobs
+      # Tối ưu cho máy 15 GB RAM, nạp 18M cạnh user-skill
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    ports:
+      - "5433:5432"
+    volumes:
+      # Dữ liệu bền — không mất khi down
+      - dss_pgdata:/var/lib/postgresql/data
+      # Schema tự chạy lần đầu tạo volume
+      - ./api/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+    command:
+      - "postgres"
+      # work_mem cao để COPY 18M dòng nhanh hơn
+      - "-c"
+      - "work_mem=256MB"
+      - "-c"
+      - "maintenance_work_mem=512MB"
+      - "-c"
+      - "shared_buffers=512MB"
+      - "-c"
+      - "max_wal_size=2GB"
+      - "-c"
+      - "checkpoint_timeout=30min"
+      # tắt fsync KHÔNG nên bật cho production, nhưng an toàn cho dev
+      - "-c"
+      - "log_min_duration_statement=2000"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dss -d dss_jobs"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    shm_size: 256mb
+
+volumes:
+  dss_pgdata:
+    name: dss_pgdata

@@ -1,0 +1,494 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FL Node Console — giám sát node học liên bang</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%2320415c'/%3E%3Crect x='3' y='3' width='4' height='4' fill='%232c7f57'/%3E%3Crect x='9' y='3' width='4' height='4' fill='%23b5811a'/%3E%3Crect x='3' y='9' width='4' height='4' fill='%23e9edf0'/%3E%3Crect x='9' y='9' width='4' height='4' fill='%23b23a32'/%3E%3C/svg%3E" />
+<link rel="stylesheet" href="assets/app.css" />
+</head>
+<body>
+<div class="shell">
+
+  <!-- ================= TOPBAR ================= -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true"></div>
+      <div class="brand-text">
+        <div class="brand-title">FL NODE CONSOLE</div>
+        <div class="brand-sub">Gợi ý việc làm GNN · client = nhà tuyển dụng · giám sát node &amp; độ trễ</div>
+      </div>
+    </div>
+
+    <div class="topbar-stats">
+      <div class="stat">
+        <span class="stat-k">Backend</span>
+        <span class="stat-v"><span class="badge" id="healthBadge" data-tone=""><span class="dot"></span>đang kiểm tra</span></span>
+      </div>
+      <div class="stat">
+        <span class="stat-k">Database</span>
+        <span class="stat-v mono" id="dbState">—</span>
+      </div>
+      <div class="stat">
+        <span class="stat-k">Artifacts</span>
+        <span class="stat-v mono" id="artState">—</span>
+      </div>
+      <div class="stat">
+        <span class="stat-k">Tổng client</span>
+        <span class="stat-v mono" id="clientTotal">—</span>
+      </div>
+      <div class="stat">
+        <span class="stat-k">WebSocket</span>
+        <span class="stat-v"><span class="badge" id="wsBadge" data-tone="warn"><span class="dot"></span>disconnected</span></span>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <button class="btn btn-sm" id="modeBtn" type="button" title="Chuyển giữa dữ liệu backend thật và dữ liệu giả lập để xem giao diện">Chế độ</button>
+      <button class="btn btn-primary" id="startBtnTop" type="button">▶ Start Training</button>
+    </div>
+  </header>
+
+  <!-- ================= DEMO NOTICE ================= -->
+  <div class="notice" id="demoNotice" role="status">
+    <strong>DEMO MODE</strong>
+    <span id="demoReason">Không kết nối được backend — đang hiển thị dữ liệu giả lập để xem giao diện.</span>
+    <span class="spacer"></span>
+    <button class="btn btn-sm" id="retryBackendBtn" type="button">Thử kết nối lại</button>
+  </div>
+
+  <!-- ================= GRAPH SUMMARY ================= -->
+  <section class="strip" id="strip" aria-label="Tóm tắt đồ thị">
+    <div class="strip-item" data-pending="1"><span class="strip-k">Người dùng</span><span class="strip-v" id="sUsers">—</span></div>
+    <div class="strip-item" data-pending="1"><span class="strip-k">Tin tuyển dụng</span><span class="strip-v" id="sJobs">—</span></div>
+    <div class="strip-item" data-pending="1"><span class="strip-k">Kỹ năng</span><span class="strip-v" id="sSkills">—</span></div>
+    <div class="strip-item" data-pending="1"><span class="strip-k">Nghề O*NET</span><span class="strip-v" id="sOcc">—</span></div>
+    <div class="strip-item" data-pending="1"><span class="strip-k">Cạnh user–job</span><span class="strip-v" id="sUJ">—</span></div>
+    <div class="strip-item" data-pending="1"><span class="strip-k">Cạnh job–skill</span><span class="strip-v" id="sJS">—</span></div>
+    <div class="strip-item" data-pending="1"><span class="strip-k">Cạnh user–skill</span><span class="strip-v" id="sUS">—</span></div>
+    <div class="strip-item" data-pending="1"><span class="strip-k">Client (employer)</span><span class="strip-v" id="sClients">—</span></div>
+    <div class="strip-item" data-pending="1"><span class="strip-k">Độ thưa</span><span class="strip-v" id="sSparse">—</span></div>
+  </section>
+
+  <!-- ================= GIẢI THÍCH 1: MỘT NODE LÀ GÌ ================= -->
+  <details class="panel nc-panel nc-what" id="ncWhatPanel" open>
+    <summary class="panel-head nc-what-head">
+      <span class="nc-q" aria-hidden="true">?</span>
+      <span class="panel-title" id="ncWhatTitle">Một node là gì?</span>
+      <span class="panel-note">client = nhà tuyển dụng · dữ liệu của ai thì ở máy người đó</span>
+      <span class="spacer"></span>
+      <span class="nc-collapse" aria-hidden="true"></span>
+    </summary>
+    <div class="nc-env-note">
+      <span class="nc-env-tag">MÔI TRƯỜNG CHẠY</span>
+      <span>Mô phỏng: 50 node chạy như 50 luồng trong <b>MỘT tiến trình Python trên một máy</b>. Không phải 9.116 máy thật. Latency đo thật, nhưng không có độ trễ mạng giữa các máy.</span>
+    </div>
+    <div class="nc-what-body">
+      <div class="nc-employer-card" id="ncEmployerCard">
+        <div class="nc-emp-kicker">Ví dụ một node (một ô trong lưới)</div>
+        <div class="nc-emp-name" id="ncEmpName">randstad</div>
+        <div class="nc-emp-stats">
+          <span><b id="ncEmpApps">4.745</b> application</span>
+          <span><b id="ncEmpUsers">4.215</b> ứng viên</span>
+          <span><b id="ncEmpJobs">603</b> tin</span>
+        </div>
+        <div class="nc-emp-note" id="ncEmpSource">ví dụ mẫu — backend chưa kết nối</div>
+      </div>
+      <div class="nc-what-copy">
+        <p><strong>Mỗi ô vuông trong lưới = MỘT NHÀ TUYỂN DỤNG.</strong> Đó là một "node" trong học liên bang: một employer sở hữu một mảnh dữ liệu riêng, không ai khác nhìn thấy mảnh đó.</p>
+        <ul class="nc-what-list">
+          <li><b>Node giữ dữ liệu CỦA MÌNH:</b> những application nộp vào tin của chính nhà tuyển dụng đó — user_id, job_id, thời điểm, phản hồi.</li>
+          <li><b>Node không thấy dữ liệu của node khác:</b> randstad không biết ứng viên X còn ứng tuyển ở Viettel hay FPT.</li>
+          <li><b>Server chỉ giữ tham số:</b> nó nhận embedding (các con số) từ node, không nhận bảng dữ liệu. Vì vậy server không dựng lại được "ai ứng tuyển vào đâu".</li>
+        </ul>
+        <div class="nc-total">Tổng số node (client) trong hệ thống: <b class="mono" id="ncTotalNodes">9.116</b> nhà tuyển dụng</div>
+      </div>
+    </div>
+  </details>
+
+  <!-- ================= GIẢI THÍCH 2: 5 BƯỚC MỘT VÒNG ================= -->
+  <section class="panel nc-panel nc-round" id="ncRoundPanel" aria-labelledby="ncRoundTitle">
+    <div class="panel-head">
+      <span class="panel-title" id="ncRoundTitle">Một vòng FL chạy qua 5 bước</span>
+      <span class="panel-note">bước nào đang diễn ra thì phát sáng</span>
+      <span class="spacer"></span>
+      <span class="nc-round-state mono" id="ncRoundState">chưa chạy vòng nào</span>
+    </div>
+    <div class="nc-flow" id="ncFlow">
+      <div class="nc-step" data-step="1" data-dir="send">
+        <div class="nc-step-top">
+          <span class="nc-step-no">1</span><span class="nc-step-n">BƯỚC 1</span>
+          <span class="nc-step-dir">truyền đi</span>
+        </div>
+        <div class="nc-step-title">Server gửi embedding hiện tại xuống các node đã chọn</div>
+        <dl class="nc-step-meta">
+          <dt>AI LÀM</dt><dd>Server</dd>
+          <dt>DI CHUYỂN</dt><dd>embedding hiện tại: server → node</dd>
+          <dt>KÍCH THƯỚC</dt><dd class="mono" id="ncStep1Bytes">92,0–95,6 KB / node</dd>
+        </dl>
+      </div>
+      <div class="nc-step" data-step="2" data-dir="stay">
+        <div class="nc-step-top">
+          <span class="nc-step-no">2</span><span class="nc-step-n">BƯỚC 2</span>
+          <span class="nc-step-dir">ở lại máy</span>
+        </div>
+        <div class="nc-step-title">Mỗi node huấn luyện CỤC BỘ trên dữ liệu của mình</div>
+        <dl class="nc-step-meta">
+          <dt>AI LÀM</dt><dd>Từng node (nhà tuyển dụng)</dd>
+          <dt>DI CHUYỂN</dt><dd>không có gì rời máy: application, user_id, job_id ở lại</dd>
+          <dt>KÍCH THƯỚC</dt><dd class="mono">0 B — dữ liệu không đi đâu</dd>
+        </dl>
+      </div>
+      <div class="nc-step" data-step="3" data-dir="send">
+        <div class="nc-step-top">
+          <span class="nc-step-no">3</span><span class="nc-step-n">BƯỚC 3</span>
+          <span class="nc-step-dir">truyền đi</span>
+        </div>
+        <div class="nc-step-title">Node gửi LÊN chỉ phần tham số thay đổi (Δ embedding)</div>
+        <dl class="nc-step-meta">
+          <dt>AI LÀM</dt><dd>Từng node</dd>
+          <dt>DI CHUYỂN</dt><dd>Δ embedding của node: node → server</dd>
+          <dt>KÍCH THƯỚC</dt><dd class="mono" id="ncStep3Bytes">12,5–15,5 KB / node</dd>
+        </dl>
+      </div>
+      <div class="nc-step" data-step="4" data-dir="stay">
+        <div class="nc-step-top">
+          <span class="nc-step-no">4</span><span class="nc-step-n">BƯỚC 4</span>
+          <span class="nc-step-dir">ở lại máy</span>
+        </div>
+        <div class="nc-step-title">Server cộng trung bình có trọng số (FedAvg)</div>
+        <dl class="nc-step-meta">
+          <dt>AI LÀM</dt><dd>Server</dd>
+          <dt>DI CHUYỂN</dt><dd>không — server chỉ cộng các Δ trong RAM</dd>
+          <dt>KÍCH THƯỚC</dt><dd class="mono">0 B — không phát sinh byte mới</dd>
+        </dl>
+      </div>
+      <div class="nc-step" data-step="5" data-dir="send">
+        <div class="nc-step-top">
+          <span class="nc-step-no">5</span><span class="nc-step-n">BƯỚC 5</span>
+          <span class="nc-step-dir">truyền đi</span>
+        </div>
+        <div class="nc-step-title">Server gửi mô hình mới xuống, sang vòng tiếp</div>
+        <dl class="nc-step-meta">
+          <dt>AI LÀM</dt><dd>Server → tất cả node</dd>
+          <dt>DI CHUYỂN</dt><dd>mô hình mới: server → node</dd>
+          <dt>KÍCH THƯỚC</dt><dd class="mono" id="ncStep5Bytes">92,0–95,6 KB / node</dd>
+        </dl>
+      </div>
+    </div>
+    <div class="nc-flow-foot">
+      <span class="nc-key nc-key-stay"><span class="nc-key-sw"></span>xanh = ở lại máy</span>
+      <span class="nc-key nc-key-send"><span class="nc-key-sw"></span>cam = truyền đi</span>
+      <span class="spacer"></span>
+      <span class="nc-flow-note">Một vòng: node chỉ gửi Δ embedding vài chục KB, không gửi application / user_id / job_id.</span>
+    </div>
+  </section>
+
+  <!-- ================= GIẢI THÍCH 3: Ở LẠI / TRUYỀN ĐI ================= -->
+  <section class="panel nc-panel nc-stay" id="ncStayPanel" aria-labelledby="ncStayTitle">
+    <div class="panel-head">
+      <span class="panel-title" id="ncStayTitle">Cái gì ở lại máy — cái gì truyền đi</span>
+      <span class="panel-note" id="ncStayNote">số liệu của node đang chọn</span>
+      <span class="spacer"></span>
+      <span class="nc-stay-badge badge" id="ncStayBadge" data-tone=""><span class="dot"></span>chưa chạy</span>
+    </div>
+    <div class="nc-stay-grid">
+      <div class="nc-stay-col nc-stay-col-stay">
+        <div class="nc-stay-head"><span class="nc-key-sw nc-key-sw-stay"></span>Ở LẠI MÁY<span class="nc-stay-sub">không bao giờ rời node</span></div>
+        <ul class="nc-stay-list" id="ncStayList">
+          <li><span class="nc-stay-item">user_id (ứng viên đã ứng tuyển)</span><span class="nc-stay-val mono" data-row="users">—</span></li>
+          <li><span class="nc-stay-item">job_id (tin của nhà tuyển dụng)</span><span class="nc-stay-val mono" data-row="jobs">—</span></li>
+          <li><span class="nc-stay-item">application (dòng tương tác)</span><span class="nc-stay-val mono" data-row="apps">—</span></li>
+          <li><span class="nc-stay-item">rating / phản hồi của NTD</span><span class="nc-stay-val mono">nằm trong application</span></li>
+          <li><span class="nc-stay-item">lịch sử ứng tuyển (thời điểm nộp)</span><span class="nc-stay-val mono">nằm trong application</span></li>
+        </ul>
+        <div class="nc-stay-foot">
+          Node này giữ <b class="mono" id="ncStayRows">—</b> dòng thô
+          (<span class="mono" id="ncStayBreak">—</span>).
+        </div>
+      </div>
+      <div class="nc-stay-col nc-stay-col-send">
+        <div class="nc-stay-head"><span class="nc-key-sw nc-key-sw-send"></span>TRUYỀN ĐI<span class="nc-stay-sub">mỗi vòng, chỉ có tham số</span></div>
+        <ul class="nc-stay-list">
+          <li><span class="nc-stay-item">vector embedding (dim × client_nodes)</span><span class="nc-stay-val mono" id="ncSendShape">dim × 1</span></li>
+          <li><span class="nc-stay-item">byte gửi LÊN (bytes_up)</span><span class="nc-stay-val mono" id="ncSendUp">—</span></li>
+          <li><span class="nc-stay-item">byte nhận XUỐNG (bytes_down)</span><span class="nc-stay-val mono" id="ncSendDown">—</span></li>
+          <li><span class="nc-stay-item">số vòng đã trao đổi</span><span class="nc-stay-val mono" id="ncSendRounds">0</span></li>
+          <li><span class="nc-stay-item">tổng byte toàn lượt chạy</span><span class="nc-stay-val mono" id="ncSendTotal">—</span></li>
+        </ul>
+        <div class="nc-stay-foot" id="ncSendFoot">Bấm <b>Start Training</b> để xem số byte thật của từng vòng.</div>
+        <div class="nc-stay-ref">
+          <span class="nc-ref-k">Đã đo trên bản chạy thật (12 vòng):</span>
+          gửi lên <b>12,5–15,5 KB</b>/node/vòng · nhận xuống <b>92,0–95,6 KB</b>/node/vòng · cả lượt <b>12,56 MB</b>.
+          <code class="mono">bytes_down</code> ≈ 96 KB khớp kích thước mô hình 24.000 tham số × 4 byte (float32).
+        </div>
+      </div>
+    </div>
+    <div class="nc-stay-claim">Node không gửi dữ liệu thô. Server không thể tái tạo lại ai ứng tuyển vào đâu.</div>
+  </section>
+
+  <!-- ================= CONSOLE ================= -->
+  <main class="console">
+
+    <!-- ---------- LEFT ---------- -->
+    <div class="col-left">
+
+      <!-- NODE GRID -->
+      <section class="panel node-panel" aria-labelledby="nodeTitle">
+        <div class="panel-head">
+          <span class="panel-title" id="nodeTitle">Lưới node đang huấn luyện</span>
+          <span class="panel-note" id="nodeNote">chưa có lượt chạy</span>
+          <span class="spacer"></span>
+          <div class="legend" aria-hidden="true">
+            <span class="legend-item"><span class="legend-swatch s-ok"></span>&lt; 50 ms</span>
+            <span class="legend-item"><span class="legend-swatch s-warn"></span>&lt; 200 ms</span>
+            <span class="legend-item"><span class="legend-swatch s-bad"></span>≥ 200 ms</span>
+            <span class="legend-item"><span class="legend-swatch s-pending"></span>chưa gửi</span>
+          </div>
+        </div>
+        <div class="panel-body flush">
+          <div class="node-grid" id="nodeGrid" role="list" aria-label="Các node client">
+            <div class="node-empty">Bấm <strong>Start Training</strong> để tạo lưới node.<br />Mỗi ô vuông là một client (nhà tuyển dụng) trong lượt chạy; màu đổi theo độ trễ vòng hiện tại.</div>
+          </div>
+        </div>
+        <div class="node-foot">
+          <span>Node đã báo cáo <span class="mono" id="nodeReported">0/0</span></span>
+          <span>p50 <span class="mono" id="nodeP50">—</span></span>
+          <span>p95 <span class="mono" id="nodeP95">—</span></span>
+          <span>max <span class="mono" id="nodeMax">—</span></span>
+          <span class="spacer"></span>
+          <span>Byte trao đổi <span class="mono" id="nodeBytes">—</span></span>
+        </div>
+      </section>
+
+      <!-- CHARTS -->
+      <div class="charts-row">
+        <section class="panel chart-panel" aria-labelledby="chartRecallTitle">
+          <div class="panel-head">
+            <span class="panel-title" id="chartRecallTitle">Recall@20 theo vòng</span>
+            <span class="panel-note">cao hơn là tốt hơn</span>
+          </div>
+          <div class="panel-body flush">
+            <div class="chart-box"><canvas id="chartRecall" aria-label="Biểu đồ Recall@20 theo vòng"></canvas></div>
+            <div class="chart-readout">
+              <span>vòng hiện tại <b id="roRound">—</b></span>
+              <span>Recall@20 <b id="roRecall">—</b></span>
+              <span>NDCG@20 <b id="roNdcg">—</b></span>
+              <span>Loss <b id="roLoss">—</b></span>
+            </div>
+            <div class="nc-sim-note">
+              Đường cong <b>mô phỏng</b> để minh hoạ vòng lặp FedAvg — không phải kết quả huấn luyện thật. Kết quả thật ở notebook Kaggle: LightGCN 0,7151 (vũ trụ FL).
+            </div>
+          </div>
+        </section>
+
+        <section class="panel chart-panel" aria-labelledby="chartLatencyTitle">
+          <div class="panel-head">
+            <span class="panel-title" id="chartLatencyTitle">Độ trễ p50 / p95</span>
+            <span class="panel-note">mili giây mỗi vòng</span>
+          </div>
+          <div class="panel-body flush">
+            <div class="chart-box"><canvas id="chartLatency" aria-label="Biểu đồ độ trễ p50 và p95 theo vòng"></canvas></div>
+            <div class="chart-readout">
+              <span>p50 <b id="roP50">—</b></span>
+              <span>p95 <b id="roP95">—</b></span>
+              <span>ngưỡng cảnh báo <b>200 ms</b></span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- CLIENT TABLE -->
+      <section class="panel table-panel" aria-labelledby="tableTitle">
+        <div class="panel-head">
+          <span class="panel-title" id="tableTitle">Client theo nhà tuyển dụng</span>
+          <span class="panel-note" id="tableNote">—</span>
+          <span class="spacer"></span>
+          <button class="btn btn-sm" id="refreshBtn" type="button">Tải lại</button>
+        </div>
+        <div class="panel-body flush">
+          <div class="table-wrap">
+            <table class="clients" id="clientTable">
+              <thead>
+                <tr>
+                  <th scope="col" style="width:74px">client_id</th>
+                  <th scope="col">Tên employer</th>
+                  <th scope="col" class="num" style="width:96px">
+                    <button class="th-sort" type="button" data-sort="n_apps" data-active="1">n_apps <span class="arrow">▼</span></button>
+                  </th>
+                  <th scope="col" class="num" style="width:82px">n_users</th>
+                  <th scope="col" class="num" style="width:74px">n_jobs</th>
+                  <th scope="col" style="width:104px">status</th>
+                </tr>
+              </thead>
+              <tbody id="clientBody">
+                <tr><td colspan="6" class="table-state">Đang tải danh sách client…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="table-foot">
+          <button class="btn btn-sm" id="prevPage" type="button" aria-label="Trang trước">← Trước</button>
+          <span class="mono" id="pageInfo">trang 1 / 1</span>
+          <button class="btn btn-sm" id="nextPage" type="button" aria-label="Trang sau">Sau →</button>
+          <span class="spacer"></span>
+          <span class="mono" id="rowInfo">0 client</span>
+          <label class="mono" style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-3)">
+            cỡ trang
+            <select id="pageSize" style="width:70px;padding:2px 4px;font-size:11.5px">
+              <option value="25">25</option>
+              <option value="50" selected>50</option>
+              <option value="100">100</option>
+            </select>
+          </label>
+        </div>
+      </section>
+    </div>
+
+    <!-- ---------- RIGHT ---------- -->
+    <div class="col-right">
+
+      <!-- TRACE MỘT NODE -->
+      <section class="panel nc-panel nc-trace is-off" id="ncTracePanel" aria-labelledby="ncTraceTitle" aria-live="polite">
+        <div class="panel-head">
+          <span class="panel-title" id="ncTraceTitle">Trace một node</span>
+          <span class="panel-note">bấm một ô trong lưới để mở</span>
+          <span class="spacer"></span>
+          <button class="btn btn-sm" id="ncTraceClose" type="button" title="Đóng panel trace">✕</button>
+        </div>
+        <div class="nc-trace-body" id="ncTraceBody">
+          <div class="nc-trace-empty" id="ncTraceEmpty">
+            Chưa chọn node. Bấm vào một ô vuông trong <b>Lưới node đang huấn luyện</b> (hoặc một dòng trong bảng client) để xem node đó đang làm gì trong từng vòng.
+          </div>
+          <div class="nc-trace-content is-off" id="ncTraceContent">
+            <div class="nc-trace-head">
+              <div class="nc-trace-name" id="ncTraceName">—</div>
+              <div class="nc-trace-id mono" id="ncTraceId">—</div>
+            </div>
+            <div class="nc-trace-counts" id="ncTraceCounts">—</div>
+            <div class="nc-trace-state-row">
+              <span class="nc-trace-state-label">Trạng thái hiện tại</span>
+              <span class="nc-trace-state" id="ncTraceState" data-state="idle"><span class="dot"></span><b>idle</b></span>
+              <span class="nc-trace-state-desc" id="ncTraceStateDesc">chưa có vòng nào — node đang chờ lệnh Start</span>
+            </div>
+            <div class="nc-state-legend">
+              <span class="nc-sl" data-s="idle"><b>idle</b> chưa tham gia vòng nào</span>
+              <span class="nc-sl" data-s="training"><b>training</b> đang chạy SGD trên dữ liệu của mình</span>
+              <span class="nc-sl" data-s="uploading"><b>uploading</b> đang gửi Δ embedding lên server</span>
+              <span class="nc-sl" data-s="waiting"><b>waiting</b> gửi xong, chờ server FedAvg &amp; vòng mới</span>
+            </div>
+            <div class="nc-trace-grid">
+              <div class="nc-trace-kv"><span>train cục bộ (vòng này)</span><b class="mono" id="ncTraceTrain">—</b></div>
+              <div class="nc-trace-kv"><span>byte gửi lên</span><b class="mono" id="ncTraceUp">—</b></div>
+              <div class="nc-trace-kv"><span>byte nhận xuống</span><b class="mono" id="ncTraceDown">—</b></div>
+              <div class="nc-trace-kv"><span>loss vòng này (mô phỏng)</span><b class="mono" id="ncTraceLoss">—</b></div>
+            </div>
+            <div class="nc-trace-tl-head">
+              <span>5 vòng gần nhất của node</span>
+              <span class="spacer"></span>
+              <span class="mono" id="ncTraceRounds">0 vòng</span>
+            </div>
+            <div class="nc-trace-timeline" id="ncTraceTimeline">
+              <div class="nc-trace-tl-empty">Chưa có vòng nào. Bấm <b>Start Training</b> để node này bắt đầu làm việc.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTROL -->
+      <section class="panel control-panel" aria-labelledby="ctrlTitle">
+        <div class="panel-head">
+          <span class="panel-title" id="ctrlTitle">Điều khiển lượt chạy</span>
+          <span class="spacer"></span>
+          <span class="badge" id="runBadge" data-tone=""><span class="dot"></span>idle</span>
+        </div>
+        <div class="panel-body">
+          <div class="field">
+            <label class="field-label" for="nClients">Số client tham gia</label>
+            <span class="field-value" id="nClientsVal">50</span>
+            <div class="field-control">
+              <input type="range" id="nClients" min="5" max="200" step="1" value="50" aria-describedby="nClientsVal" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="rounds">Số vòng</label>
+            <span class="field-value" id="roundsVal">10</span>
+            <div class="field-control">
+              <input type="range" id="rounds" min="1" max="50" step="1" value="10" aria-describedby="roundsVal" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="algorithm">Thuật toán</label>
+            <span class="field-value" id="algorithmVal">FedAvg</span>
+            <div class="field-control">
+              <select id="algorithm">
+                <option value="fedavg" selected>FedAvg</option>
+                <option value="fedprox">FedProx</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field" style="border-bottom:0">
+            <label class="field-label" for="localEpochs">Local epochs</label>
+            <span class="field-value" id="localEpochsVal">1</span>
+            <div class="field-control">
+              <input type="range" id="localEpochs" min="1" max="5" step="1" value="1" />
+            </div>
+          </div>
+
+          <div class="control-actions">
+            <button class="btn btn-primary" id="startBtn" type="button">▶ Start Training</button>
+            <button class="btn btn-danger" id="stopBtn" type="button" disabled>■ Stop</button>
+            <button class="btn" id="demoRunBtn" type="button" title="Chạy mô phỏng cục bộ, không cần backend">Chạy demo</button>
+          </div>
+
+          <dl class="run-meta">
+            <dt>run_id</dt><dd id="runId">—</dd>
+            <dt>vòng</dt><dd id="runRound">—</dd>
+            <dt>trạng thái</dt><dd id="runStatus">chưa chạy</dd>
+            <dt>thuật toán</dt><dd id="runAlgo">—</dd>
+          </dl>
+
+          <div class="detail is-off" id="detailBox">
+            <div class="detail-head">
+              <span class="detail-name" id="detailName">—</span>
+              <span class="detail-sub" id="detailId"></span>
+            </div>
+            <div class="detail-row" id="detailCounts"></div>
+            <div class="skill-list" id="detailSkills"></div>
+          </div>
+
+          <div class="legend-wall">
+            <span>WebSocket: <span class="mono" id="wsUrlLabel">—</span></span>
+            <span>API: <span class="mono" id="apiUrlLabel">—</span></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- LOG -->
+      <section class="panel log-panel" aria-labelledby="logTitle">
+        <div class="panel-head">
+          <span class="panel-title" id="logTitle">Dòng chảy sự kiện</span>
+          <span class="panel-note" id="logNote">mỗi message WS một dòng</span>
+          <span class="spacer"></span>
+          <label class="mono" style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink-3)">
+            <input type="checkbox" id="autoscroll" checked /> auto-scroll
+          </label>
+          <button class="btn btn-sm" id="clearLogBtn" type="button">Xoá</button>
+        </div>
+        <div class="panel-body flush">
+          <div class="log" id="log" role="log" aria-live="polite">
+            <div class="log-empty" id="logEmpty">Chưa có sự kiện. Log sẽ chạy khi lượt huấn luyện bắt đầu.</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script src="vendor/chart.umd.min.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

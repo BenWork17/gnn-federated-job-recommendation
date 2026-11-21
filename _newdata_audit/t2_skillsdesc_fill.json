@@ -1,0 +1,38 @@
+{
+  "datastax/linkedin_job_listings": {
+    "err": "HTTPError: HTTP Error 502: Bad Gateway"
+  },
+  "xanderios/linkedin-job-postings": {
+    "n_sampled": 100,
+    "fill": {
+      "job_id": {
+        "present_pct": 100.0,
+        "example": "3757940104"
+      },
+      "company_id": {
+        "present_pct": 94.0,
+        "example": "553718.0"
+      },
+      "title": {
+        "present_pct": 100.0,
+        "example": "Hearing Care Provider"
+      },
+      "skills_desc": {
+        "present_pct": 4.0,
+        "example": "Bachelor's Degree in Mechanical Engineering preferred or equivalent work experience.10 years working in an Industrial Equipment Construction Environment. Experi"
+      },
+      "formatted_experience_level": {
+        "present_pct": 79.0,
+        "example": "Entry level"
+      },
+      "location": {
+        "present_pct": 100.0,
+        "example": "Little River, SC"
+      },
+      "description": {
+        "present_pct": 100.0,
+        "example": "Overview\n\nHearingLife is a national hearing care company and part of the Demant Group, a global leader in hearing healthcare built on a heritage of care, health"
+      }
+    }
+  }
+}

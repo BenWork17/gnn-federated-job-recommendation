@@ -1,0 +1,822 @@
+{
+  "name": "job-data-hunt",
+  "id": "job-data-hunt",
+  "description": "Tìm bộ dữ liệu public phù hợp cho đề tài GNN + Học liên bang cho gợi ý việc làm. Ràng buộc cứng: (1) tương tác người dùng–tin thật, (2) kỹ năng phía tin, (3) hồ sơ/kỹ năng phía ứng viên, (4) cột đơn vị tuyển dụng để chia client FL, (5) giấy phép dùng học thuật. Hiện trạng: bộ MEDAJob của môn học chỉ có 70 user / 1.014 job / 307 tương tác, lại là dữ liệu tổng hợp (Tech Company N, example.com); bộ CareerBuilder vừa crawl có 1,6M tương tác thật nhưng thiếu employer_id, thiếu cột kỹ năng, và thiếu rating. Mục tiêu: xác định bộ dữ liệu (hoặc tổ hợp bộ dữ liệu) dùng được, kèm số đo kiểm chứng và giấy phép.",
+  "captainSessionId": "session-77e32ab7-3f6c-45b9-9af5-00cc17b3daec",
+  "createdAt": 1794112481083,
+  "phase": "running",
+  "members": [
+    {
+      "id": "c24ddc8b-5b39-49f8-823e-d3211253e989",
+      "name": "recsys-datasets",
+      "role": "researcher: săn bộ dữ liệu gợi ý việc làm CÓ TƯƠNG TÁC THẬT. Chỉ báo cáo dữ kiện kiểm chứng được: tên, URL, schema từng cột, số dòng, giấy phép, cách tải. Không suy đoán schema từ mô tả marketing — nếu không đọc được schema thì ghi rõ 'chưa xác minh'.",
+      "provider": "deploy",
+      "model": "deepseek-ai/deepseek-v4.1-flash-1017",
+      "joinedAt": 1794112481083,
+      "status": "removed",
+      "runtimeSetup": {
+        "persona": "You are recsys-datasets, a member of the multi-agent team \"job-data-hunt\" running inside DeepSeek Harness AgentTeams. The captain leads the team; you are a worker member with the role: researcher: săn bộ dữ liệu gợi ý việc làm CÓ TƯƠNG TÁC THẬT. Chỉ báo cáo dữ kiện kiểm chứng được: tên, URL, schema từng cột, số dòng, giấy phép, cách tải. Không suy đoán schema từ mô tả marketing — nếu không đọc được schema thì ghi rõ 'chưa xác minh'..\n\nTeam context:\n- Team id: job-data-hunt\n- Your name inside the team (use it as `from`/identity): recsys-datasets\n- Team goal: Tìm bộ dữ liệu public phù hợp cho đề tài GNN + Học liên bang cho gợi ý việc làm. Ràng buộc cứng: (1) tương tác người dùng–tin thật, (2) kỹ năng phía tin, (3) hồ sơ/kỹ năng phía ứng viên, (4) cột đơn vị tuyển dụng để chia client FL, (5) giấy phép dùng học thuật. Hiện trạng: bộ MEDAJob của môn học chỉ có 70 user / 1.014 job / 307 tương tác, lại là dữ liệu tổng hợp (Tech Company N, example.com); bộ CareerBuilder vừa crawl có 1,6M tương tác thật nhưng thiếu employer_id, thiếu cột kỹ năng, và thiếu rating. Mục tiêu: xác định bộ dữ liệu (hoặc tổ hợp bộ dữ liệu) dùng được, kèm số đo kiểm chứng và giấy phép.\n- Profile protocol: (none)\n- The team state lives under .agent-teams/job-data-hunt/ (team.json and inbox/*.jsonl). You may inspect these files read-only for diagnostics, but never edit them directly; use the agent_teams_* tools so JSON escaping and concurrent updates stay safe.\n- The captain and your teammates reach you through messages. Coordination arrives at your nearest model step. Apply it to your current attempt; a task assignment starts a separate turn.\nWhen you receive a task, treat the assignment prompt's dependency results as source material. Do not ignore them.\n\nWorking rules:\n1. When you receive a task assignment, call agent_teams_claim_task with the task id. Keep the returned attempt_id: include it in every agent_teams_update_task call for that execution attempt. Then mark the task in_progress.\n2. Work thoroughly with your available tools; do not cut corners.\n3. When finishing a task:\n   - use status=completed only when the task's success criteria are satisfied;\n   - use status=failed when blocking findings or validation failures mean downstream work must not proceed;\n   - include a concise output in either case;\n   - a stale-attempt rejection means the captain reassigned or took over the task; stop touching that task and wait for new work.\n   claimed cannot jump to completed. Mark in_progress first, then completed or failed.\n   Include attempt_id on every update. Then report once as described below and become idle.\n4. Send one short report with agent_teams_send_message (to=captain) when you complete a task or hit a blocker. Include source_task_id and source_attempt_id in task reports; a stale source rejection means stop, never relabel an old result with a new attempt. The captain is also your parent: this single message satisfies both reporting duties. Do not repeat it through the native send_message tool or send acknowledgments that add no new information.\n5. To ask a teammate something, use agent_teams_send_message with to=<teammate name>; the message lands in their mailbox and wakes them directly — teammates talk to each other without the captain in the loop. The same applies to the captain (to=captain).\n6. After your turn becomes idle, the shared task scheduler may assign your next ready task automatically. Never claim a second task while you still own unfinished work.\n7. If you already own an open attempt (claimed or in_progress) and receive mail, treat it as guidance for that same attempt_id unless the mail explicitly tells you to stop or fail. Do not claim a new task in that turn.\n8. Do not start a teammate's assigned task. Do not privately tell the next-stage member to start; the scheduler assigns unlocked work after you become idle.\n9. You are a worker: do not create or delete teams, reassign tasks, or add/remove members — that is the captain's job.\n10. Quality-gate kinds carry a contract (kind, objective, inScope, acceptance, verify). Stay inside inScope. Do not mark your own implementation as review pass. Review/requirements complete only with verdict=pass; needs_revision/reject must fail with findings. Mail is not a formal next review. Completed work must not be repeated to attach late evidence: call update_task on the original task with its attempt_id and acceptanceResults/commandsRun/evidence_note; supplements are append-only and cannot change its verdict.",
+        "toolFilter": {
+          "deny": [
+            "agent_teams_create",
+            "agent_teams_approve",
+            "agent_teams_edit_plan",
+            "agent_teams_add_member",
+            "agent_teams_remove_member",
+            "agent_teams_create_task",
+            "agent_teams_reassign_task",
+            "agent_teams_amend_task",
+            "agent_teams_resume",
+            "agent_teams_delete"
+          ]
+        }
+      }
+    },
+    {
+      "id": "75c27842-b51b-4192-982b-3990eee348d5",
+      "name": "skills-data",
+      "role": "researcher: săn nguồn KỸ NĂNG/NGÀNH có cấu trúc (ESCO, O*NET) và job corpus giàu kỹ năng. Ưu tiên thứ dùng được offline, giấy phép rõ. Ghi rõ chi phí biến đổi để thành cột skill của job.",
+      "provider": "deploy",
+      "model": "deepseek-ai/deepseek-v4.1-flash-1017",
+      "joinedAt": 1794112481083,
+      "status": "removed",
+      "runtimeSetup": {
+        "persona": "You are skills-data, a member of the multi-agent team \"job-data-hunt\" running inside DeepSeek Harness AgentTeams. The captain leads the team; you are a worker member with the role: researcher: săn nguồn KỸ NĂNG/NGÀNH có cấu trúc (ESCO, O*NET) và job corpus giàu kỹ năng. Ưu tiên thứ dùng được offline, giấy phép rõ. Ghi rõ chi phí biến đổi để thành cột skill của job..\n\nTeam context:\n- Team id: job-data-hunt\n- Your name inside the team (use it as `from`/identity): skills-data\n- Team goal: Tìm bộ dữ liệu public phù hợp cho đề tài GNN + Học liên bang cho gợi ý việc làm. Ràng buộc cứng: (1) tương tác người dùng–tin thật, (2) kỹ năng phía tin, (3) hồ sơ/kỹ năng phía ứng viên, (4) cột đơn vị tuyển dụng để chia client FL, (5) giấy phép dùng học thuật. Hiện trạng: bộ MEDAJob của môn học chỉ có 70 user / 1.014 job / 307 tương tác, lại là dữ liệu tổng hợp (Tech Company N, example.com); bộ CareerBuilder vừa crawl có 1,6M tương tác thật nhưng thiếu employer_id, thiếu cột kỹ năng, và thiếu rating. Mục tiêu: xác định bộ dữ liệu (hoặc tổ hợp bộ dữ liệu) dùng được, kèm số đo kiểm chứng và giấy phép.\n- Profile protocol: (none)\n- The team state lives under .agent-teams/job-data-hunt/ (team.json and inbox/*.jsonl). You may inspect these files read-only for diagnostics, but never edit them directly; use the agent_teams_* tools so JSON escaping and concurrent updates stay safe.\n- The captain and your teammates reach you through messages. Coordination arrives at your nearest model step. Apply it to your current attempt; a task assignment starts a separate turn.\nWhen you receive a task, treat the assignment prompt's dependency results as source material. Do not ignore them.\n\nWorking rules:\n1. When you receive a task assignment, call agent_teams_claim_task with the task id. Keep the returned attempt_id: include it in every agent_teams_update_task call for that execution attempt. Then mark the task in_progress.\n2. Work thoroughly with your available tools; do not cut corners.\n3. When finishing a task:\n   - use status=completed only when the task's success criteria are satisfied;\n   - use status=failed when blocking findings or validation failures mean downstream work must not proceed;\n   - include a concise output in either case;\n   - a stale-attempt rejection means the captain reassigned or took over the task; stop touching that task and wait for new work.\n   claimed cannot jump to completed. Mark in_progress first, then completed or failed.\n   Include attempt_id on every update. Then report once as described below and become idle.\n4. Send one short report with agent_teams_send_message (to=captain) when you complete a task or hit a blocker. Include source_task_id and source_attempt_id in task reports; a stale source rejection means stop, never relabel an old result with a new attempt. The captain is also your parent: this single message satisfies both reporting duties. Do not repeat it through the native send_message tool or send acknowledgments that add no new information.\n5. To ask a teammate something, use agent_teams_send_message with to=<teammate name>; the message lands in their mailbox and wakes them directly — teammates talk to each other without the captain in the loop. The same applies to the captain (to=captain).\n6. After your turn becomes idle, the shared task scheduler may assign your next ready task automatically. Never claim a second task while you still own unfinished work.\n7. If you already own an open attempt (claimed or in_progress) and receive mail, treat it as guidance for that same attempt_id unless the mail explicitly tells you to stop or fail. Do not claim a new task in that turn.\n8. Do not start a teammate's assigned task. Do not privately tell the next-stage member to start; the scheduler assigns unlocked work after you become idle.\n9. You are a worker: do not create or delete teams, reassign tasks, or add/remove members — that is the captain's job.\n10. Quality-gate kinds carry a contract (kind, objective, inScope, acceptance, verify). Stay inside inScope. Do not mark your own implementation as review pass. Review/requirements complete only with verdict=pass; needs_revision/reject must fail with findings. Mail is not a formal next review. Completed work must not be repeated to attach late evidence: call update_task on the original task with its attempt_id and acceptanceResults/commandsRun/evidence_note; supplements are append-only and cannot change its verdict.",
+        "toolFilter": {
+          "deny": [
+            "agent_teams_create",
+            "agent_teams_approve",
+            "agent_teams_edit_plan",
+            "agent_teams_add_member",
+            "agent_teams_remove_member",
+            "agent_teams_create_task",
+            "agent_teams_reassign_task",
+            "agent_teams_amend_task",
+            "agent_teams_resume",
+            "agent_teams_delete"
+          ]
+        }
+      }
+    },
+    {
+      "id": "5871dfc1-662d-4210-962b-13f19d5261f6",
+      "name": "fl-benchmarks",
+      "role": "researcher: khảo sát cách các bài báo FL-recsys chia client, và bộ dữ liệu nào có ranh giới tổ chức tự nhiên. Câu hỏi trung tâm: khi KHÔNG có cột employer thì chia client bằng gì cho hợp lý học thuật, và biện luận thế nào trong bài báo.",
+      "provider": "deploy",
+      "model": "deepseek-ai/deepseek-v4.1-flash-1017",
+      "joinedAt": 1794112481083,
+      "status": "removed",
+      "runtimeSetup": {
+        "persona": "You are fl-benchmarks, a member of the multi-agent team \"job-data-hunt\" running inside DeepSeek Harness AgentTeams. The captain leads the team; you are a worker member with the role: researcher: khảo sát cách các bài báo FL-recsys chia client, và bộ dữ liệu nào có ranh giới tổ chức tự nhiên. Câu hỏi trung tâm: khi KHÔNG có cột employer thì chia client bằng gì cho hợp lý học thuật, và biện luận thế nào trong bài báo..\n\nTeam context:\n- Team id: job-data-hunt\n- Your name inside the team (use it as `from`/identity): fl-benchmarks\n- Team goal: Tìm bộ dữ liệu public phù hợp cho đề tài GNN + Học liên bang cho gợi ý việc làm. Ràng buộc cứng: (1) tương tác người dùng–tin thật, (2) kỹ năng phía tin, (3) hồ sơ/kỹ năng phía ứng viên, (4) cột đơn vị tuyển dụng để chia client FL, (5) giấy phép dùng học thuật. Hiện trạng: bộ MEDAJob của môn học chỉ có 70 user / 1.014 job / 307 tương tác, lại là dữ liệu tổng hợp (Tech Company N, example.com); bộ CareerBuilder vừa crawl có 1,6M tương tác thật nhưng thiếu employer_id, thiếu cột kỹ năng, và thiếu rating. Mục tiêu: xác định bộ dữ liệu (hoặc tổ hợp bộ dữ liệu) dùng được, kèm số đo kiểm chứng và giấy phép.\n- Profile protocol: (none)\n- The team state lives under .agent-teams/job-data-hunt/ (team.json and inbox/*.jsonl). You may inspect these files read-only for diagnostics, but never edit them directly; use the agent_teams_* tools so JSON escaping and concurrent updates stay safe.\n- The captain and your teammates reach you through messages. Coordination arrives at your nearest model step. Apply it to your current attempt; a task assignment starts a separate turn.\nWhen you receive a task, treat the assignment prompt's dependency results as source material. Do not ignore them.\n\nWorking rules:\n1. When you receive a task assignment, call agent_teams_claim_task with the task id. Keep the returned attempt_id: include it in every agent_teams_update_task call for that execution attempt. Then mark the task in_progress.\n2. Work thoroughly with your available tools; do not cut corners.\n3. When finishing a task:\n   - use status=completed only when the task's success criteria are satisfied;\n   - use status=failed when blocking findings or validation failures mean downstream work must not proceed;\n   - include a concise output in either case;\n   - a stale-attempt rejection means the captain reassigned or took over the task; stop touching that task and wait for new work.\n   claimed cannot jump to completed. Mark in_progress first, then completed or failed.\n   Include attempt_id on every update. Then report once as described below and become idle.\n4. Send one short report with agent_teams_send_message (to=captain) when you complete a task or hit a blocker. Include source_task_id and source_attempt_id in task reports; a stale source rejection means stop, never relabel an old result with a new attempt. The captain is also your parent: this single message satisfies both reporting duties. Do not repeat it through the native send_message tool or send acknowledgments that add no new information.\n5. To ask a teammate something, use agent_teams_send_message with to=<teammate name>; the message lands in their mailbox and wakes them directly — teammates talk to each other without the captain in the loop. The same applies to the captain (to=captain).\n6. After your turn becomes idle, the shared task scheduler may assign your next ready task automatically. Never claim a second task while you still own unfinished work.\n7. If you already own an open attempt (claimed or in_progress) and receive mail, treat it as guidance for that same attempt_id unless the mail explicitly tells you to stop or fail. Do not claim a new task in that turn.\n8. Do not start a teammate's assigned task. Do not privately tell the next-stage member to start; the scheduler assigns unlocked work after you become idle.\n9. You are a worker: do not create or delete teams, reassign tasks, or add/remove members — that is the captain's job.\n10. Quality-gate kinds carry a contract (kind, objective, inScope, acceptance, verify). Stay inside inScope. Do not mark your own implementation as review pass. Review/requirements complete only with verdict=pass; needs_revision/reject must fail with findings. Mail is not a formal next review. Completed work must not be repeated to attach late evidence: call update_task on the original task with its attempt_id and acceptanceResults/commandsRun/evidence_note; supplements are append-only and cannot change its verdict.",
+        "toolFilter": {
+          "deny": [
+            "agent_teams_create",
+            "agent_teams_approve",
+            "agent_teams_edit_plan",
+            "agent_teams_add_member",
+            "agent_teams_remove_member",
+            "agent_teams_create_task",
+            "agent_teams_reassign_task",
+            "agent_teams_amend_task",
+            "agent_teams_resume",
+            "agent_teams_delete"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ade04e97-1ec1-4970-b07b-0ccd43ec1619",
+      "name": "dataset-verifier",
+      "role": "analyst: kiểm chứng THỰC NGHIỆM, không tin mô tả. Dùng API/metadata/đọc trực tiếp để đếm số dòng, liệt kê cột, tính mật độ, kiểm tra trùng lặp. Mọi con số phải có nguồn hoặc lệnh tái lập được. Đánh dấu rõ 'đã kiểm' vs 'suy từ tài liệu'.",
+      "provider": "deploy",
+      "model": "deepseek-ai/deepseek-v4.1-flash-1017",
+      "joinedAt": 1794112481083,
+      "status": "removed",
+      "runtimeSetup": {
+        "persona": "You are dataset-verifier, a member of the multi-agent team \"job-data-hunt\" running inside DeepSeek Harness AgentTeams. The captain leads the team; you are a worker member with the role: analyst: kiểm chứng THỰC NGHIỆM, không tin mô tả. Dùng API/metadata/đọc trực tiếp để đếm số dòng, liệt kê cột, tính mật độ, kiểm tra trùng lặp. Mọi con số phải có nguồn hoặc lệnh tái lập được. Đánh dấu rõ 'đã kiểm' vs 'suy từ tài liệu'..\n\nTeam context:\n- Team id: job-data-hunt\n- Your name inside the team (use it as `from`/identity): dataset-verifier\n- Team goal: Tìm bộ dữ liệu public phù hợp cho đề tài GNN + Học liên bang cho gợi ý việc làm. Ràng buộc cứng: (1) tương tác người dùng–tin thật, (2) kỹ năng phía tin, (3) hồ sơ/kỹ năng phía ứng viên, (4) cột đơn vị tuyển dụng để chia client FL, (5) giấy phép dùng học thuật. Hiện trạng: bộ MEDAJob của môn học chỉ có 70 user / 1.014 job / 307 tương tác, lại là dữ liệu tổng hợp (Tech Company N, example.com); bộ CareerBuilder vừa crawl có 1,6M tương tác thật nhưng thiếu employer_id, thiếu cột kỹ năng, và thiếu rating. Mục tiêu: xác định bộ dữ liệu (hoặc tổ hợp bộ dữ liệu) dùng được, kèm số đo kiểm chứng và giấy phép.\n- Profile protocol: (none)\n- The team state lives under .agent-teams/job-data-hunt/ (team.json and inbox/*.jsonl). You may inspect these files read-only for diagnostics, but never edit them directly; use the agent_teams_* tools so JSON escaping and concurrent updates stay safe.\n- The captain and your teammates reach you through messages. Coordination arrives at your nearest model step. Apply it to your current attempt; a task assignment starts a separate turn.\nWhen you receive a task, treat the assignment prompt's dependency results as source material. Do not ignore them.\n\nWorking rules:\n1. When you receive a task assignment, call agent_teams_claim_task with the task id. Keep the returned attempt_id: include it in every agent_teams_update_task call for that execution attempt. Then mark the task in_progress.\n2. Work thoroughly with your available tools; do not cut corners.\n3. When finishing a task:\n   - use status=completed only when the task's success criteria are satisfied;\n   - use status=failed when blocking findings or validation failures mean downstream work must not proceed;\n   - include a concise output in either case;\n   - a stale-attempt rejection means the captain reassigned or took over the task; stop touching that task and wait for new work.\n   claimed cannot jump to completed. Mark in_progress first, then completed or failed.\n   Include attempt_id on every update. Then report once as described below and become idle.\n4. Send one short report with agent_teams_send_message (to=captain) when you complete a task or hit a blocker. Include source_task_id and source_attempt_id in task reports; a stale source rejection means stop, never relabel an old result with a new attempt. The captain is also your parent: this single message satisfies both reporting duties. Do not repeat it through the native send_message tool or send acknowledgments that add no new information.\n5. To ask a teammate something, use agent_teams_send_message with to=<teammate name>; the message lands in their mailbox and wakes them directly — teammates talk to each other without the captain in the loop. The same applies to the captain (to=captain).\n6. After your turn becomes idle, the shared task scheduler may assign your next ready task automatically. Never claim a second task while you still own unfinished work.\n7. If you already own an open attempt (claimed or in_progress) and receive mail, treat it as guidance for that same attempt_id unless the mail explicitly tells you to stop or fail. Do not claim a new task in that turn.\n8. Do not start a teammate's assigned task. Do not privately tell the next-stage member to start; the scheduler assigns unlocked work after you become idle.\n9. You are a worker: do not create or delete teams, reassign tasks, or add/remove members — that is the captain's job.\n10. Quality-gate kinds carry a contract (kind, objective, inScope, acceptance, verify). Stay inside inScope. Do not mark your own implementation as review pass. Review/requirements complete only with verdict=pass; needs_revision/reject must fail with findings. Mail is not a formal next review. Completed work must not be repeated to attach late evidence: call update_task on the original task with its attempt_id and acceptanceResults/commandsRun/evidence_note; supplements are append-only and cannot change its verdict.",
+        "toolFilter": {
+          "deny": [
+            "agent_teams_create",
+            "agent_teams_approve",
+            "agent_teams_edit_plan",
+            "agent_teams_add_member",
+            "agent_teams_remove_member",
+            "agent_teams_create_task",
+            "agent_teams_reassign_task",
+            "agent_teams_amend_task",
+            "agent_teams_resume",
+            "agent_teams_delete"
+          ]
+        }
+      }
+    },
+    {
+      "id": "f4c8ff23-e33d-4d22-a582-9916b29baba3",
+      "name": "doc-writer",
+      "role": "writer: viết tiếng Việt kỹ thuật, câu ngắn, không hoa mỹ. Mỗi khẳng định định lượng phải kèm số và nguồn. Không bịa số: nếu thiếu thì ghi 'chưa xác minh'. Người đọc là sinh viên chuẩn bị bảo vệ đồ án trước hội đồng.",
+      "provider": "deploy",
+      "model": "deepseek-ai/deepseek-v4.1-flash-1017",
+      "joinedAt": 1794112481083,
+      "status": "removed",
+      "runtimeSetup": {
+        "persona": "You are doc-writer, a member of the multi-agent team \"job-data-hunt\" running inside DeepSeek Harness AgentTeams. The captain leads the team; you are a worker member with the role: writer: viết tiếng Việt kỹ thuật, câu ngắn, không hoa mỹ. Mỗi khẳng định định lượng phải kèm số và nguồn. Không bịa số: nếu thiếu thì ghi 'chưa xác minh'. Người đọc là sinh viên chuẩn bị bảo vệ đồ án trước hội đồng..\n\nTeam context:\n- Team id: job-data-hunt\n- Your name inside the team (use it as `from`/identity): doc-writer\n- Team goal: Tìm bộ dữ liệu public phù hợp cho đề tài GNN + Học liên bang cho gợi ý việc làm. Ràng buộc cứng: (1) tương tác người dùng–tin thật, (2) kỹ năng phía tin, (3) hồ sơ/kỹ năng phía ứng viên, (4) cột đơn vị tuyển dụng để chia client FL, (5) giấy phép dùng học thuật. Hiện trạng: bộ MEDAJob của môn học chỉ có 70 user / 1.014 job / 307 tương tác, lại là dữ liệu tổng hợp (Tech Company N, example.com); bộ CareerBuilder vừa crawl có 1,6M tương tác thật nhưng thiếu employer_id, thiếu cột kỹ năng, và thiếu rating. Mục tiêu: xác định bộ dữ liệu (hoặc tổ hợp bộ dữ liệu) dùng được, kèm số đo kiểm chứng và giấy phép.\n- Profile protocol: (none)\n- The team state lives under .agent-teams/job-data-hunt/ (team.json and inbox/*.jsonl). You may inspect these files read-only for diagnostics, but never edit them directly; use the agent_teams_* tools so JSON escaping and concurrent updates stay safe.\n- The captain and your teammates reach you through messages. Coordination arrives at your nearest model step. Apply it to your current attempt; a task assignment starts a separate turn.\nWhen you receive a task, treat the assignment prompt's dependency results as source material. Do not ignore them.\n\nWorking rules:\n1. When you receive a task assignment, call agent_teams_claim_task with the task id. Keep the returned attempt_id: include it in every agent_teams_update_task call for that execution attempt. Then mark the task in_progress.\n2. Work thoroughly with your available tools; do not cut corners.\n3. When finishing a task:\n   - use status=completed only when the task's success criteria are satisfied;\n   - use status=failed when blocking findings or validation failures mean downstream work must not proceed;\n   - include a concise output in either case;\n   - a stale-attempt rejection means the captain reassigned or took over the task; stop touching that task and wait for new work.\n   claimed cannot jump to completed. Mark in_progress first, then completed or failed.\n   Include attempt_id on every update. Then report once as described below and become idle.\n4. Send one short report with agent_teams_send_message (to=captain) when you complete a task or hit a blocker. Include source_task_id and source_attempt_id in task reports; a stale source rejection means stop, never relabel an old result with a new attempt. The captain is also your parent: this single message satisfies both reporting duties. Do not repeat it through the native send_message tool or send acknowledgments that add no new information.\n5. To ask a teammate something, use agent_teams_send_message with to=<teammate name>; the message lands in their mailbox and wakes them directly — teammates talk to each other without the captain in the loop. The same applies to the captain (to=captain).\n6. After your turn becomes idle, the shared task scheduler may assign your next ready task automatically. Never claim a second task while you still own unfinished work.\n7. If you already own an open attempt (claimed or in_progress) and receive mail, treat it as guidance for that same attempt_id unless the mail explicitly tells you to stop or fail. Do not claim a new task in that turn.\n8. Do not start a teammate's assigned task. Do not privately tell the next-stage member to start; the scheduler assigns unlocked work after you become idle.\n9. You are a worker: do not create or delete teams, reassign tasks, or add/remove members — that is the captain's job.\n10. Quality-gate kinds carry a contract (kind, objective, inScope, acceptance, verify). Stay inside inScope. Do not mark your own implementation as review pass. Review/requirements complete only with verdict=pass; needs_revision/reject must fail with findings. Mail is not a formal next review. Completed work must not be repeated to attach late evidence: call update_task on the original task with its attempt_id and acceptanceResults/commandsRun/evidence_note; supplements are append-only and cannot change its verdict.",
+        "toolFilter": {
+          "deny": [
+            "agent_teams_create",
+            "agent_teams_approve",
+            "agent_teams_edit_plan",
+            "agent_teams_add_member",
+            "agent_teams_remove_member",
+            "agent_teams_create_task",
+            "agent_teams_reassign_task",
+            "agent_teams_amend_task",
+            "agent_teams_resume",
+            "agent_teams_delete"
+          ]
+        }
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "id": "t1",
+      "profileSeedId": "t1",
+      "subject": "Khảo sát bộ dữ liệu gợi ý việc làm có tương tác người dùng–tin THẬT",
+      "description": "Mục tiêu: tìm bộ dữ liệu có tương tác thật (apply / click / bookmark / view), không phải dữ liệu tổng hợp.\n\nBẮT BUỘC kiểm chứng và ghi rõ từng mục cho MỌI ứng viên:\n1. Tên + URL chính thức.\n2. Schema thực tế: liệt kê đúng tên cột (không phải mô tả).\n3. Số dòng từng bảng (số user, job, tương tác).\n4. Loại tương tác: tường minh (rating 1-5) hay ngầm (apply/click).\n5. CÓ cột employer/company/job_board không? (điều kiện để chia client FL).\n6. Text job có kỹ năng dạng cấu trúc không, hay phải trích từ HTML?\n7. Ngày tháng, khoảng thời gian.\n8. Giấy phép + có cần đăng ký/đồng ý điều khoản không.\n9. Mật độ ma trận tương tác = tương tác / (user × job).\n\nMANH MỐI PHẢI KIỂM (theo thứ tự ưu tiên):\n- RecSys Challenge 2016 (XING) — nghi có ~1,5M job posting, user, và tương tác click/bookmark/reply. Ứng viên số 1, kiểm trước.\n- RecSys Challenge 2017 (XING).\n- Kaggle Job Recommendation Challenge (CareerBuilder) — đối chiếu bản gốc Kaggle với bản nhóm đã crawl, xem có cột nào khác không.\n- HuggingFace xanderios/linkedin-job-postings.\n- Kaggle kshitizregmi/jobs-and-job-description, kaggle kandij/job-recommendation-datasets.\n- Các bộ có interaction dùng trong paper GNN-recsys cho job (tìm trên paperswithcode).\n\nKẾT QUẢ: bảng Markdown, mỗi ứng viên 1 dòng, cột = mục 1-9. Thêm cột 'Đạt yêu cầu cứng?' ghi rõ thiếu gì. Xếp hạng ứng viên. Ghi rõ bộ nào ĐÃ XÁC MINH bằng schema thật vs chỉ suy từ abstract.",
+      "status": "completed",
+      "assignee": "recsys-datasets",
+      "dependencies": [],
+      "attempt": 1,
+      "createdAt": 1794112481083,
+      "updatedAt": 1794115146382,
+      "attemptId": "4c5c946d-bde8-4750-8723-31c85ec25bdd",
+      "reassigning": false,
+      "output": "Đã khảo sát 12 ứng viên. Kết quả: KHÔNG bộ public nào đạt đủ 5 ràng buộc cứng; ràng buộc (4) employer_id là ràng buộc không bộ nào thoả mãn đồng thời với (1).\n\nBáo cáo đầy đủ: docs/KHAO_SAT_DATASET_TUONG_TAC_THAT.md (152 dòng, bảng 12 ứng viên × 12 cột theo đúng 9 mục yêu cầu + cột \"Đạt yêu cầu cứng?\" + cột mức xác minh A/B/C, kèm xếp hạng và khuyến nghị).\n\nXẾP HẠNG:\n1. RecSys 2017 XING (3,5/5): 7.267.094 tương tác dương + 314.501.101 impression, 6 loại tương tác tường minh (kể cả recruiter-interest), hồ sơ UV giàu. NHƯNG: không employer_id; kỹ năng chỉ là ID ẩn danh không có codebook; bản quyền XING AG cấm chia sẻ + phải được organizer approve mới tải được.\n2. CareerBuilder 2012 (2/5) — bộ DUY NHẤT đã kiểm schema thật và đang có trên đĩa.\n3. Zhaopin/Tianchi 31623 (?/5) — chưa xác minh, hứa hẹn nhất.\n\nĐÃ KIỂM BẰNG SCHEMA THẬT (mức A): CareerBuilder (4 file trên đĩa: header + đếm dòng), xanderios/linkedin-job-postings (HF info+statistics), arshkon/linkedin-job-postings (file list+byte size), OLX (file list+README), JobHop, lang-uk Djinni (2 repo), kandij (file list+preview cột), kshitizregmi.\nCHỈ SUY TỪ TÀI LIỆU CHÍNH THỨC (mức B): RecSys 2016 (TrainingDataset.md + Table 1 arXiv:1608.03333), RecSys 2017 (trang dataset + Table 1 Abel et al. DOI 10.1145/3109859.3109954), rules pháp lý CareerBuilder (.docx chính thức).\nCHƯA XÁC MINH (mức C): jobs/job_skills.csv của arshkon; toàn bộ schema Zhaopin/Tianchi; asaniczka/1-3m-linkedin-jobs-and-skills-2024.\n\nSỐ ĐO MỚI (tự đo trên dữ liệu thật):\n- Mật độ CareerBuilder: 1.603.111/(389.708×1.092.096)=3,767e-06 (0,000377%); theo user/job active = 1,365e-05 (0,001365%).\n- Mật độ XING 2017 dương: 3,717e-06; mọi event: 1,651e-04. OLX: 1,072e-04.\n- Đối chiếu CareerBuilder bản gốc vs bản crawl: KHỚP 100% header, thiếu 3 file (window_dates.tsv, test_users.tsv, splitjobs.zip). Bản gốc Kaggle KHÔNG có cột employer/skills/rating → thiếu là thuộc tính nguồn, không crawl bù được.\n- Thử 5 cách trích employer từ text: explicit field 0,17%; hậu tố pháp lý 30,93% (nhiễu); dòng đầu 2,03%; email domain phủ 21,32% application/16.106 domain; block City,State 7.333 block. KẾT LUẬN: top \"employer\" trích được toàn là công ty headhunt (volt.com 13.675, randstadusa.com 6.170, roberthalf.com 2.982) và chỉ 20 domain ≥1.000 app phủ 3,23% → proxy employer KHÔNG dùng làm nhãn FL được.\n- Hồ sơ UV CareerBuilder: Major 75,14%, GraduationDate 69,15%, TotalYearsExperience 96,36%, user_history 96,4% user có ≥1 job, 657.226 JobTitle phân biệt, TB 4,67 job/user.\n- 92,43% job có HTML trong Description/Requirements (1.009.435/1.092.096) → phải trích.\n\nKHUYẾN NGHỊ: (A) dùng ngay CareerBuilder + chia client FL theo block địa lý (City,State) — đo thật 69 block ≥200 tin phủ 36,21% job, đủ 5-12 client; ghi rõ là proxy địa lý. (B) Xin approval XING 2017 nếu cần đúng ngữ nghĩa nhưng không để thành đường găng (cấm tái phân phối). (C) Cử 1 người có tài khoản Tianchi verify sinh viên tải 3 file (~324 MB, dưới hạn 500 MB) đọc header thật — đây là ứng viên DUY NHẤT có thể đạt (1)+(2)+(3) mà chưa ai xác minh. (D) Nếu bắt buộc employer_id thật: không có bộ public nào, phải đổi framing và nêu giới hạn.\n\nGIỚI HẠN KỸ THUẬT ĐÃ GẶP: shell trên máy này chặn toàn bộ HTTPS (curl→000, python urllib fail), chỉ web_fetch ra ngoài được → không tải được file >0 byte để kiểm schema; mọi \"kiểm thật\" chỉ thực hiện được qua API metadata (HF/Kaggle) và 4 file đã có sẵn trên đĩa.",
+      "supplementalEvidence": [
+        {
+          "at": 1794115881618,
+          "by": "recsys-datasets",
+          "attempt": 1,
+          "attemptId": "4c5c946d-bde8-4750-8723-31c85ec25bdd",
+          "note": "ĐÍNH CHÍNH + KIỂM CHỨNG LẠI THEO YÊU CẦU CAPTAIN. Task t1 vẫn completed; đây là bằng chứng bổ sung (append-only, không đổi verdict).\n\n1) ĐÍNH CHÍNH KẾT LUẬN SAI VỀ MẠNG — nhận lỗi.\nKết luận \"shell chặn toàn bộ HTTPS\" của tôi là SAI, do một DƯƠNG TÍNH GIẢ: tôi test bằng cách pipe heredoc vào `python -`, lệnh đó mở REPL tương tác chứ không chạy script, nên \"fail\". Ghi script ra file .py rồi chạy thì Python HTTPS hoạt động bình thường. Đã tải thật:\n- Djinni job descriptions parquet: 145.859.589 B trong 19,6 s\n- Djinni candidate profiles parquet: 237.415.736 B trong 29,4 s\n- quét stream xanderios 134.845.243 B, datastax 516.843.769 B, lukebarousse 231.152.089 B\nTốc độ ~7 MB/s. curl (000) và Invoke-WebRequest vẫn hỏng — chỉ Python tải được. Đã ghi rõ trong tài liệu để người đọc không tưởng cả đội bị chặn mạng.\n\n2) ĐÍNH CHÍNH \"KHÔNG BỘ NÀO CÓ employer_id\" — nhận sai. Có ít nhất 4 bộ có employer thật, đo trên TOÀN BỘ file (không phải mẫu 100 dòng):\n- lukebarousse/data_jobs: company_name 785.740/785.741 = 100,00%, 139.984 công ty phân biệt\n- Djinni job descriptions: Company Name 100,00% (mẫu 20.000 dòng), 4.997 công ty phân biệt\n- datastax/linkedin_job_listings: company_name 122.130/123.849 = 98,61%\n- xanderios/linkedin-job-postings: company_id 32.592/33.246 = 98,03%\nPhát biểu đúng: (1) và (4) LOẠI TRỪ NHAU — bộ có employer thì không có tương tác user–job, bộ có tương tác thì không có employer.\n\n3) XÁC NHẬN lukebarousse/data_jobs là phát hiện lớn nhất — đã tự kiểm bằng cách quét 100% file:\n785.741 dòng. job_skills = 668.704 (85,10%), parse ast.literal_eval thành công 668.704/668.704, 0 lỗi — list Python thật, KHÔNG trích từ HTML. job_type_skills cùng 85,10% dạng dict phân nhóm. company_name 100,00%. Không có cột user/applicant nào.\nLƯU Ý SỐ LIỆU: captain đọc 89% từ mẫu 100 dòng; quét toàn bộ file cho 85,10% (chênh 3,9 điểm). Tương tự xanderios: mẫu 100 dòng cho applies 26%/views 55%, quét toàn bộ cho 48,84%/77,86%. Đã ghi cảnh báo \"luôn quét toàn bộ khi được, đừng tin mẫu 100 dòng\" vào tài liệu.\n\n4) XÁC NHẬN Zhaopin giữ mức C, không phải điểm chặn. Đã thử 4 endpoint API Tianchi: đều trả shell SPA (HTML, không JSON). Paper OKRA (arXiv:2504.07108) xác nhận nhãn 0–3 và xác nhận bộ còn lại là \"proprietary commercial dataset\" của XING không công bố. Tài liệu ghi rõ \"bỏ qua, không chặn\".\n\n5) ĐÃ TÌM ĐƯỢC SCHEMA job_skills.csv CỦA ARSHKON (chỗ trước đây ghi \"chưa xác minh\"):\nTừ đặc tả DB chính thức của chính scraper sinh ra dataset (DatabaseStructure.md, github.com/ArshKA/LinkedIn-Job-Scraper):\n- jobs/job_skills.csv = `job_id, skill_abr`\n- mappings/skills.csv = `skill_abr, skill_name`\nNâng từ mức C lên mức B. Số dòng vẫn mức C vì Kaggle API trả 404 không auth (đã thử cả 3 endpoint download/view).\n\n6) KIỂM TRA CHÉO MỘT LỖI PHƯƠNG PHÁP: đếm dòng bằng bytes.count(b'\\n') cho xanderios ra 702.287, nhưng parse CSV thật chỉ 33.246 dòng — SAI 21 LẦN do newline nằm trong field description. Nếu ai đó đếm thô sẽ báo sai số dòng. Đã ghi cảnh báo \"luôn dùng csv.reader\" vào tài liệu.\n\n7) BỔ SUNG MỤC 3.5 MỚI: bảng \"cột nào dùng được cho yêu cầu (2) kỹ năng JOB và (3) kỹ năng USER\" cho từng bộ, trả lời trực tiếp yêu cầu số 2 của captain.\n\n8) BỔ SUNG MỤC 4bis: artifact tái lập được + lệnh Python tái lập. Đã xoá file lớn theo ràng buộc <500 MB, giữ mẫu tại _newdata_audit/_dl/samples/:\n- djinni_job_descriptions_schema+10rows.json (24.679 B, num_rows=141897)\n- djinni_candidate_profiles_schema+10rows.json (24.735 B, num_rows=210250)\n- csv_headers.txt (1.336 B)\n\n9) KHÔNG đo lại CareerBuilder theo đúng chỉ đạo.\n\nTài liệu: docs/KHAO_SAT_DATASET_TUONG_TAC_THAT.md — từ 152 lên 261 dòng, 44.227 B. Đã grep xác nhận không còn câu sai nào (\"chặn toàn bộ HTTPS\", \"KHÔNG bộ public nào đạt đủ\") và không còn dòng \"chưa đọc header\" cho job_skills."
+        }
+      ]
+    },
+    {
+      "id": "t2",
+      "profileSeedId": "t2",
+      "subject": "Khảo sát nguồn KỸ NĂNG / NGÀNH có cấu trúc và job corpus giàu kỹ năng",
+      "description": "Mục tiêu: bù phần thiếu của bộ CareerBuilder (không có cột skill, không có cột industry).\n\nCần 3 thứ riêng biệt, đừng trộn:\n(A) TAXONOMY kỹ năng/ngành: ESCO (EU, có API + đa ngữ), O*NET (US DOL, occupation-skill matrix), Lightcast nếu mở, taxonomy LinkedIn. Ghi: số nghề, số kỹ năng, có quan hệ phân cấp skill→nhóm không, có map sang nghề không, giấy phép, có API offline-able không.\n(B) JOB CORPUS có cột skill TƯỜNG MINH (không trích text): Kaggle asaniczka/1-3m-linkedin-jobs-and-skills-2024 (2,0 GB), Kaggle ravindrasinghrana/job-description-dataset, Adzuna API, USAJobs API, Arbeitnow.\n(C) PROFILE ứng viên có kỹ năng: HuggingFace aida-ugent/JobHop (355.315 quỹ đạo nghề, mã ESCO), cnamuangtoun/resume-job-description-fit.\n\nMỗi nguồn ghi: số bản ghi, cột thực tế, giấy phép, dung lượng, cần đăng ký không, CHI PHÍ BIẾN ĐỔI (bao nhiêu bước để thành cột skill của job / của user).\n\nKẾT QUẢ: 3 bảng (A/B/C) + kết luận: tổ hợp nào cho đồ thị User–Job–Skill–Industry đầy đủ nhất, và mất gì.",
+      "status": "completed",
+      "assignee": "skills-data",
+      "dependencies": [],
+      "attempt": 1,
+      "createdAt": 1794112481083,
+      "updatedAt": 1794116594448,
+      "attemptId": "d6eca35f-b7d8-45dc-afb8-b93522ac8be0",
+      "reassigning": false,
+      "output": "Hoàn thành khảo sát 3 phần A/B/C. Báo cáo: docs/KHAO_SAT_NGUON_KY_NANG_VA_NGANH.md (179 dòng, 21.179 B). Bằng chứng máy đọc: _newdata_audit/T2_EVIDENCE.json (20.666 B) + 12 file t2_*.json + script tái lập. Đã dọn 189,6 MB dữ liệu thô, giữ header trong t2_HEADERS_KEPT.json.\n\n(A) TAXONOMY. ESCO v1.2.1: 2.942 nghề [ĐO], 13.485 skill [ĐO], 28 ngôn ngữ, CÓ phân cấp (60/60 skill có broaderHierarchyConcept; 38/60 broaderSkill), CÓ ma trận nghề–kỹ năng (TB 20,85 essential + 17,03 optional = 37,88 cạnh/nghề, ước ~111.441 cạnh cho 2.942 nghề), 78/80 skill có ≥1 nghề. Giấy phép Quyết định 2011/833/EU — miễn phí mọi mục đích, bắt buộc ghi công. Offline: CSV/ODS/RDF/TTL/JSON-LD + Local API, gói 19 file; tải cần nhập email, KHÔNG cần tài khoản. TIẾNG VIỆT: KHÔNG CÓ — đã kiểm bằng API, language=vi trả đúng 28 preferredLabel và 'vi' không nằm trong preferredLabel/alternativeLabel.\n\nO*NET 29.3 (đã tải thật 13.301.357 B, 42 file): 1.016 nghề [ĐO], chỉ 35 kỹ năng (10 Basic 2.A + 25 Cross-Functional 2.B), 30.765 cạnh nghề–kỹ năng phủ 879 nghề. Bù lại Technology Skills 32.681 cạnh / 8.775 phần mềm, Tools Used 41.662 cạnh / 18.105 dụng cụ, Alternate Titles 56.558 tên. Có phân cấp Element ID + IWA (332) + DWA (2.088). Giấy phép CC BY 4.0. Có crosswalk chính thức ESCO↔O*NET.\nLightcast: KHÔNG mở. LinkedIn taxonomy: KHÔNG public (đều đã kiểm).\n\n(B) JOB CORPUS. \n- asaniczka: 6.190.063.069 B (6,19 GB) > 500 MB nên KHÔNG tải; endpoint download trả 404 không auth, chỉ đọc được data card. Cột thật: linkedin_job_postings.csv = job_link,last_processed_time,got_summary,got_ner,is_being_worked,job_title,company,job_location,first_seen,search_city (1.348.454 dòng, got_summary 96%); job_skills.csv = job_link,job_skills (1.296.381 dòng). Skill là chuỗi NER phải .split(\", \"), lẫn cả phúc lợi (Health Insurance, Dental Insurance) và có dòng rác. ODC-By.\n- ravindra: 1.615.940 dòng, 23 cột, skills điền 100% NHƯNG LÀ DỮ LIỆU TỔNG HỢP — Company Size 5.412 giá trị/5.551 dòng, Qualifications chỉ 10 giá trị, cặp vô lý BT Group→Gibraltar, Truist→Maldives, Prudential→San Marino, lương 181.794.758.338–62.170.523.408.759. LOẠI.\n- lukebarousse/data_jobs (phát hiện tốt nhất): đã tải TOÀN BỘ 231.152.089 B, đo 100% dòng rồi xoá. 785.741 dòng × 17 cột. job_skills non-null 668.704 = 85,10%, parse thành list không rỗng 668.704/668.704 — 0 LỖI PARSE (list Python thật, không trích HTML). TB 5,45 skill/tin, 246 skill phân biệt; job_type_skills 85,10% dạng dict phân nhóm; company_name điền 100,00% / 139.982 công ty phân biệt; 2023-01-01→2023-12-31. Apache-2.0. KHÔNG có user/applies/views.\n- Adzuna: cần app_id+app_key, 20 kết quả/trang, không cột skill, không employer_id; ToS trả 403 nên giấy phép CHƯA XÁC MINH.\n- USAJobs: cần API key+email (401 nếu không); có OrganizationName + JobCategory (ngành) nhưng QualificationSummary là free text, không cột skill.\n- Arbeitnow: không cần key; quét được 3.511 tin/15 trang rồi HTTP 429; tags 96,5% nhưng là 896 nhãn NGÀNH/chức năng, KHÔNG phải kỹ năng.\n\n(C) PROFILE. JobHop v2: đã tải parquet 9.213.302 B và đọc. Cột THỰC TẾ là resume_id,matched_code,start_date,end_date,university_level — KHÁC README (README ghi person_id/esco_code/education_level). 1.594.827 dòng train, 284.251 resume_id, 2.983 mã, unknown 6,93%. Join sang ESCO: 57/60 = 95,0% khớp chính xác occupation.code. CC-BY-4.0. NHƯNG README nói rõ KHÔNG phát hành technical skills (trích nguyên văn trong báo cáo) → không có skill phía user.\nresume-job-description-fit: 8.000 dòng (6.241+1.759), 3 cột resume_text/job_description_text/label, KHÔNG có cột skill, KHÔNG CÓ GIẤY PHÉP (cardData null) → không dùng được cho ràng buộc (5).\n\nKẾT LUẬN: tổ hợp đầy đủ nhất = data_jobs (Job–Skill) + ESCO (Skill/Occupation/Industry taxonomy) + JobHop (User–Occupation). MẤT: (1) không có tương tác user–tin thật ở bất kỳ bộ B nào; (2) không có skill phía ứng viên (JobHop giữ kín); (3) không có cột industry ở mức tin, chỉ suy qua ISCO; (4) Job là data/analytics 2023 toàn cầu, User là Bỉ/Flanders 91,4% tiếng Hà Lan — ghép 2 thị trường khác nhau, phải khai báo; (5) taxonomy không có tiếng Việt. Chi phí biến đổi: data_jobs→job.skills = 2 bước (parse + match ESCO), JobHop→user.skills = 2 bước; asaniczka cần 3–4 bước và tỉ lệ khớp ESCO chưa đo được.",
+      "changedPaths": [
+        "docs/KHAO_SAT_NGUON_KY_NANG_VA_NGANH.md",
+        "_newdata_audit/T2_EVIDENCE.json",
+        "_newdata_audit/t2_HEADERS_KEPT.json",
+        "_newdata_audit/t2_onet_stats.json",
+        "_newdata_audit/t2_esco_matrix.json",
+        "_newdata_audit/t2_esco_skill_detail.json",
+        "_newdata_audit/t2_esco_coverage.json",
+        "_newdata_audit/t2_c_stats.json",
+        "_newdata_audit/t2_datajobs_full.json",
+        "_newdata_audit/t2_jobhop_join.json",
+        "_newdata_audit/t2_ravindra_fill.json",
+        "_newdata_audit/t2_arbeitnow.json",
+        "_newdata_audit/t2_kaggle_columns.json",
+        "_newdata_audit/t2_sources_probe.json"
+      ],
+      "acceptanceResults": [
+        {
+          "criterion": "Bảng (A) TAXONOMY: số nghề, số kỹ năng, phân cấp skill→nhóm, map sang nghề, giấy phép, offline-able",
+          "status": "passed",
+          "evidence": "ESCO: 2.942 nghề, 13.485 skill đo qua /api/search total; phân cấp 60/60 có broaderHierarchyConcept, 38/60 broaderSkill; ma trận 37,88 cạnh/nghề trên 199 nghề mẫu → ước 111.441 cạnh; giấy phép 2011/833/EU đọc từ FAQ; offline CSV 19 file + Local API. O*NET: tải thật 13.301.357 B/42 file, 1.016 nghề, 35 kỹ năng, 30.765 cạnh, CC BY 4.0. Lightcast/LinkedIn: xác nhận không mở/không public."
+        },
+        {
+          "criterion": "Bảng (B) JOB CORPUS có cột skill TƯỜNG MINH: số bản ghi, cột thực tế, giấy phép, dung lượng, cần đăng ký",
+          "status": "passed",
+          "evidence": "6 nguồn. asaniczka: cột thật lấy từ data card HTML, 6,19 GB, ODC-By, 1.296.381 dòng job_skills. ravindra: 1.615.940 dòng, skills 100% nhưng chứng minh TỔNG HỢP bằng 6 phép đo. data_jobs: tải toàn bộ 231.152.089 B, đo 100% dòng, 785.741 dòng, job_skills 85,10% parse-0-lỗi, company_name 100%/139.982 công ty, Apache-2.0. Adzuna/USAJobs/Arbeitnow: liệt kê cột thật, xác nhận cần key hoặc rate limit, không có cột skill."
+        },
+        {
+          "criterion": "Bảng (C) PROFILE ứng viên có kỹ năng: JobHop và resume-job-description-fit",
+          "status": "passed",
+          "evidence": "JobHop: tải parquet 9.213.302 B, cột thực tế resume_id/matched_code/start_date/end_date/university_level (khác README), 1.594.827 dòng train, 284.251 resume_id, join ESCO 57/60=95,0%, CC-BY-4.0, README xác nhận KHÔNG phát hành technical skills. resume-fit: tải cả 2 file, 8.000 dòng, 3 cột, KHÔNG có skill, KHÔNG có giấy phép."
+        },
+        {
+          "criterion": "Mỗi nguồn ghi CHI PHÍ BIẾN ĐỔI (số bước thành cột skill của job / của user)",
+          "status": "passed",
+          "evidence": "Bảng riêng 10 dòng: ESCO 2 bước/1 bước; O*NET 2/2; asaniczka 3-4 (matching chưa đo được); ravindra 1 nhưng vô nghĩa; data_jobs 2/—; Adzuna 3; USAJobs 3; Arbeitnow 4; JobHop —/2; resume-fit 3/3."
+        },
+        {
+          "criterion": "KẾT LUẬN: tổ hợp cho đồ thị User–Job–Skill–Industry đầy đủ nhất và mất gì",
+          "status": "passed",
+          "evidence": "Khuyến nghị data_jobs + ESCO + JobHop kèm sơ đồ node/cạnh và số cạnh từng loại. Nêu 6 mất mát: không tương tác thật, không skill phía user, không cột industry mức tin, lệch miền (data/analytics 2023 vs Bỉ/Flanders), không có tiếng Việt ở taxonomy, rủi ro giấy phép C2 và Adzuna chưa xác minh."
+        },
+        {
+          "criterion": "Ưu tiên nêu rõ ESCO có bản tiếng Việt hay không (yêu cầu bổ sung của captain)",
+          "status": "passed",
+          "evidence": "Kiểm trực tiếp bằng API: resource/occupation?language=vi trả 28 preferredLabel, 'vi' không có trong preferredLabel lẫn alternativeLabel, giống hệt language=en/fr/de. Danh sách 28 ngôn ngữ liệt kê đầy đủ. Kết luận: KHÔNG có tiếng Việt, kèm cách biện luận cho hội đồng (dùng skill_uri làm khoá, dịch nhãn hiển thị ở tầng UI)."
+        },
+        {
+          "criterion": "Tuân thủ ràng buộc <500 MB và dọn file nặng",
+          "status": "passed",
+          "evidence": "Không tải asaniczka 6,19 GB. File lớn nhất đã tải là data_jobs 231.152.089 B (<500 MB), đo xong xoá ngay. Dọn tổng 189.556.508 B (189,6 MB) khỏi _newdata_audit/t2_data, giữ header + số dòng trong t2_HEADERS_KEPT.json. Còn lại 12,07 MB."
+        },
+        {
+          "criterion": "Mọi con số trong báo cáo truy nguồn được, không bịa",
+          "status": "passed",
+          "evidence": "Script kiểm chứng _newdata_audit/t2_verify_doc3.py đối chiếu 357 token số trong báo cáo với T2_EVIDENCE.json: chỉ còn 1 token không truy nguồn được là '3.13' (phiên bản Python, không phải số liệu). Không còn khẳng định cấm kỳ nào (đã grep 4 cụm)."
+        }
+      ],
+      "commandsRun": [
+        {
+          "command": "python _newdata_audit/t2_onet.py  (tải O*NET db_29_3_text.zip 13.301.357 B, giải nén 42 file)",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "downloaded bytes: 13301357; entries: 42; Skills.txt 5.550.164 B header 'O*NET-SOC Code\\tElement ID\\tElement Name\\tScale ID\\tData Value...'"
+        },
+        {
+          "command": "python _newdata_audit/t2_onet_stats.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "n_occupation_rows 1016; skills_unique_elements 35; skills_edges_occ_skill 30765; techskills_unique_examples 8775; alt_titles_edges 56558"
+        },
+        {
+          "command": "python _newdata_audit/t2_esco_matrix3.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "essential mean 20.85 median 19 min 3 max 90; optional mean 17.03 max 108; mean_edges_per_occ 37.88; est_total 111441"
+        },
+        {
+          "command": "python _newdata_audit/t2_esco_skill_detail.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "hierarchy_on_60_sample {has_broader:38, has_narrower:10, has_skill_group:60}; skillType {skill:49, knowledge:11}; reuse {sector:29, cross-sector:18, occupation-specific:12, transversal:1}"
+        },
+        {
+          "command": "python _newdata_audit/t2_esco_coverage.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "78/80 skills linked to >=1 occupation, pct_linked 97.5"
+        },
+        {
+          "command": "python _newdata_audit/t2_esco_dbg3.py  (xác minh ngôn ngữ VI)",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "lang=vi: n_prefLabel=28 vi_in_pref=False vi_in_alt=False; lang=en/fr/de cũng 28, không có 'vi'"
+        },
+        {
+          "command": "python _newdata_audit/t2_c_stats.py  (tải JobHop parquet 9.213.302 B + resume-fit 68.616.017 B)",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "JobHop cols [resume_id, matched_code, start_date, end_date, university_level], n_rows 1594827, n_unique_resume_id 284251, n_unique_matched_code 2983; rjdf train 6241 / test 1759 cols [resume_text, job_description_text, label]"
+        },
+        {
+          "command": "python _newdata_audit/t2_jobhop_join2.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "n_sampled 60, hit 57, miss 3, join_pct 95.0"
+        },
+        {
+          "command": "python _newdata_audit/t2_datajobs_full.py  (tải toàn bộ 231.152.089 B, đo 100% dòng, xoá file)",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "rows 785741 cols 17; job_skills non-null 668704 (85.10%); parses_to_nonempty_list 668704; parse_fail 0; mean skills/job 5.45; distinct 246; company_name fill 100.0% distinct 139982; dates 2023-01-01→2023-12-31; parquet deleted"
+        },
+        {
+          "command": "python _newdata_audit/t2_rav_range.py  (HTTP Range trên CSV 1.74 GB, không tải hết)",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "206 Content-Range bytes 0-400000/1743166140; 23 cột; skills fill 100.0% ở cả 6 offset"
+        },
+        {
+          "command": "python _newdata_audit/t2_synth_check.py  (chứng minh ravindra tổng hợp)",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "Company Size unique=5412/5551; Qualifications unique=10; companies: BT Group→Gibraltar, Truist Financial→Maldives, Prudential Financial→San Marino, UltraTech Cement→Madagascar"
+        },
+        {
+          "command": "python _newdata_audit/t2_arbeitnow.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "pages 15, items 3511, dừng ở HTTP 429; tags fill 96.5% distinct 896; distinct_companies 1399; top tags Remote/Engineering/Sales (nhãn ngành)"
+        },
+        {
+          "command": "python _newdata_audit/t2_columns.py  (trích tên cột thật từ data card Kaggle)",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "linkedin_job_postings.csv: job_link, last_processed_time, got_summary, got_ner, is_being_worked, job_title, company, job_location, first_seen, search_city"
+        },
+        {
+          "command": "python _newdata_audit/t2_cleanup.py  (dọn dữ liệu thô, giữ header)",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "freed 189556508 bytes (189.6 MB); headers -> t2_HEADERS_KEPT.json; còn lại 12.07 MB"
+        },
+        {
+          "command": "python _newdata_audit/t2_verify_doc3.py  (kiểm chứng truy nguồn số liệu trong báo cáo)",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "357 token số kiểm tra; KHÔNG truy nguồn được: 1 -> ['3.13'] (phiên bản Python); khẳng định cấm kỳ: tất cả False"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "profileSeedId": "t3",
+      "subject": "Khảo sát cách chia client trong FL-recsys và bộ dữ liệu có ranh giới tổ chức",
+      "description": "Bối cảnh: đề bài yêu cầu 'mỗi nền tảng/doanh nghiệp giữ dữ liệu riêng'. Bộ CareerBuilder KHÔNG có cột employer. Cần biện luận học thuật cho phương án thay thế.\n\nCần trả lời:\n1. Các bài báo FL-recsys chia client theo tiêu chí gì? Dẫn bài cụ thể (tên, năm, hội nghị) và cách họ mô tả lý do.\n2. Có bộ dữ liệu FL công khai nào cho recsys không (FedRec, FLBench, benchmark FL)? Schema và cách chia.\n3. Khi dữ liệu không có employer: cách chia nào ĐƯỢC CHẤP NHẬN trong bài báo (user_id hash, vùng địa lý, item cluster, thời gian)? Ưu nhược từng cách, cách nào bị phản biện là 'phi thực tế'.\n4. Có tiền lệ chia client theo BANG/VÙNG ĐỊA LÝ cho dữ liệu tuyển dụng không? (dữ liệu CareerBuilder có 84% ứng tuyển cùng bang — tín hiệu mạnh cần dẫn chứng học thuật).\n5. Ngưỡng non-IID nào thì FL còn có nghĩa? Có bài nào đo mức suy giảm theo độ lệch phân bố client không?\n\nKẾT QUẢ: báo cáo có trích dẫn + bảng 'cách chia client → dẫn chứng → rủi ro bị phản biện'.",
+      "status": "completed",
+      "assignee": "fl-benchmarks",
+      "dependencies": [],
+      "attempt": 1,
+      "createdAt": 1794112481083,
+      "updatedAt": 1794117204878,
+      "attemptId": "3592eab8-c2ea-43af-8376-00bb093e9755",
+      "reassigning": false,
+      "output": "Báo cáo: docs/KHAO_SAT_CHIA_CLIENT_FL.md (420 dòng, 21 tài liệu đã kiểm chứng qua arXiv API/OpenAlex/DOI) + 3 file số liệu JSON. Trả lời đủ 5 câu hỏi + bảng quyết định.\n\nPHÁT HIỆN CHÍNH (định lượng, đo trên bộ CareerBuilder):\n\n1. Chuẩn mặc định của FL-recsys là client = USER (cross-device), không phải doanh nghiệp: FedGNN, PFedRec (IJCAI'23), GPFedRec (KDD'24), pFL-Bench (NeurIPS'22 D&B). \"Mỗi doanh nghiệp = 1 client\" là biến thể cross-silo, có tiền lệ: FedCT (SIGIR'21), Horizontal Cross-Silo FedRec (RecSys'21, \"corporate companies...\"), FedCORE (TKDE'24).\n\n2. Tiền lệ TRỰC TIẾP duy nhất cho \"công ty = client\" trong TUYỂN DỤNG: FedLMF/MPCAC-FL (Guo et al., arXiv:2409.19545, 2024) — client là công ty, lý do bảo mật dữ liệu nhân sự. Đây là trích dẫn neo.\n\n3. KHÔNG có bộ FL-recsys công khai nào có nhãn employer. Mọi benchmark đều CHIA LẠI dữ liệu centralized (MovieLens/Amazon/Yelp). => Tự định nghĩa ranh giới client là THỰC HÀNH CHUẨN đã công bố, miễn khai báo.\n\n4. CẢNH BÁO QUAN TRỌNG NHẤT: chia thô theo 189 bang KHÔNG dùng được — min 1 / median 11 / max 169.760 app per client; 145/189 client <1.000 app, 128 client <100 app. Phải gom nhóm. Khuyến nghị G1 K=20 (top-20 bang + Rest) = 21 client, max/min = 8,4×, top-1 chỉ 12,2%.\n\n5. PHÁT HIỆN TINH TẾ, dễ tự bắn vào chân: chia theo bang tạo non-IID ở mức ITEM nhưng gần như IID ở mức NHÓM NGÀNH.\n   - JSD trên nhóm ngành thô: 0,0007–0,0027 (~IID) => TUYỆT ĐỐI không dùng để biện luận.\n   - JSD trên job_id: state 0,8057 vs nền hash 0,6008 (+34%).\n   - JSD trên title: state 0,5261 vs nền hash 0,3437 (+53%).\n   - 46,6% traffic rơi vào job CHỈ 1 bang ứng tuyển; Jaccard item-set median 1,2% (max 16,7% NY–NJ, hai bang kề — kiểm chứng hợp lý).\n   - 60,2% traffic trên job ≥2 bang dùng chung => item phổ biến dùng chung tốt, đuôi dài rất địa phương => cần item embedding riêng theo client (xác nhận cạm bẫy FedAvg ngây thơ ở PHAN_TICH_DE_TAI.md A.3).\n   => Phải báo cáo JSD so với NỀN HASH cùng số client, không đọc giá trị tuyệt đối.\n\n6. Bằng chứng 84,05% cùng bang là thật nhưng dùng hẹp: ở mức user trung bình 87,0%, median 100%, 78,9% ứng viên CHỈ ứng tuyển trong 1 bang. Chưa có bài nào chia theo bang cho recsys tuyển dụng (arXiv: 0 kết quả cho \"federated\"+\"job recommendation\") — vừa là rủi ro vừa là ĐÓNG GÓP.\n\n7. Ngưỡng non-IID có định lượng: Zhao (arXiv:1806.00582) giảm tới 55%; Hsu (arXiv:1909.06335) suy giảm đơn điệu 30,1%→76,9%; pFL-Bench dùng Dirichlet α∈{5;0,5;0,1} + JSD làm trục đo.\n\n8. Cách chia BỊ PHẢN BIỆN là phi thực tế: (a) item-cluster làm client — đo được 51,6% user thuộc ≥2 client, 1,94 client/user => rò rỉ chéo client; (b) hash làm client chính — \"chia bừa, không ngữ nghĩa\"; (c) thời gian làm client — sai khái niệm, bộ này chỉ trải 63 ngày phân biệt.\n\nARTIFACT: docs/KHAO_SAT_CHIA_CLIENT_FL.md; _newdata_audit/{clientsplit,client_configs,nonIID}.json; script p26/p27/p28/p29. Có mục \"giới hạn của số liệu\" ghi rõ 84,05% tính trên toàn bộ app không lọc split, và JSD job_id bị nhiễu do vũ trụ item lớn."
+    },
+    {
+      "id": "t4",
+      "profileSeedId": "t4",
+      "subject": "Kiểm chứng thực nghiệm top ứng viên theo 5 yêu cầu cứng",
+      "description": "Nhận danh sách ứng viên từ t1/t2/t3. Chọn 3 ứng viên mạnh nhất và KIỂM CHỨNG BẰNG SỐ ĐO, không bằng mô tả.\n\nVới mỗi ứng viên, đo và ghi rõ đã kiểm hay chỉ suy từ tài liệu:\n1. Đếm thật số user / job / tương tác (tải metadata, đọc header, hoặc sample nhỏ rồi ngoại suy — ghi rõ cách).\n2. Mật độ = tương tác / (user × job).\n3. Phân bố tương tác/user và tương tác/job: median, p90, max, số user có >=5 tương tác.\n4. Bao nhiêu % job có >=1 kỹ năng trích được.\n5. Có cột phân vùng client không; nếu không thì phương án t3 nào áp được.\n6. Giấy phép có cho phép dùng trong đồ án học thuật và công bố báo cáo không.\n\nCẢNH BÁO: bộ CareerBuilder đã đo rồi (1.603.111 tương tác; 321.235 user; 365.668 job; mật độ 0,0014%; 43,4% job chỉ có 1 tương tác; user>=10 và job>=10 còn 36.387 user / 37.538 job / 495.684 tương tác). Dùng làm mốc so sánh, đừng đo lại.\n\nKẾT QUẢ: bảng so sánh 3 ứng viên × 6 tiêu chí, cộng bảng 'đạt/không đạt' theo 5 yêu cầu cứng của đề tài. Nêu rõ ứng viên nào là phương án 1, 2, 3.",
+      "status": "completed",
+      "assignee": "dataset-verifier",
+      "dependencies": [
+        "t1",
+        "t2",
+        "t3"
+      ],
+      "attempt": 1,
+      "createdAt": 1794112481083,
+      "updatedAt": 1794121371001,
+      "attemptId": "e3d1f0ef-f25f-4870-81b2-c829f3148ede",
+      "reassigning": false,
+      "output": "Báo cáo: docs/BAO_CAO_T4_KIEM_CHUNG_UNG_VIEN.md (300 dòng, 34.758 B). Bằng chứng máy đọc: _newdata_audit/t4_verify/ (11 file t4_*.json + 11 script tái lập). Đã dọn 359 MB dữ liệu thô.\n\n## PHÁT HIỆN QUYẾT ĐỊNH — bẫy captain cảnh báo đã được ĐO và XÁC NHẬN, nhưng hệ quả nặng hơn ước lượng\n\nGiả định \"data_jobs chỉ có data roles\" ĐÚNG: 98,61% job_title chứa từ khoá data; chỉ 10 giá trị job_title_short (Data Analyst 196.075 … Cloud Engineer 12.331).\n\nNHƯNG join title CB↔data_jobs cho 22,76% app khớp, trong đó **86,92% là TRÙNG CHUỖI VÔ NGHĨA**:\n- administrative assistant 35.604 | customer service representative 25.179 | receptionist 16.419 | executive assistant 9.994 | customer service 6.428 | staff accountant 5.291\n→ join rồi gán job_skills của data_jobs cho \"administrative assistant\" = gán python/sql/tableau cho tin thư ký. SAI NGỮ NGHĨA, không phải sai kỹ thuật.\nTrần thật của phần ĐÚNG NGHĨA = **2,977%** (47.726 app, data+khớp) — sát ước lượng 2,4% của captain. Phần \"22,76%\" chỉ là rác.\n\n## 3 mức join (đã đo, theo app/user/job)\n| Mức | data_jobs | arshkon |\n|---|---|---|\n| CHẶT | 11,48% app | 19,09% |\n| LỎNG | 11,28% | 5,68% |\n| NHÓM (job_title_short) | 0,29% | — |\n| KHÔNG KHỚP | 49,87% (cả 2) | |\n| Cộng dồn | 23,06% | 24,78% (hợp: 47,83%) |\n\n## arshkon: phủ tốt hơn nhưng HỎNG cột employer\nĐã tải thật postings.csv qua mirror datastax (516 MB, 123.849 dòng, 15.850 company_id). Ghép title là NHIỀU–NHIỀU:\n- chỉ **7,11%** app xác định được ĐÚNG 1 công ty (113.910)\n- **39,50%** app mơ hồ (633.280): median **18 công ty/title**, max **372**\n- 53,39% không khớp\n- skills_desc chỉ **1,97%** (2.439); bảng jobs/job_skills.csv VẪN CHƯA TẢI ĐƯỢC (Kaggle 404, không mirror HF) → mức C.\n→ arshkon KHÔNG cứu được cột (4). Gán bừa 1/18 công ty = nhãn employer sai = client FL sai.\n\n## Phương án không ghép (KHUYẾN NGHỊ) — kỹ năng MỨC NGHỀ\nO*NET 29.3 tải thật 13.301.357 B: 49.849 khoá title, 763 nghề có Skills.txt, 798 nghề có Technology Skills.\nTrên toàn CB: 129.120 job map được nghề (35,31%), **641.952 app (40,04%)**; 93,07% trong số đó có ≥1 kỹ năng → **37,32% tổng app có kỹ năng**. Cao gấp ~13× phương án join đúng nghĩa (2,977%) và KHÔNG cần khoá ngoại.\n\nPipeline P1 (client = top-20 bang + REST, cấu hình t3): **641.952 tương tác / 214.832 user / 129.120 job / 21 client** (min 9.420 / median 22.825 / max 77.589), % job có kỹ năng 93,07%. P2 (user≥5,job≥5) = 270.763 / 32.614 / 32.330.\n\n## XẾP HẠNG\n1. **CareerBuilder + kỹ năng mức nghề O*NET + client theo bang — 4/5** (chỉ hỏng license)\n2. CareerBuilder ⨝ arshkon — 2,5/5 (employer mơ hồ 39,50%)\n3. data_jobs làm bộ chính — 2/5 (mất hoàn toàn (1) và (3))\nLOẠI: CareerBuilder ⨝ data_jobs theo title — 86,92% rác\n\n## Giấy phép CareerBuilder — rủi ro THẬT (đọc nguyên văn .docx 14.148 B)\n\"Entrants must use the Data provided to them **solely for purposes of the Competition**\"\n\"promptly after the Competition ends, Entrants must **cease all use of the Data** … and **erase or otherwise destroy** all … computer entries\"\n→ Cuộc thi kết thúc 2012; dùng cho đồ án 2026 + công bố là vùng xám. Đề xuất: không đính kèm dữ liệu thô, chỉ công bố mã + số liệu tổng hợp, ghi rõ hạn chế.\n\n## XING 2017 — cổng đã CHẾT, không lấy được\nrecsys.xing.com → 301 → www.xing.com; /data → 404; interactions.csv & recsys2017.zip → 404. Mirror RecoHut chỉ có README 48 B. HF search: không có dataset. Số liệu vẫn mức B: trang 2017 không nêu con số (grep \"314\"/\"7.267\"/\"1.497\" = 0 hit), arXiv 0 kết quả, OpenAlex abstract không có bảng, S2 CLOSED, CEUR overview.pdf là workshop summary không có Table 1.\n\n## Số phụ đã đo\n- CareerBuilder đối chiếu mốc captain: KHỚP 100% (36.387 user≥10, 43,44% job 1 app, 37.538 job≥10). Bổ sung: app/user median 2 / p90 10 / max 2.473; user≥5 = 87.760 (27,32%); app/job median 2 / p90 10 / max 208.\n- data_jobs: 785.741 dòng, job_skills 85,10% (668.704), parse 0 lỗi, TB 5,474 skill/tin, 252 skill, company_name 100% 139.984 cty. Job/công ty median 2 / p90 9 / p99 62 / max 6.664 → chia client thô theo công ty KHÔNG dùng được.\n- Gazetteer O*NET strict trên CB: chỉ **12,94%** tin có ≥1 kỹ năng công nghệ (n=43.678, stride 25) → trích từ HTML là hướng yếu, phải dùng mức nghề.\n- License [ĐO qua cardData]: data_jobs apache-2.0 (gated=False); Djinni 2 repo mit.\n\n## Đã loại / không đo được\nasaniczka (Kaggle 404 cả 3 endpoint, không mirror HF); Zhaopin (SPA shell); arshkon job_skills.csv (mức C); ravindra (dữ liệu tổng hợp).",
+      "changedPaths": [
+        "docs/BAO_CAO_T4_KIEM_CHUNG_UNG_VIEN.md",
+        "_newdata_audit/t4_lukebarousse.py",
+        "_newdata_audit/t4_cb_dist.py",
+        "_newdata_audit/t4_cb_skills.py",
+        "_newdata_audit/t4_cb_skills_onet.py",
+        "_newdata_audit/t4_cb_skills_onet_strict.py",
+        "_newdata_audit/t4_cb_skills_fast.py",
+        "_newdata_audit/t4_djinni.py",
+        "_newdata_audit/t4_djinni_files.py",
+        "_newdata_audit/t4_join_rates.py",
+        "_newdata_audit/t4_join_retention.py",
+        "_newdata_audit/t4_join_semantic.py",
+        "_newdata_audit/t4_datajobs_scope.py",
+        "_newdata_audit/t4_employer_ambiguity.py",
+        "_newdata_audit/t4_onet_coverage.py",
+        "_newdata_audit/t4_pipeline_option1.py",
+        "_newdata_audit/t4_licenses.py",
+        "_newdata_audit/t4_esco_api.py",
+        "_newdata_audit/t4_mirrors.py",
+        "_newdata_audit/t4_net.py",
+        "_newdata_audit/t4_arshkon_titles.py",
+        "_newdata_audit/t4_title_join.py",
+        "_newdata_audit/t4_xing_probe.py",
+        "_newdata_audit/t4_xing_docs.py",
+        "_newdata_audit/t4_xing_portal.py",
+        "_newdata_audit/t4_xing_papers.py",
+        "_newdata_audit/t4_xing_paper_lookup.py",
+        "_newdata_audit/t4_xing_pdf.py",
+        "_newdata_audit/t4_verify/t4_lukebarousse.json",
+        "_newdata_audit/t4_verify/t4_careerbuilder_dist.json",
+        "_newdata_audit/t4_verify/t4_join_rates.json",
+        "_newdata_audit/t4_verify/t4_join_semantic.json",
+        "_newdata_audit/t4_verify/t4_join_retention.json",
+        "_newdata_audit/t4_verify/t4_datajobs_scope_check.json",
+        "_newdata_audit/t4_verify/t4_employer_ambiguity.json",
+        "_newdata_audit/t4_verify/t4_onet_occupation_coverage.json",
+        "_newdata_audit/t4_verify/t4_pipeline_option1.json",
+        "_newdata_audit/t4_verify/t4_cb_skills_strict.json",
+        "_newdata_audit/t4_verify/t4_cb_skills_onet.json",
+        "_newdata_audit/t4_verify/t4_licenses.json",
+        "_newdata_audit/t4_verify/t4_djinni_files.json",
+        "_newdata_audit/t4_verify/t4_esco_api.json",
+        "_newdata_audit/t4_verify/t4_xing_probe.json",
+        "_newdata_audit/t4_verify/t4_xing_docs.json",
+        "_newdata_audit/t4_verify/t4_xing_portal.json",
+        "_newdata_audit/t4_verify/t4_xing_papers.json",
+        "_newdata_audit/t4_verify/t4_xing_paper_lookup.json",
+        "_newdata_audit/t4_verify/cb_rules.docx",
+        "_newdata_audit/t4_verify/cb_rules.txt",
+        "_newdata_audit/t4_verify/xing2017_overview.pdf",
+        "_newdata_audit/t4_verify/c2017_home.html",
+        "_newdata_audit/t4_verify/c2016_TrainingDataset.md"
+      ],
+      "acceptanceResults": [
+        {
+          "criterion": "Đếm thật số user/job/tương tác cho 3 ứng viên, ghi rõ cách đo",
+          "status": "passed",
+          "evidence": "CareerBuilder 321.235/365.668/1.603.111 [ĐO csv.reader toàn bộ apps.tsv, đối chiếu mốc captain khớp 100%]; data_jobs 0/785.741/0 [ĐO quét toàn bộ 231.152.089 B]; arshkon 0/123.849/0 [ĐO stream toàn bộ postings.csv 516 MB]. B và C xác nhận ZERO tương tác. t4_verify/t4_lukebarousse.json, t4_careerbuilder_dist.json"
+        },
+        {
+          "criterion": "Mật độ = tương tác/(user×job)",
+          "status": "passed",
+          "evidence": "CareerBuilder 1,365e-05 (0,001365%) khớp mốc; B và C = N/A vì không có ma trận user×item (đã ghi rõ thay vì bịa số). t4_careerbuilder_dist.json"
+        },
+        {
+          "criterion": "Phân bố tương tác/user và tương tác/job: median, p90, max, số user ≥5",
+          "status": "passed",
+          "evidence": "App/user median 2, p90 10, p99 44, max 2.473, n≥5 = 87.760 (27,32%), n≥10 = 36.387; App/job median 2, p90 10, p99 41, max 208, 1 app = 158.829 (43,44%), n≥10 = 37.538. Bổ sung job/công ty cho data_jobs: median 2, p90 9, max 6.664, 139.984 cty"
+        },
+        {
+          "criterion": "% job có ≥1 kỹ năng trích được",
+          "status": "passed",
+          "evidence": "CareerBuilder 12,94% bằng gazetteer O*NET strict (n=43.678 stride 25) [ĐO-MẪU]; 93,07% của phần map được nghề = 37,32% tổng app [ĐO toàn bộ]. data_jobs 85,10% [ĐO toàn bộ, 0 lỗi parse]. arshkon skills_desc 1,97% [ĐO]; job_skills.csv chưa tải được → mức C"
+        },
+        {
+          "criterion": "Có cột phân vùng client không; phương án t3 nào áp được",
+          "status": "passed",
+          "evidence": "CareerBuilder KHÔNG employer → áp t3 top-20 bang + REST = 21 client, đã đo trên P1: min 9.420 / median 22.825 / max 77.589 app. data_jobs CÓ company_name 100% nhưng chia thô hỏng (median 2 tin/cty). arshkon CÓ company_id nhưng join mơ hồ: chỉ 7,11% app xác định 1 công ty, 39,50% mơ hồ (median 18, max 372 công ty/title)"
+        },
+        {
+          "criterion": "Giấy phép có cho phép dùng học thuật và công bố không",
+          "status": "passed",
+          "evidence": "CareerBuilder: tải .docx rules gốc 14.148 B, trích nguyên văn 'solely for purposes of the Competition' và 'cease all use … erase or otherwise destroy' → KHÔNG ĐẠT. data_jobs apache-2.0 gated=False [ĐO cardData HF]. arshkon CC BY-SA 4.0. O*NET CC BY 4.0 [ĐO]. XING 2017: cổng chết (301→www.xing.com, /data 404), không lấy được"
+        },
+        {
+          "criterion": "Bảng so sánh 3 ứng viên × 6 tiêu chí",
+          "status": "passed",
+          "evidence": "§5.1 của docs/BAO_CAO_T4_KIEM_CHUNG_UNG_VIEN.md — đủ 3 ứng viên × 6 tiêu chí + cột cách đo"
+        },
+        {
+          "criterion": "Bảng đạt/không đạt theo 5 yêu cầu cứng + nêu phương án 1/2/3",
+          "status": "passed",
+          "evidence": "§5.2 (CareerBuilder 3,5/5, data_jobs 2/5, arshkon 1/5) và §8.1 xếp hạng: PA1 CareerBuilder+O*NET mức nghề+client bang (4/5), PA2 ⨝arshkon (2,5/5), PA3 data_jobs chính (2/5), LOẠI CB⨝data_jobs theo title"
+        },
+        {
+          "criterion": "Ràng buộc mới của captain: đo thật tỉ lệ join 3 mức (chặt/lỏng/không khớp) + phương án dự phòng arshkon + phương án không ghép",
+          "status": "passed",
+          "evidence": "§4.1 3 mức cho cả 2 nguồn; §4.2 phép đo ngữ nghĩa phát hiện 86,92% khớp là rác (trần đúng nghĩa 2,977%); §4.3 arshkon employer mơ hồ 39,50%; §4.4 phương án mức nghề phủ 40,04% app. §5.3 bảng phương án ghép theo đúng 5 cột captain yêu cầu"
+        }
+      ],
+      "commandsRun": [
+        {
+          "command": "python _newdata_audit\\t4_lukebarousse.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "Quét toàn bộ 785.741 dòng / 231.152.089 B: job_skills 85,10%, 0 lỗi parse, 139.984 công ty, job/công ty median 2 p90 9 max 6.664"
+        },
+        {
+          "command": "python _newdata_audit\\t4_cb_dist.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "1.603.111 app; app/user median 2 p90 10 max 2.473 n≥5=87.760; app/job median 2, 1 app 43,44%; KHỚP mốc captain ở 4 chỉ số"
+        },
+        {
+          "command": "python _newdata_audit\\t4_join_rates.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "Join 3 mức: data_jobs 11,48%/11,28%/0,29%/không khớp 49,87%; arshkon 19,09%/5,68%; hợp 47,83%"
+        },
+        {
+          "command": "python _newdata_audit\\t4_join_semantic.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "data_jobs: 2,977% data+khớp, 19,784% non-data+khớp → 86,92% khớp là rác. arshkon: 3,487% data+khớp"
+        },
+        {
+          "command": "python _newdata_audit\\t4_datajobs_scope.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "data_jobs data-only: 98,61% title có từ khoá data, 10 job_title_short; top title khớp là administrative assistant/receptionist"
+        },
+        {
+          "command": "python _newdata_audit\\t4_employer_ambiguity.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "arshkon 123.849 dòng, 15.850 company_id; employer: 7,11% unique, 39,50% multi (median 18, max 372), 53,39% unmatched; skills_desc 1,97%"
+        },
+        {
+          "command": "python _newdata_audit\\t4_onet_coverage.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "129.120/365.668 job map được nghề (35,31%), 641.952/1.603.111 app (40,04%), 37,32% app có ≥1 skill"
+        },
+        {
+          "command": "python _newdata_audit\\t4_pipeline_option1.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "P1 = 641.952 tương tác / 214.832 user / 129.120 job / 21 client (min 9.420, median 22.825, max 77.589), 93,07% job có skill"
+        },
+        {
+          "command": "python _newdata_audit\\t4_cb_skills_fast.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "Gazetteer O*NET strict, stride 25, n=43.678: 12,94% tin có ≥1 kỹ năng công nghệ, median 0 skill/tin"
+        },
+        {
+          "command": "python _newdata_audit\\t4_licenses.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "Tải rules CareerBuilder .docx 14.148 B + trích nguyên văn; cardData license: data_jobs apache-2.0 gated=False, 2 repo Djinni mit"
+        },
+        {
+          "command": "python _newdata_audit\\t4_xing_probe.py; python _newdata_audit\\t4_xing_portal.py; python _newdata_audit\\t4_xing_paper_lookup.py; python _newdata_audit\\t4_xing_pdf.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "Chứng minh cổng XING chết: recsys.xing.com 301→www.xing.com, /data 404, interactions.csv & recsys2017.zip 404, RecoHut chỉ README 48 B, HF 0 dataset; arXiv 0, S2 CLOSED, CEUR overview.pdf không có Table 1"
+        },
+        {
+          "command": "python _newdata_audit\\t4_arshkon_titles.py; python _newdata_audit\\t4_djinni_files.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "Tải mirror công khai postings.csv 516 MB (123.849 dòng, 31 cột); Djinni sibset xác nhận MIT qua cardData"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "profileSeedId": "t5",
+      "subject": "Thiết kế phương án dữ liệu cuối cùng (ghép bộ + số đo + rủi ro)",
+      "description": "Từ kết quả t4, chốt MỘT khuyến nghị, không đưa danh sách lựa chọn chung chung.\n\nPhải trả lời dứt khoát:\n1. Nếu có 1 bộ đạt cả 5 yêu cầu → chỉ ra và nêu số đo chứng minh.\n2. Nếu KHÔNG bộ nào đạt → nêu rõ bộ nào thiếu gì, rồi thiết kế TỔ HỢP: bộ nào cấp tương tác, bộ nào cấp kỹ năng, bộ nào cấp employer, ghép bằng khoá gì, và bao nhiêu % ghép được (join rate cụ thể, không phải 'khá tốt').\n3. Phương án B (không cần employer): dùng cách chia client nào từ t3, biện luận thế nào trước hội đồng.\n4. Chi phí kỹ thuật thật: dung lượng tải, thời gian xử lý trên máy 15,4 GB RAM / 12 luồng / 25 GB trống.\n5. Rủi ro: bộ nào có thể biến mất, bộ nào cần đăng ký, bộ nào giấy phép cấm công bố.\n6. Điều gì phải NÓI THẬT trong báo cáo nếu chọn từng phương án.\n\nKẾT QUẢ: 1 khuyến nghị chính + 1 dự phòng, mỗi cái kèm lý do định lượng.",
+      "status": "completed",
+      "assignee": "dataset-verifier",
+      "dependencies": [
+        "t4"
+      ],
+      "attempt": 1,
+      "createdAt": 1794112481083,
+      "updatedAt": 1794123515704,
+      "attemptId": "fa01100d-b032-4c88-b7ae-0b7c76757860",
+      "reassigning": false,
+      "output": "Báo cáo: docs/THIET_KE_PHUONG_AN_DU_LIEU_CUOI_CUNG.md (331 dòng, 36.116 B). Bằng chứng: _newdata_audit/t5_verify/ (12 JSON + olx_wayback.html) + 13 script t5_*.py.\n\n## 1. TRẢ LỜI DỨT KHOÁT CÂU HỎI CỦA CAPTAIN (§0)\nViết đúng câu captain yêu cầu: **\"Không tồn tại bộ dữ liệu công khai thoả đồng thời tương tác thật và giấy phép sạch.\"**\nĐã đọc VĂN BẢN LICENSE GỐC của cả 4 bộ tương tác thật — không suy đoán.\n\n## 2. HAI PHÁT HIỆN t5 TỰ TÌM RA (ngoài yêu cầu)\n**(a) Lớp Skill của O*NET VÔ DỤNG — t4 đề xuất sai.** `Skills.txt` gán **đủ 35/35 kỹ năng cho 763/763 nghề (100%)** → nút Skill entropy=0, đồ thị bipartite đầy đủ. Nếu làm theo t4, đồ án có lớp \"kỹ năng\" trông đẹp trong hình nhưng vô dụng.\n→ Sửa: dùng **ESCO** làm chuẩn (13.485 skill, đo thật **36,52 cạnh/nghề**, essential 20,28 min 5 max 70) + **O*NET Technology** (8.775, min 1/mean 37,93/max 594).\n\n**(b) Tự đính chính lỗi đo của t4.** Phép đối chứng chứng minh: cùng URL Kaggle, **python UA → 404 nhưng browser UA → 200**. Vậy kết luận t4 \"dataset bị xoá\" là **SAI** — Kaggle chặn theo User-Agent, rồi chặn bằng reCAPTCHA.\n**(c) Đính chính JSD:** JSD ở t3 và t5 khác **định nghĩa hàm** (client-vs-toàn-cục vs pairwise-to-mean). Đã đo lại bằng đúng hàm t3: job_id **0,7527 vs hash 0,4091 (+84,0%)**; title 0,2314 vs 0,0808; nhóm ngành 0,0044 (~IID). Số 0,0087 bị loại bỏ.\n\n## 3. LICENSE — ĐÃ ĐỌC VĂN BẢN GỐC (§3)\n- **CareerBuilder: CẤM.** \"solely for purposes of the Competition\" + \"cease all use … erase or otherwise destroy\". Cuộc thi kết thúc 2012-10-07.\n- **OLX: VÙNG XÁM (an toàn hơn CB)** — đọc được qua Wayback: \"solely as a base or supplement for conducting an analysis or research, incl. academic … under no circumstances the data set itself may be further published\"; \"non-commercial\"; **\"can be revoked at any time\"**. Chỉ 4 cột → tự nó không dùng được.\n- **Zhaopin: KHÔNG đọc được** (SPA shell 4.085 ký tự). Captain nói CC-BY-SA-NC đúng về nguyên tắc, nhưng tôi **không đọc được văn bản** → giữ [TL], không ghi như sự thật.\n- **Djinni ×2: MIT** nhưng **0 tương tác**.\n- SẠCH: data_jobs Apache-2.0, JobHop CC-BY-4.0, xanderios MIT, O*NET CC BY 4.0, ESCO 2011/833/EU, MEDAJob.\n\n## 4. NHÓM 3 REPO TỔNG HỢP — tôi kiểm LẠI độc lập, xác nhận captain ĐÚNG và mạnh hơn\n**SHA-256 của 6/6 bảng GIỐNG HỆT giữa 3 repo khác tên** (`n_distinct_hashes=1` mỗi bảng). Cộng: số dòng y hệt 15.000/9.000/320/2.000/7.196/938; `score` min 0,350 max 0,980 decile cách đều ~0,063 (dấu hiệu `random.uniform`); tên công ty **60,94%** khớp mẫu Faker.\n→ Đã thêm **checklist 7 dấu hiệu nhận diện** và **áp cho MEDAJob**: `Tech Company N`, `hr1@example.com` → đúng cả 7 → tổng hợp.\n\n## 5. THIẾT KẾ CUỐI (§8) — ghép ở MỨC NGHỀ, không cần khoá ngoại\nUser 213.793 · Job 127.784 · Occupation 832 · Skill 8.316 (Tech) + 13.485 (ESCO) · **User–Job 636.896** (trụ đồ án) · Job–Occ 127.784 · User–Occ 343.401 · Job–Skill 47.567. Mật độ 0,002331%.\n**Phía USER (t4 chưa đo, t5 đo):** 77,86% user trong đồ thị có ≥1 skill — nhưng **suy qua nghề**, không phải tự khai.\nClient: 21 (top-20 bang + REST) min 9.352/median 22.626/max 76.993; hash đối chứng 29.410/30.178/32.252.\n\n## 6. KHUYẾN NGHỊ\n**CHÍNH = P1** CareerBuilder + ESCO/O*NET mức nghề + client địa lý. 3 lý do: 636.896 cạnh thật (gấp **2.075×** MEDAJob); 93,07% job & 77,86% user có skill; chi phí **<2 phút** (apps.tsv 1,93s; jobs.tsv ngoại suy 68,6s), dữ liệu **3,63 GB đã có trên đĩa**, chỉ cần thêm 12,7 MB.\n**DỰ PHÒNG = P6** MEDAJob trình bày + CareerBuilder robustness không công bố. License sạch 100% nhưng 307 tương tác, CI 95% R@20 [0,334;0,655] → không có ý nghĩa thống kê.\n\n## 7. HƯỚNG NGƯỜI DÙNG CHỌN ĐÃ BỊ SỐ LIỆU BÁC BỎ — nói thẳng\nGhép CareerBuilder + data_jobs theo title: **86,92% khớp là rác** (administrative assistant 35.604 app), trần đúng nghĩa **2,977%**. Không cố cứu. Ghép arshkon: employer chỉ **7,106%** xác định, **39,50%** mơ hồ (median **18** công ty/title).\n**Và (4) employer không đạt được trên BẤT KỲ dữ liệu công khai nào** — đây là thuộc tính của dữ liệu, không phải hạn chế của nhóm.\n\n## 8. RỦI RO + 3 LỰA CHỌN ĐỐI PHÓ (§6, §7)\n(A) CareerBuilder không công bố dữ liệu thô — chọn làm CHÍNH; (B) MEDAJob demo + CB robustness — DỰ PHÒNG; (C) OLX license tốt hơn nhưng mất 3/5 tiêu chí — loại. Mỗi cái có \"ai có thể phản đối\".\n\nChi phí thật: RAM khả dụng **3.978 MB** → cảnh báo **không nạp pandas** `jobs.tsv` 3,17 GB, phải streaming. Ổ trống 25,08 GB.",
+      "changedPaths": [
+        "docs/THIET_KE_PHUONG_AN_DU_LIEU_CUOI_CUNG.md",
+        "_newdata_audit/t5_graph_design.py",
+        "_newdata_audit/t5_skill_discriminative.py",
+        "_newdata_audit/t5_esco_graph2.py",
+        "_newdata_audit/t5_control.py",
+        "_newdata_audit/t5_license_probe.py",
+        "_newdata_audit/t5_license_real.py",
+        "_newdata_audit/t5_olx_timing.py",
+        "_newdata_audit/t5_synthetic_check.py",
+        "_newdata_audit/t5_synthetic_check2.py",
+        "_newdata_audit/t5_faker_timing.py",
+        "_newdata_audit/t5_clients_final.py",
+        "_newdata_audit/t5_jsd_t3method.py",
+        "_newdata_audit/t5_matrix.py",
+        "_newdata_audit/t5_verify/t5_matrix.json",
+        "_newdata_audit/t5_verify/t5_graph_design.json",
+        "_newdata_audit/t5_verify/t5_esco_and_graph2.json",
+        "_newdata_audit/t5_verify/t5_skill_discriminative.json",
+        "_newdata_audit/t5_verify/t5_control.json",
+        "_newdata_audit/t5_verify/t5_olx_and_timing.json",
+        "_newdata_audit/t5_verify/t5_synthetic_check.json",
+        "_newdata_audit/t5_verify/t5_license_probe.json",
+        "_newdata_audit/t5_verify/t5_license_real.json",
+        "_newdata_audit/t5_verify/t5_clients_final.json",
+        "_newdata_audit/t5_verify/t5_jsd_t3method.json",
+        "_newdata_audit/t5_verify/olx_wayback.html"
+      ],
+      "acceptanceResults": [
+        {
+          "criterion": "Nếu có 1 bộ đạt cả 5 yêu cầu → chỉ ra; nếu KHÔNG → nêu bộ nào thiếu gì",
+          "status": "passed",
+          "evidence": "§0 + §3: KHÔNG bộ nào đạt. Đã đọc văn bản license GỐC của cả 4 bộ tương tác thật: CareerBuilder CẤM (trích nguyên văn 'solely for purposes of the Competition' + 'cease all use … erase or otherwise destroy'); OLX VÙNG XÁM (Wayback snapshot, chỉ 4 cột); Zhaopin CHƯA XÁC MINH (SPA shell); XING cổng đã chết. Bảng đầy đủ §4.1 với 6 phương án"
+        },
+        {
+          "criterion": "Thiết kế TỔ HỢP: bộ nào cấp tương tác/skill/employer, ghép bằng khoá gì, % ghép được cụ thể",
+          "status": "passed",
+          "evidence": "§8: CareerBuilder cấp tương tác (636.896 cạnh); ESCO 13.485 skill + O*NET Technology 8.775 cấp skill qua MÃ NGHỀ (49.849 khoá title), không cần khoá ngoại job_id; employer KHÔNG CÓ. Join rates cụ thể: data_jobs đúng nghĩa 2,977% app; arshkon 19,094% chặt nhưng employer chỉ 7,106% xác định; mức nghề 40,044% app map được nghề, 37,322% có skill"
+        },
+        {
+          "criterion": "Phương án B (không cần employer): cách chia client từ t3 + biện luận trước hội đồng",
+          "status": "passed",
+          "evidence": "§8: top-20 bang + REST = 21 client đo LẠI trên cơ sở graph_final: min 9.352 / median 22.626 / max 76.993, max/min 8,23×, top-1 12,09%. Đối chứng hash%21: 29.410/30.178/32.252, max/min 1,10×. JSD đo bằng ĐÚNG hàm t3: job_id state 0,7527 vs hash 0,4091 (+84,0%); title 0,2314 vs 0,0808 (+186,4%); nhóm ngành 0,0044 vs 0,0001 (~IID, không dùng biện luận). Biện luận + trích dẫn FedLMF/RecSys'21 ở §9 dòng 2"
+        },
+        {
+          "criterion": "Chi phí kỹ thuật thật: dung lượng tải, thời gian xử lý trên máy 15,4GB RAM/12 luồng/25GB trống",
+          "status": "passed",
+          "evidence": "§5 đo thật: apps.tsv 1.603.111 dòng/1,93s; jobs.tsv 200.000 dòng/12,57s → ngoại suy toàn bộ 1.092.096 dòng ≈ 68,6s ≈ 1,1 phút. RAM khả dụng đo được 3.978 MB (cảnh báo không nạp pandas). Ổ trống 26.924.969.984 B = 25,08 GB. CareerBuilder 3,63 GB ĐÃ CÓ trên đĩa + O*NET 12,7 MB"
+        },
+        {
+          "criterion": "Rủi ro: bộ nào có thể biến mất, cần đăng ký, giấy phép cấm công bố",
+          "status": "passed",
+          "evidence": "§6 bảng 7 rủi ro có mức + bằng chứng + giảm thiểu. CareerBuilder CẤM ngoài cuộc thi (ĐỎ); nhóm dữ liệu tổng hợp (ĐỎ); Kaggle reCAPTCHA; XING đã chết; Zhaopin cần tài khoản + verify sinh viên; OLX có thể thu hồi bất kỳ lúc nào; data_jobs/ESCO rủi ro thấp"
+        },
+        {
+          "criterion": "Điều phải NÓI THẬT trong báo cáo cho từng phương án",
+          "status": "passed",
+          "evidence": "§9: 10 dòng, mỗi dòng 1 câu, gồm cả việc (4) employer không đạt được trên bất kỳ dữ liệu công khai nào, skill phía job là của NGHỆ không phải của TIN, skill phía user là SUY LUẬN qua nghề không phải tự khai, không có rating 1-5"
+        },
+        {
+          "criterion": "KẾT QUẢ: 1 khuyến nghị chính + 1 dự phòng, mỗi cái kèm lý do định lượng",
+          "status": "passed",
+          "evidence": "§10: CHÍNH = P1 CareerBuilder + ESCO/O*NET mức nghề + client địa lý (3 lý do: 636.896 cạnh thật gấp 2.075× MEDAJob; 93,07% job & 77,86% user có skill; chi phí <2 phút, dữ liệu đã có). DỰ PHÒNG = P6 MEDAJob trình bày + CareerBuilder robustness (license sạch 100%; nhưng 307 tương tác, CI 95% R@20 [0,334;0,655] không có ý nghĩa thống kê)"
+        },
+        {
+          "criterion": "Ràng buộc mới của captain: xếp hạng lại CÓ TÍNH LICENSE + đánh giá OLX/Zhaopin/Djinni + 3 lựa chọn đối phó + nhóm dữ liệu tổng hợp",
+          "status": "passed",
+          "evidence": "License hạng nhất (§3, §4.1). OLX đọc được license thật qua Wayback (§3.2, nguyên văn). Zhaopin không đọc được → giữ [TL] không ghi như sự thật đã kiểm (§3.3). Djinni MIT nhưng 0 tương tác (§3.4). 3 lựa chọn đối phó có đánh đổi + ai phản đối (§7). Nhóm 3 repo tổng hợp: LOẠI với SHA-256 6/6 bảng trùng byte (§4.3) + checklist 7 dấu hiệu (§4.4) áp cho cả MEDAJob"
+        },
+        {
+          "criterion": "Hai phát hiện t5 tự tìm ra ngoài yêu cầu: O*NET Skills.txt vô dụng + tự đính chính lỗi đo của t4",
+          "status": "passed",
+          "evidence": "§1: Skills.txt gán ĐỦ 35/35 kỹ năng cho 763/763 nghề (100%) → nút Skill entropy=0, đồ thị bipartite đầy đủ → phải dùng ESCO (36,52 cạnh/nghề trên 13.485 skill) và O*NET Technology (8.775, mean 37,93). §3.1: phép đối chứng chứng minh Kaggle 404 ở t4 là do CHẶN USER-AGENT, không phải dataset bị xoá — kết luận t4 SAI. §3.1b: JSD t4/t5 dùng 2 định nghĩa khác nhau (pairwise vs client-to-global), đã đo lại bằng đúng hàm t3, loại bỏ số 0,0087"
+        }
+      ],
+      "commandsRun": [
+        {
+          "command": "python _newdata_audit\\t5_graph_design.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "P1: 598.307 cạnh (Skills.txt basis), 207.672 user, 120.175 job, 806 nghề. Phía USER: user_history 1.753.901 dòng, 758.080/1.753.901 = 43,22% title map được → 300.580 user có skill; trong P1: 161.702/207.672 = 77,86%"
+        },
+        {
+          "command": "python _newdata_audit\\t5_skill_discriminative.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "PHÁT HIỆN: O*NET Skills.txt cho 35/35 kỹ năng cho 763/763 nghề = 100% → nút Skill vô dụng. Technology Skills phân biệt (min 1/mean 37,93/max 594 trên 8.775)"
+        },
+        {
+          "command": "python _newdata_audit\\t5_esco_graph2.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "ESCO đo thật 100 nghề: essential 20,28 (min 5 max 70) + optional 16,24 (min 0 max 66) = 36,52 cạnh/nghề. Đồ thị graph_final: 636.896 cạnh, 213.793 user, 127.784 job, 832 nghề, 8.316 skill tech, 47.567 cạnh job-skill, 94,77% vocab"
+        },
+        {
+          "command": "python _newdata_audit\\t5_control.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "ĐỐI CHỨNG: cùng URL Kaggle, python UA → 404 nhưng browser UA → 200. HF search 1 từ OK (linkedin 56, recruitment 55, jobs 100, interaction 100) nhưng đa từ → 0. Chứng minh Kaggle 404 ở t4 là chặn UA, không phải dataset bị xoá"
+        },
+        {
+          "command": "python _newdata_audit\\t5_olx_timing.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "License OLX đọc được qua Wayback 20221010125932 (200, 33.736 ký tự): 'solely as a base or supplement for conducting an analysis or research, incl. academic … under no circumstances the data set itself may be further published'; 'solely for non-commercial'; 'can be revoked … at any time'. Timing: jobs.tsv 200k dòng/12,57s → toàn bộ ≈68,6s"
+        },
+        {
+          "command": "python _newdata_audit\\t5_synthetic_check2.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "SHA-256: 6/6 bảng (applications, candidates, companies, jobs, interviews, offers) GIỐNG HỆT giữa 3 repo khác tên (n_distinct_hashes=1 mỗi bảng). Số dòng 15.000/9.000/320/2.000/7.196/938 y hệt. score min 0,350 max 0,980 decile cách đều ~0,063. Tên công ty 60,94% khớp mẫu Faker"
+        },
+        {
+          "command": "python _newdata_audit\\t5_clients_final.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "21 client trên graph_final: bang min 9.352/median 22.626/max 76.993 (max/min 8,23×, top-1 12,09%); hash%21: 29.410/30.178/32.252 (max/min 1,10×)"
+        },
+        {
+          "command": "python _newdata_audit\\t5_jsd_t3method.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "JSD đo bằng hàm chép nguyên văn từ p28_noniid.py: job_id state 0,7527 vs hash 0,4091 (+84,0%); title 0,2314 vs 0,0808 (+186,4%); nhóm ngành 0,0044 vs 0,0001 (~IID). Loại bỏ số 0,0087 do khác định nghĩa hàm"
+        },
+        {
+          "command": "python _newdata_audit\\t5_matrix.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "t5_matrix.json: mọi con số trong báo cáo đọc từ file này. Cross-check: edges 636.896, users 213.793, jobs 127.784, skill 8.316, onet_all_35 100%, esco 36,52, user_skill 77.86%, synthetic byte-identical True, valid join 2,977%"
+        }
+      ]
+    },
+    {
+      "id": "t6",
+      "profileSeedId": "t6",
+      "subject": "Viết báo cáo khuyến nghị bộ dữ liệu (tiếng Việt, cho hội đồng)",
+      "description": "Viết file docs/CHON_BO_DU_LIEU.md trong workspace E:\\2026\\DUT\\DSS\\SauGK\\CuoiKi.\n\nCấu trúc bắt buộc:\n1. Vấn đề: vì sao MEDAJob không đủ (70 user, 307 tương tác, 16 user trong test, 218 tham số/tương tác, tuyên bố 92,9% có CI bootstrap [-300%, +450%]).\n2. Vì sao bộ CareerBuilder vừa crawl cũng chưa đủ (thiếu employer, thiếu skill, thiếu rating, mật độ 0,0014%).\n3. Bảng khảo sát các bộ public: tên, schema, số dòng, giấy phép, đạt/không đạt 5 yêu cầu cứng.\n4. KHUYẾN NGHỊ: phương án chính + dự phòng, kèm số đo.\n5. Cách chia client FL và biện luận học thuật (từ t3).\n6. Rủi ro + điều phải nói thật trong báo cáo.\n7. Bước tiếp theo, có thứ tự ưu tiên.\n\nQuy tắc viết:\n- Mọi con số phải khớp nguồn từ t1-t5. Không bịa số.\n- Nếu một số chưa xác minh, ghi rõ 'chưa xác minh' thay vì đoán.\n- Câu ngắn, tiếng Việt kỹ thuật, không hoa mỹ.\n- Bảng Markdown, không dùng ảnh.\n- Mở đầu bằng đoạn 5 dòng tóm tắt kết luận cho người đọc vội.\n\nSau khi viết, tự đọc lại file và kiểm tra: mọi số trong văn xuôi có xuất hiện trong bảng không, và không có ký tự hỏng U+FFFD.",
+      "status": "completed",
+      "assignee": "doc-writer",
+      "dependencies": [
+        "t5"
+      ],
+      "attempt": 1,
+      "createdAt": 1794112481083,
+      "updatedAt": 1794125221794,
+      "attemptId": "4cc20db3-7cc7-45a5-896f-9ebc5244478e",
+      "reassigning": false,
+      "output": "Đã viết docs/QUYET_DINH_BO_DU_LIEU.md (608 dòng, 50.855 B). Tự kiểm bằng script: PASS cả 3 tiêu chí captain yêu cầu.\n\n## ⚠️ MỘT PHÁT HIỆN LÀM THAY ĐỔI NỘI DUNG — cần captain xem\n\nBriefing ghi \"MEDAJob đúng cả 7 dấu hiệu tổng hợp\". Tôi ĐO LẠI trên file thô và **kết quả không như vậy**. Tôi đã viết theo số đo của mình, không viết theo briefing, và ghi rõ đính chính trong tài liệu.\n\nĐo trên E:\\2026\\DUT\\DSS\\SauGK\\Lab03\\job.csv (1.217 dòng) + users.csv + ratings.csv + user_profiles.csv:\n\n**Tầng TIN TUYỂN DỤNG phần lớn là THẬT, không phải bịa:**\n- 1.159/1.217 tin = **95,23%** không có dấu hiệu sinh tự động nào\n- **358** tên công ty Việt Nam CÓ THẬT: FPT Software Academy, Viettel AI, VinBigData, TIKI, TOPCV, Savvycom, Axon Active Vietnam, LG CNS Viet Nam, Saigon Technology, ZIGExN VeNtura\n- `Tech Company N` chỉ **46 tin / 5 tên = 3,78%** (không phải toàn bộ như cách nói tắt)\n- Categorical **lộn xộn kiểu crawl**, ngược với dữ liệu tổng hợp: `job_type` **11** giá trị (lẫn `Full-time`/`full-time`/`Tại văn phòng`), `experience_level` **61** giá trị\n- `rating` KHÔNG phân bố đều: 1→22, 2→19, 3→40, 4→115, 5→125\n\n**Tầng TƯƠNG TÁC — đây mới là chỗ hỏng, và hỏng nặng hơn:**\n- 321 rating đến từ chỉ **20 tài khoản**\n- **19/20** username dạng mã sinh viên `sv`+9-10 chữ số (vd `sv102220332`)\n- **17/20** email `@dut.vn` hoặc `@dut.udn.vn`\n- **19/20** mang `role = employer` → nhà tuyển dụng rating tin của nhau, không phải ứng viên ứng tuyển\n- **0** rating có comment\n- **1.030/1.217 tin = 84,63%** KHÔNG có rating nào\n- **51/70 user = 72,86%** không có tương tác nào\n\n**Hồ sơ:** 41/75 = **54,67%** hồ sơ thuộc tài khoản `employer`; `cv_url` rỗng **93,33%**; `profile_vector` rỗng **100%**.\n\n## CÁCH TÔI VIẾT LẠI LUẬN ĐIỂM\nKhông viết \"MEDAJob là dữ liệu tổng hợp\" (dễ bị hội đồng bác bằng cách mở users.csv). Viết chính xác hơn và chặt hơn:\n> \"MEDAJob là bộ tin tuyển dụng Việt Nam crawl thật, ghép với một tầng tương tác do sinh viên trong môn tự tạo để chạy thử. Tầng tương tác — thứ đề bài cần nhất — không có dữ liệu thật đứng sau.\"\n\nĐiều này vẫn dẫn tới CÙNG kết luận (không dùng làm kết quả chính) nhưng đứng vững khi bị chất vấn.\n\n## ĐÃ GIỮ NGUYÊN THEO BRIEFING (tôi tự kiểm lại, đều ĐÚNG)\n1. **O*NET Skills.txt vô dụng** — đo lại: 879 nghề, đúng 35 element, **879/879 = 100% nghề có đủ 35/35**, element hiếm nhất phủ 100% nghề, entropy = 0. t5 đúng.\n2. **Technology Skills.txt dùng được** — 32.681 dòng, 923 nghề, 8.775 công cụ, min 1 / **median 22** / mean 35,41 / max 426, **0/923** nghề có đủ tất cả, 8.677 công cụ phủ ≤5% nghề, top: Excel 859 · MS Office 813 · Word 784.\n   - Lưu ý: t6 đo mean **35,41** / max **426** trên **923** nghề; t5 báo **37,93** / **594** trên **798** nghề. Khác do t5 lọc theo nghề có trong CareerBuilder — tôi đã lập Bảng 13 giải thích, không phải mâu thuẫn.\n3. **License CareerBuilder CẤM** — giữ nguyên văn trích dẫn.\n4. **CI [-300%, +450%]** — tôi chạy lại p25_howmuch.py, khớp đúng. Bổ sung: tỉ lệ lần tỉ số <0 là **9,8%**, >1 là **38,8%;** cần **423** user để phát hiện hiệu ứng 0,05.\n\n## CẤU TRÚC FILE (đúng 10 mục yêu cầu + 3 mục bổ sung)\nMở đầu 5 dòng (có đúng câu bắt buộc) · §1 vấn đề MEDAJob (3 tầng: tin/tương tác/hồ sơ) · §2 vì sao không tìm ra (loại trừ (1)↔(4)↔(5)) · **§3 checklist 7 dấu hiệu nhận diện dữ liệu tổng hợp** (có ví dụ 3 repo SHA-256 trùng 6/6 bảng, 60,94% tên Faker, score decile cách đều ~0,063) · §4 bảng khảo sát 16 bộ × schema/số dòng/license/mức A-B-C · §5 P1 chính · §6 P6 dự phòng · §7 **6 điều phải nói thật** + §7.1 ba điều bổ sung về MEDAJob · §7 Bảng 11 non-IID · §8 cảnh báo kỹ thuật · §9 bước tiếp theo · §10 bằng chứng + tự kiểm.\n\n## KẾT QUẢ TỰ KIỂM (bắt buộc theo task)\n`python _newdata_audit\\t6_check_doc.py` → **PASS**:\n- Ký tự hỏng U+FFFD: **0 dòng**; file giải mã UTF-8 hợp lệ\n- Mọi số trong văn xuôi có trong bảng: **0 số không truy được** / 265 token\n- 6 điều mục 7: **6/6**\n- 10 mục cấu trúc: **10/10**; câu bắt buộc ở mở đầu: **có**\n\nSố JSD 0,0087 (bản đo sai định nghĩa) đã được đưa vào **Bảng 11b** ghi rõ \"đã loại\", không lặng lẽ xoá.\n\n## FILE ĐÃ TẠO\n- `docs/QUYET_DINH_BO_DU_LIEU.md` (608 dòng)\n- `_newdata_audit/t6_probe_medajob_full.py` + `t6_verify/t6_medajob_provenance.json`\n- `_newdata_audit/t6_verify_onet_skills.py` + `t6_verify/t6_onet_skill_layers.json`\n- `_newdata_audit/t6_check_doc.py` + `t6_verify/t6_doc_check.json`\n- `_newdata_audit/t6_probe_filters.py`\n\nCả 4 script chạy lại đều exit 0. Đã xoá 18 script probe một lần dùng, gộp số đo vào `t6_probe_medajob_full.py`.",
+      "changedPaths": [
+        "docs/QUYET_DINH_BO_DU_LIEU.md",
+        "_newdata_audit/t6_probe_medajob_full.py",
+        "_newdata_audit/t6_verify_onet_skills.py",
+        "_newdata_audit/t6_check_doc.py",
+        "_newdata_audit/t6_probe_filters.py",
+        "_newdata_audit/t6_verify/t6_medajob_provenance.json",
+        "_newdata_audit/t6_verify/t6_onet_skill_layers.json",
+        "_newdata_audit/t6_verify/t6_doc_check.json"
+      ],
+      "acceptanceResults": [
+        {
+          "criterion": "Viết docs/QUYET_DINH_BO_DU_LIEU.md, mở đầu 5 dòng tóm tắt có đúng câu 'Không tồn tại bộ dữ liệu công khai thoả đồng thời tương tác thật và giấy phép sạch.'",
+          "status": "passed",
+          "evidence": "608 dòng, 50.855 B. Khối 'Tóm tắt cho người đọc vội (5 dòng)' ở dòng 9-15, câu bắt buộc ở dòng 11. Checker: summary_block_present=true, required_sentences_present=true."
+        },
+        {
+          "criterion": "Mục 1: vì sao MEDAJob không đủ (70 user, 307 tương tác, 16 user test, 218 tham số/tương tác, CI bootstrap [-300%,+450%])",
+          "status": "passed",
+          "evidence": "§1.1 bảng quy mô (70/1.014/307/16/54.304 tham số/218 tham số mỗi tương tác); §1.2 chạy lại p25_howmuch.py xác nhận CI [-300%, +450%], bổ sung 9,8% lần tỉ số<0 và 38,8% lần >1, cần 423 user cho hiệu ứng 0,05; §1.3 ba tầng nguồn gốc; Bảng 1c chất lượng nội dung."
+        },
+        {
+          "criterion": "Mục 2: vì sao tìm mãi không ra — (1) và (5) loại trừ nhau, kèm bảng 5 tiêu chí × bộ dữ liệu",
+          "status": "passed",
+          "evidence": "§2.1 phát biểu quy luật loại trừ (1)↔(4)↔(5) + dẫn t3 (21 tài liệu, không benchmark nào có nhãn tổ chức); Bảng 1 ma trận 17 bộ × 5 tiêu chí cứng; Bảng 1b mật độ 6 bộ; Bảng 2 các hướng cứu cột (4) đều thất bại kèm số đo."
+        },
+        {
+          "criterion": "Mục 3: checklist 7 dấu hiệu nhận diện dữ liệu tổng hợp + ví dụ 3 repo + áp cho MEDAJob",
+          "status": "passed",
+          "evidence": "§3.1 bảng 7 dấu hiệu có cách kiểm và ngưỡng; §3.2 ví dụ mindweave/Arivalagan2025/kunkrm: SHA-256 trùng 6/6 bảng, 15.000/9.000/320/2.000/7.196/938 dòng, 60,94% tên Faker, score decile cách đều ~0,063; §3.3 áp cho MEDAJob."
+        },
+        {
+          "criterion": "Mục 4: bảng khảo sát các bộ public — tên, schema, số dòng, license (SẠCH/VÙNG XÁM/CẤM), đạt/không đạt 5 tiêu chí, mức A/B/C",
+          "status": "passed",
+          "evidence": "Bảng 3: 16 bộ × schema/số dòng/license/mức; Bảng 4 taxonomy (ESCO 2.942/13.485/36,52; O*NET 1.016/8.775); Bảng 5 license phân 3 mức kèm trích nguyên văn."
+        },
+        {
+          "criterion": "Mục 5: KHUYẾN NGHỊ P1 chính kèm số đo (213.793 user / 127.784 job / 832 nghề / 636.896 cạnh / 343.401 cạnh user–nghề / 93,07% / 77,86% / 21 client 9.352-22.626-76.993 / <2 phút)",
+          "status": "passed",
+          "evidence": "§5.2 Bảng 6 đặc tả đồ thị đủ mọi số captain yêu cầu; §5.3 Bảng 7 so P1/P2/P3 (13,3×); §5.4 Bảng 8 ba lý do định lượng (2.075× MEDAJob); §5.5 Bảng 9 phát hiện Skills.txt vô dụng."
+        },
+        {
+          "criterion": "Mục 6: DỰ PHÒNG P6 (MEDAJob trình bày + CareerBuilder robustness không công bố, CI [0,334; 0,655])",
+          "status": "passed",
+          "evidence": "§6 bảng P6 + Bảng 10 ba lựa chọn đối phó (A chọn, B dự phòng, C loại) + cảnh báo bắt buộc phải khai báo tầng tương tác MEDAJob nếu chọn P6."
+        },
+        {
+          "criterion": "Mục 7: đủ 6 điều phải nói thật, mỗi dòng một câu",
+          "status": "passed",
+          "evidence": "§7 có đúng 6 mục đánh số (checker: section7_numbered_items=6, section7_has_6=true): (4) employer proxy địa lý; (5) license CareerBuilder cấm; skill user suy qua nghề; ESCO không có tiếng Việt; 86,92% rác / 2,977% đúng nghĩa; non-IID chỉ ở mức item. Thêm §7.1 ba điều bổ sung về MEDAJob để không bị bắt lỗi ngược."
+        },
+        {
+          "criterion": "Mục 8: cảnh báo kỹ thuật (RAM 3.978 MB, không nạp pandas jobs.tsv 3,17 GB, streaming csv.reader, ổ trống 25,08 GB)",
+          "status": "passed",
+          "evidence": "§8 bảng cảnh báo kỹ thuật đủ 4 số captain yêu cầu + 3 bẫy đã mắc (bytes.count, mẫu 100 dòng, heredoc REPL)."
+        },
+        {
+          "criterion": "Mục 9: bước tiếp theo có thứ tự ưu tiên",
+          "status": "passed",
+          "evidence": "§9 bảng 7 việc theo thứ tự ưu tiên 1-7 (dựng partition G1 K=20 → dựng đồ thị P1 → sửa lớp Skill → chạy lại thực nghiệm → viết Hạn chế → item embedding riêng → Zhaopin tuỳ chọn) + 3 hướng đã bị số liệu bác bỏ."
+        },
+        {
+          "criterion": "Tự đọc lại file, kiểm tra (a) không có U+FFFD, (b) mọi số trong văn xuôi có trong bảng, (c) đủ 6 điều mục 7",
+          "status": "passed",
+          "evidence": "python _newdata_audit\\t6_check_doc.py → PASS, exit 0. U+FFFD: 0 dòng. Số văn xuôi không truy được: 0/265 token (21 token tham chiếu mục đã đối chiếu heading có thật, RFC 2606, năm, và 5 định danh username). 6 điều mục 7: 6/6. 10 mục cấu trúc: 10/10."
+        }
+      ],
+      "commandsRun": [
+        {
+          "command": "python _newdata_audit\\t6_verify_onet_skills.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "skills_txt: 879 nghề, 35 element, skills_per_occ min=median=max=35, occupations_with_all_elements=879/879, occupation_share_of_rarest_element_pct=100.0. technology_skills_txt: 32.681 dòng, 923 nghề, 8.775 công cụ, min1/median22/mean35.41/max426, occupations_with_all_tools=0, tools_covering_le_5pct=8.677, top3 Excel 859 / MS Office 813 / Word 784. Khớp briefing."
+        },
+        {
+          "command": "python _newdata_audit\\t6_probe_medajob_full.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "job_markers: 1.217 dòng, 58 tin có dấu hiệu sinh tự động = 4,77%, 1.159 trông thật = 95,23%, 358 tên công ty có dấu tiếng Việt, Tech Company N chỉ 46 tin/5 tên = 3,78%. interaction_layer: 321 rating, 20 user, 19 username dạng sv+chữ số = 95%, 17 email @dut.vn = 85%, 19 role=employer, 0 comment. clean_interaction_coverage: 19/70 user có tương tác = 27,14%, 51/70 = 72,86% không có. rating_skew: 1.030/1.217 tin không rating = 84,63%."
+        },
+        {
+          "command": "python _newdata_audit\\p25_howmuch.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "Xác nhận nguyên văn: 218 tham số mỗi tương tác (54.304/249); tuyên bố 'lấy lại 92,9% khoảng cách' bootstrap 95% = [-300%, +450%]; tỉ lệ lần tỉ số<0 = 9,8%, >1 = 38,8%; cần 423 user cho hiệu ứng 0,05; mỗi user test 3,62 tin liên quan, mỗi hit nhảy 0,28."
+        },
+        {
+          "command": "python _newdata_audit\\t6_check_doc.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "PASS. bytes 50.855, lines 608, replacement_char_lines [], utf8_decodes true, prose_number_tokens 265, missing_from_tables_n 0, section7_numbered_items 6, section7_has_6 true, summary_block_present true, required_sections 10/10 true."
+        },
+        {
+          "command": "python _newdata_audit\\t6_probe_filters.py",
+          "status": "passed",
+          "exitCode": 0,
+          "evidence": "Occupation Data 1.016 mã; Skills.txt 879 mã (∩ 879); Technology Skills 923 mã (∩ 923); Scale ID IM 30.765 + LV 30.765. Giải thích chênh lệch 879/923/1.016 và 763/798 của t5 — Bảng 13."
+        }
+      ],
+      "supplementalEvidence": [
+        {
+          "at": 1794125879933,
+          "by": "doc-writer",
+          "attempt": 1,
+          "attemptId": "4cc20db3-7cc7-45a5-896f-9ebc5244478e",
+          "note": "SUPPLEMENT sau khi captain phản hồi (append-only, không đổi verdict).\n\nĐã làm 3 việc captain yêu cầu + 2 phát hiện thêm khi kiểm lại.\n\n## 1. SỬA BẢNG 13 THEO CƠ CHẾ THẬT — và cơ chế của captain ĐÚNG\nTôi tự chạy lại trên db_29_3_text.zip để xác minh trước khi viết:\n- Mã ĐẦY ĐỦ (giữ .xx): 923 nghề, min 1 / median 22 / mean 35,41 / max 426\n- Mã GỐC cắt [:7]: 798 nghề, min 1 / median 20,5 / mean 37,93 / max 594\nKhớp chính xác số captain đưa. Nguyên nhân: 67/798 nhóm mã gốc chứa >1 mã chi tiết, gộp 125 mã → 923−125=798. Union làm mean/max TĂNG (ví dụ 11-1011: 49 ∪ 21 = 57 công cụ).\n\nBảng 13 đã viết lại theo đúng cơ chế này. Đã thêm dòng ghi chú captain yêu cầu, nguyên văn ở dòng 613: \"mean/max khác nhau giữa hai lần đo là do cấp gộp SOC, không phải lỗi dữ liệu\" + khai báo dùng cấp nào và dùng nhất quán một cấp.\n\n## 2. SỬA LÝ DO CAPTAIN ĐƯA — lý do đó KHÔNG đúng\nCaptain viết \"dùng mã gốc khi map sang CareerBuilder vì CareerBuilder không có hậu tố .xx\". Nửa đầu đúng, nửa sau sai: **mọi mã O*NET đều có hậu tố .xx**, ở cả 4 bảng (Occupation Data 1.016/1.016, Alternate Titles 1.016/1.016, Skills.txt 879/879, Technology Skills 923/923). CareerBuilder không có cột mã nghề NÀO (11 cột, không cột nào chứa 'soc'/'occup'), nên nó không \"có hay không có hậu tố\" — nó không có mã gì cả.\n\nNguyên nhân thật của 798: t5_graph_design.py dòng 94, 101 cắt `r[ic][:7]`. Tôi đã ghi đúng nguyên nhân này, không chép lý do sai.\n\n## 3. PHÁT HIỆN THÊM — pipeline t5 TRỘN HAI CẤP MÃ (mục 10.3b mới)\nĐây là điều captain cảnh báo \"nếu map sai cấp, số cạnh job–occupation sẽ lệch\" — tôi kiểm và **đúng là có trộn**:\n- Nút Occupation (`p1_socs` ← `title2soc`) dùng mã ĐẦY ĐỦ (dòng 73, 83, 181)\n- Cạnh Job–Skill (`skills_per_soc`, `tech_per_soc`) dùng mã GỐC `[:7]` (dòng 94, 101, 134, 168, 182–194)\nĐo hệ quả: 203/923 mã chi tiết có tập skill TRÙNG NHAU với mã khác (chỉ 792 tập phân biệt; nếu nhất quán cấp đầy đủ thì 916 tập, chỉ 13 trùng).\n\nĐã lập bảng tách rõ số nào còn đúng / số nào phải sửa:\n- 636.896 cạnh User–Job: KHÔNG ảnh hưởng\n- 47.567 cạnh Job–Skill: KHÔNG ảnh hưởng\n- 343.401 cạnh User–Occupation: KHÔNG ảnh hưởng\n- **832 nút Occupation: CÓ ảnh hưởng** → phải rà lại; nếu dùng nhất quán mã gốc thì ≤798\nĐề xuất cách sửa: chọn phương án A (mã gốc [:7] xuyên suốt) vì jobs.tsv không có cột mã nghề, mọi ánh xạ phải qua tên nghề.\n\n## 4. ĐÍNH CHÍNH SUY ĐOÁN CŨ CỦA TÔI\nBảng 13 bản trước tôi viết nguyên nhân là \"t5 lọc theo nghề có trong CareerBuilder\" — đó là SUY ĐOÁN, không phải nguyên nhân. Đã ghi rõ trong tài liệu là đã bị loại.\n\n## 5. TỰ KIỂM LẠI\npython _newdata_audit\\t6_check_doc.py → PASS, exit 0:\n- U+FFFD: 0 dòng\n- Số văn xuôi không có trong bảng: 0/… token\n- 6 điều mục 7: 6/6\n- bytes 55.150, lines 659\nCả 5 script chạy lại đều exit 0 (t6_verify_onet_skills, t6_probe_medajob_full, t6_verify_soc_levels, t6_check_doc, t6_probe_filters).\n\nĐã thu gọn các probe một lần dùng thành t6_verify_soc_levels.py + t6_verify/t6_soc_levels.json.\nChecker được bổ sung phân loại token mã SOC (11-1011, 1011.00) là định danh, không phải số liệu — không nới lỏng tiêu chí cho số liệu thật."
+        },
+        {
+          "at": 1794127856542,
+          "by": "doc-writer",
+          "attempt": 1,
+          "attemptId": "4cc20db3-7cc7-45a5-896f-9ebc5244478e",
+          "note": "SUPPLEMENT #2 — captain chọn (A), đã sửa pipeline. (append-only, không đổi verdict)\n\n## ĐÃ SỬA LỖI TRỘN CẤP SOC — và lỗi NẶNG HƠN cả hai bên ước lượng\n\nSửa `p1_socs` sang mã gốc `[:7]` rồi tra `tech[s]`. Tính lại CẢ HAI định nghĩa P1 × CẢ HAI cấp mã, mỗi tổ hợp đều nhất quán.\n\n### Bảng số chuẩn sau khi sửa (cấp gốc + Technology Skills — cấu hình chốt)\n| Thành phần | Số đúng | Số cũ SAI |\n|---|---|---|\n| Cạnh User–Job | **636.896** | 636.896 ✅ không đổi |\n| Nút User / Job | **213.793 / 127.784** | ✅ không đổi |\n| Nút Skill (Tech) | **8.316** | ✅ không đổi |\n| **Nút Occupation** | **709** | ~~832~~ |\n| **Cạnh Occupation–Skill** | **28.416** | ~~47.567~~ (phồng **67,4%**) |\n| **Cạnh User–Occupation** | **352.306** | ~~343.401~~ |\n| **% job map được có skill** | **98,97%** (127.784/129.120) | ~~93,07%~~ |\n| **% user P1 có skill** | **79,62%** (170.227/213.793) | ~~77,86%~~ |\n| % app map được nghề | **40,044%** (641.952) | ✅ đúng |\n| **% app có skill** | **39,729%** (636.896) | ~~37,322%~~ |\n\n### BA ĐIỀU TÔI PHẢI NÓI RÕ VỚI CAPTAIN\n\n**(1) Bảng của captain trộn HAI SCRIPT khác nhau.** t5 có hai script với HAI định nghĩa P1:\n- `t5_graph_design.py`: P1 lọc theo 35 Skills.txt → 598.307 cạnh / 207.672 user / **683** nghề\n- `t5_esco_graph2.py`: P1 lọc theo Technology Skill → **636.896** / **213.793** / **709** nghề\n\nCột A của captain (683/23.905/26.889/342.348/5.659.570/77,86%) khớp CHÍNH XÁC script thứ NHẤT. Nhưng 636.896 và 213.793 mà tài liệu dùng lại thuộc script thứ HAI. Đó là lý do captain thấy \"636.896 vs 598.307 — cần đối chiếu\" và \"213.793 vs 207.672 — KHÁC\": **không phải một script cho hai số khác nhau, mà là hai script**. Đã chốt một cấu hình duy nhất (script thứ hai, sau khi sửa).\n\n**(2) Cột B của captain cũng có một số sai.** Captain ghi \"B nhất quán mã đầy đủ: occ=806, Job–Skill=27.300, Job–Tech=28.833\". Đo nhất quán cấp đầy đủ thật: occ=**814**, Job–Skill=**30.360**, Job–Tech=**30.360**. Con số **806** là của *bộ lọc trộn* (lọc bằng mã gốc nhưng đếm bằng mã đầy đủ), không phải cấp đầy đủ nhất quán.\n\n**(3) 47.567 sai cả NHÃN, không chỉ sai số.** Số đó mang nhãn \"Job–Skill\" nhưng thực chất là tổng qua NGHỀ (Occupation–Skill) — CareerBuilder không có cạnh job→skill trực tiếp. Đã sửa nhãn.\n\n### Kiểm chứng cơ chế phồng (kiểm chứng được, không suy đoán)\nNhóm `11-1011` có 2 mã chi tiết (`.00` 49 công cụ, `.03` 21 công cụ). Code t5 cộng qua 2 mã nhưng tra cùng khoá gốc → **114**; đúng phải là **57**. Phồng **100%** ở nhóm đó; toàn cục phồng **67,4%**.\n\n### Chọn A là đúng — có 4 lý do đo được\n1. 180,2 job/nghề (gốc) vs 148,2 (đầy đủ) → nút dày hơn\n2. 8.316 nút Skill (gốc) vs 8.256 (đầy đủ) → giữ nhiều skill hơn\n3. Khớp crosswalk ESCO/ISCO-08 (SOC 6 ký tự)\n4. `jobs.tsv` không có cột mã nghề → mọi ánh xạ qua tên nghề rồi cắt gốc\n\n### ĐÃ GHI VÀO TÀI LIỆU\n- Bảng 6 viết lại toàn bộ, có bảng \"số cũ → số đúng → vì sao sai\"\n- **Mục 10.4 Bảng 15 \"Lỗi trộn cấp SOC: đã sửa, ghi lại để người sau không lặp\"** — triệu chứng, nguyên nhân, vị trí dòng, mức phồng, cách phát hiện, cách sửa, phòng tái diễn\n- Mục 10.3b: bảng đối chiếu 10 con số (cái nào không đổi / cái nào sai) + bảng hai định nghĩa P1\n- Tự ghi lại 3 suy đoán của tôi đã bị số liệu bác bỏ\n- Sửa cả nhãn lớp skill: Technology là lớp cạnh chính của P1, ESCO là taxonomy chuẩn hoá\n\n### KHÔNG ghi đè bằng chứng cũ\n`t5_graph_design.py` giữ nguyên. Bản sửa là `t6_graph_design_fixed.py` (chỉ đổi 6 dòng cấp mã) + `t6_bang6.py` (cấu hình chuẩn). `_newdata_audit/t5_verify/` không bị chạm.\n\n### TỰ KIỂM\n`python _newdata_audit\\t6_check_doc.py` → **PASS**, exit 0. 741 dòng, 62.245 B, U+FFFD **0**, số văn xuôi không truy được **0**, 6 điều mục 7 **6/6**, 10 mục cấu trúc **10/10**.\nCả 5 script nhanh exit 0. Ba script nặng (đọc 3,63 GB) đã chạy: t6_graph_design_fixed.py, t6_canonical.py, t6_bang6.py — đều exit 0.\n\n### SỰ CỐ MÔI TRƯỜNG đã xử lý\nGiữa chừng sandbox mất thư mục tạm `C:\\Users\\ACER\\AppData\\Local\\Temp\\dsh-r3R2Uk` → mọi lệnh pwsh bị từ chối. Tôi tạo lại thư mục bằng công cụ write rồi chạy tiếp được. Không ảnh hưởng kết quả.\n\n### ARTIFACT MỚI\n`t6_verify/t6_canonical.json` (4.106 B, ma trận 4 tổ hợp), `t6_bang6.json` (964 B, số chuẩn), `t6_graph_design_fixed.json` (1.314 B), `t6_soc_levels.json` (1.696 B); script `t6_canonical.py` (9.848 B), `t6_bang6.py` (6.752 B), `t6_graph_design_fixed.py` (9.346 B)."
+        }
+      ]
+    }
+  ],
+  "taskSeq": 6,
+  "approvedAt": 1794113631297
+}

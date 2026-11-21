@@ -1,0 +1,75 @@
+{
+  "task": "t5 supplement",
+  "clean_test": {
+    "n_test_user_job_edges": 37957,
+    "n_detour_edges_removed": 880,
+    "n_clean_edges": 37077,
+    "pct_clean": 97.68,
+    "n_users_all_test_edges": 20067,
+    "n_users_remaining_clean": 19719,
+    "n_users_losing_all_test_edges": 348,
+    "n_jobs_all_test_edges": 20100,
+    "n_jobs_remaining_clean": 19757,
+    "n_jobs_losing_all_test_edges": 343,
+    "n_users_with_only_dirty_test_edges": 348,
+    "n_clean_test_edges_on_clean_users": 37077,
+    "pct_clean_of_all_user_job_edges": 8.487,
+    "pct_all_test_of_all_user_job_edges": 8.688,
+    "pct_clean_of_eligible_user_job_edges": 19.095,
+    "pct_all_test_of_eligible_user_job_edges": 19.548,
+    "n_eligible_users_min_apps_5": 20067,
+    "n_eligible_user_job_edges": 194172,
+    "mask_order": "true order of test edges as they appear in edge_index (edge_pos = np.where(test_mask & edge_type==0)[0])",
+    "npz_arrays": {
+      "is_clean": "bool[37957] - True = cạnh test KHÔNG có đường vòng u-occ-j",
+      "detour_flag": "bool[37957] - đảo của is_clean, để đọc trực tiếp",
+      "edge_pos": "int64[37957] - vị trí cột trong edge_index",
+      "user": "int64[37957] - chỉ số nút user (0..171806)",
+      "job": "int64[37957] - chỉ số job trong khối job (0..84844), +171807 để ra node idx"
+    }
+  },
+  "clients": {
+    "n_clients": 9116,
+    "n_clients_zero_jobs": 0,
+    "n_clients_zero_users": 0,
+    "n_clients_zero_train_edges": 0,
+    "n_clients_zero_test_edges": 2040,
+    "n_clients_zero_clean_test_edges": 2096,
+    "jobs_per_client": {
+      "min": 1,
+      "p25": 2,
+      "median": 4.0,
+      "p75": 9,
+      "max": 603,
+      "mean": 9.31,
+      "sum": 84845
+    },
+    "users_per_client": {
+      "min": 5,
+      "p25": 14,
+      "median": 23.0,
+      "p75": 45,
+      "max": 4215,
+      "mean": 45.51
+    },
+    "train_edges_per_client": {
+      "min": 5,
+      "p25": 13,
+      "median": 22.0,
+      "p75": 42,
+      "max": 4320
+    },
+    "n_clients_with_train_edges_ge_1": 9116,
+    "n_clients_with_train_edges_ge_10": 8745,
+    "n_clients_with_fewer_than_2_train_edges": 0,
+    "clients_with_zero_train_examples": [],
+    "n_clients_with_zero_users_and_zero_jobs": 0,
+    "n_clients_single_job": 418,
+    "n_clients_max_3_jobs": 3877,
+    "n_clients_fewer_than_10_users": 109,
+    "cross_check_vs_clients_json": {
+      "jobs_mismatches": 0,
+      "users_mismatches": 0
+    }
+  }
+}

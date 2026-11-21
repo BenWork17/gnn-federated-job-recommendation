@@ -1,0 +1,74 @@
+{
+ "jsd_by_state": {
+  "on_exact_job_id": 0.8057,
+  "on_exact_title": 0.5261
+ },
+ "jsd_by_hash": {
+  "n_clients": 44,
+  "on_exact_job_id": 0.6008,
+  "on_exact_title": 0.3437
+ },
+ "pct_apps_on_state_exclusive_jobs": {
+  "per_state_top10": [
+   [
+    "FL",
+    50.3
+   ],
+   [
+    "TX",
+    53.8
+   ],
+   [
+    "CA",
+    65.9
+   ],
+   [
+    "IL",
+    41.9
+   ],
+   [
+    "NY",
+    32.9
+   ],
+   [
+    "GA",
+    29.5
+   ],
+   [
+    "NJ",
+    27.4
+   ],
+   [
+    "PA",
+    38.2
+   ],
+   [
+    "NC",
+    36.5
+   ],
+   [
+    "IN",
+    53.8
+   ]
+  ],
+  "weighted_mean": 46.6
+ },
+ "item_jaccard_top12": {
+  "pairs_n": 66,
+  "max": [
+   "NY",
+   "NJ",
+   16.7
+  ],
+  "min": [
+   "IN",
+   "AZ",
+   0.6
+  ],
+  "median": [
+   "TX",
+   "NC",
+   1.2
+  ]
+ }
+}

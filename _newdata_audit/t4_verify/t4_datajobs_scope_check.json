@@ -1,0 +1,228 @@
+{
+ "data_jobs": {
+  "rows": 785741,
+  "job_title_short_dist": [
+   [
+    "Data Analyst",
+    196075
+   ],
+   [
+    "Data Engineer",
+    186241
+   ],
+   [
+    "Data Scientist",
+    172286
+   ],
+   [
+    "Business Analyst",
+    49063
+   ],
+   [
+    "Software Engineer",
+    44929
+   ],
+   [
+    "Senior Data Engineer",
+    44563
+   ],
+   [
+    "Senior Data Scientist",
+    36957
+   ],
+   [
+    "Senior Data Analyst",
+    29216
+   ],
+   [
+    "Machine Learning Engineer",
+    14080
+   ],
+   [
+    "Cloud Engineer",
+    12331
+   ]
+  ],
+  "pct_titles_with_data_keyword": 98.61,
+  "sample_titles": [
+   "Senior Clinical Data Engineer / Principal Clinical Data Engineer ...",
+   "Data Analyst",
+   "Data Engineer/Scientist/Analyst, Mid or Senior (m/f/x)",
+   "LEAD ENGINEER - PRINCIPAL ANALYST - PRINCIPAL ENGINEER -  DATA...",
+   "Data Engineer- Sr Jobs",
+   "GCP Data Engineer",
+   "Senior Data Engineer  - GCP Cloud",
+   "Data Engineer",
+   "Technology & Operations Business Analyst",
+   "Data Scientist II",
+   "Erfahrene*r Data Engineer*in (m/w/d)",
+   "Data Engineer",
+   "Stagiaire Data Analyst (H/F) - Lyon (69006)",
+   "Senior Data Engineer",
+   "Data Engineer",
+   "Data Engineer",
+   "Big Data Engineer",
+   "Data Science Team Lead",
+   "Data Analyst",
+   "Data Scientist",
+   "Data Scientist",
+   "Stage - data scientist – génération ia de données synthétiques H/F",
+   "Data Engineer / Développeur·euse Big Data F/H",
+   "PhD position in computer science (NLP, finance)",
+   "Data Scientist (DataLab Team)"
+  ],
+  "sampled_every": 39287,
+  "sampled_titles": [
+   "Senior Clinical Data Engineer / Principal Clinical Data Engineer ...",
+   "Data Analyst",
+   "Master Data Analyst",
+   "Senior Data Engineer",
+   "Senior Data Engineer",
+   "Ciencia de Datos",
+   "Data Analyst Manager",
+   "Analyst, Business Analytics | Head Office",
+   "Data Analyst",
+   "Analyst | Recruitment Year 2022-23",
+   "Data Engineer - Python / SQL (m/w/d)",
+   "Data Scientist",
+   "Data Engineer, Mid (Java Dev)",
+   "Data Engineer- Bay Area Infrastructure",
+   "Data and Analytics IT Senior Specialist",
+   "Mid-Level Data Engineer",
+   "Senior Software Engineer",
+   "Senior Data Analyst - Intelligent Worksite",
+   "Senior Data Engineer, AWS Global Trade and Product Compliance...",
+   "Data Engineer"
+  ],
+  "distinct_normalized_titles": 199638
+ },
+ "cb_exact_title_match": {
+  "distinct_cb_titles_matched": 2566,
+  "apps_covered": 183994,
+  "pct_apps": 11.477,
+  "top30_by_apps": [
+   [
+    "administrative assistant",
+    35604
+   ],
+   [
+    "receptionist",
+    16419
+   ],
+   [
+    "executive assistant",
+    9994
+   ],
+   [
+    "staff accountant",
+    5291
+   ],
+   [
+    "project manager",
+    4985
+   ],
+   [
+    "sales representative",
+    4257
+   ],
+   [
+    "data entry clerk",
+    3393
+   ],
+   [
+    "financial analyst",
+    3289
+   ],
+   [
+    "recruiter",
+    3144
+   ],
+   [
+    "operations manager",
+    2958
+   ],
+   [
+    "business analyst",
+    2858
+   ],
+   [
+    "dispatcher",
+    2507
+   ],
+   [
+    "assistant manager",
+    2474
+   ],
+   [
+    "account manager",
+    2157
+   ],
+   [
+    "account executive",
+    2122
+   ],
+   [
+    "accountant",
+    2072
+   ],
+   [
+    "machine operator",
+    1818
+   ],
+   [
+    "sales manager",
+    1759
+   ],
+   [
+    "warehouse worker",
+    1751
+   ],
+   [
+    "warehouse supervisor",
+    1738
+   ],
+   [
+    "warehouse manager",
+    1327
+   ],
+   [
+    "driver",
+    1297
+   ],
+   [
+    "marketing manager",
+    1284
+   ],
+   [
+    "accounting assistant",
+    1265
+   ],
+   [
+    "data entry",
+    1086
+   ],
+   [
+    "assembler",
+    1059
+   ],
+   [
+    "office clerk",
+    1053
+   ],
+   [
+    "sales executive",
+    1036
+   ],
+   [
+    "manufacturing engineer",
+    897
+   ],
+   [
+    "collections specialist",
+    891
+   ]
+  ],
+  "pct_matched_titles_with_data_keyword": 82.27
+ },
+ "verdict_note": "neu top30 toan nghe data -> gia dinh data-only dung; neu lan ca nghe khac -> data_jobs khong chi data, phai sua lai ket luan"
+}

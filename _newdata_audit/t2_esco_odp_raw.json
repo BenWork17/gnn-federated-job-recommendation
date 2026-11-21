@@ -1,0 +1,1384 @@
+{
+  "country": {
+    "resource": "http://publications.europa.eu/resource/authority/continent/EUROPE",
+    "label": "Europe",
+    "id": "EUROPE"
+  },
+  "corporate-body-classification": {
+    "resource": "http://publications.europa.eu/resource/authority/corporate-body-classification/DIR_GEN",
+    "label": {
+      "de": "Generaldirektion",
+      "fi": "Pääosasto",
+      "sv": "Generaldirektorat",
+      "pt": "Direção-geral",
+      "bg": "Генерална дирекция",
+      "mt": "Direttorat ġenerali",
+      "el": "Γενική διεύθυνση",
+      "lt": "Generalinis direktoratas",
+      "en": "Directorate-general",
+      "hr": "Glavna uprava",
+      "lv": "Ģenerāldirektorāts",
+      "it": "Direzione generale",
+      "fr": "Direction générale",
+      "hu": "Főigazgatóság",
+      "es": "Dirección general",
+      "et": "Peadirektoraat",
+      "cs": "Generální ředitelství",
+      "sk": "Generálne riaditeľstvo",
+      "sl": "Generalni direktorat",
+      "ga": "Ard-stiúrthóireacht",
+      "pl": "Dyrekcja generalna",
+      "da": "Generaldirektorat",
+      "ro": "Direcție generală",
+      "nl": "Directoraat-generaal"
+    },
+    "id": "DIR_GEN"
+  },
+  "keywords": [
+    {
+      "language": "en",
+      "id": "curricula",
+      "label": "curricula"
+    },
+    {
+      "language": "en",
+      "id": "job-matching",
+      "label": "job matching"
+    },
+    {
+      "language": "en",
+      "id": "jobs",
+      "label": "jobs"
+    },
+    {
+      "language": "en",
+      "id": "skills-passports",
+      "label": "skills passports"
+    },
+    {
+      "language": "en",
+      "id": "occupations",
+      "label": "occupations"
+    },
+    {
+      "language": "en",
+      "id": "certificates",
+      "label": "certificates"
+    },
+    {
+      "language": "en",
+      "id": "esco",
+      "label": "ESCO"
+    },
+    {
+      "language": "en",
+      "id": "group-multilingual-assets",
+      "label": "group-multilingual-assets"
+    },
+    {
+      "language": "en",
+      "id": "job-posts",
+      "label": "job posts"
+    },
+    {
+      "language": "en",
+      "id": "knowledge",
+      "label": "knowledge"
+    },
+    {
+      "language": "en",
+      "id": "eqf",
+      "label": "EQF"
+    },
+    {
+      "language": "en",
+      "id": "education",
+      "label": "education"
+    },
+    {
+      "language": "en",
+      "id": "competences",
+      "label": "competences"
+    },
+    {
+      "language": "en",
+      "id": "professions",
+      "label": "professions"
+    },
+    {
+      "language": "en",
+      "id": "skills",
+      "label": "skills"
+    },
+    {
+      "language": "en",
+      "id": "european-skills-competences-qualifications-and-occupations",
+      "label": "European Skills Competences Qualifications and Occupations"
+    },
+    {
+      "language": "en",
+      "id": "training",
+      "label": "training"
+    }
+  ],
+  "resource": "http://data.europa.eu/88u/dataset/european-skills-competences-qualifications-and-occupations",
+  "catalog": {
+    "id": "empl",
+    "description": {
+      "et": "Tööhõive, sotsiaalküsimuste ja sotsiaalse kaasatuse peadirektoraat",
+      "pt": "Direção-Geral do Emprego, dos Assuntos Sociais e da Inclusão",
+      "nl": "Directoraat-generaal Werkgelegenheid, Sociale Zaken en Inclusie",
+      "el": "Γενική Διεύθυνση Απασχόλησης, Κοινωνικών Υποθέσεων και Ένταξης",
+      "cs": "Generální ředitelství pro zaměstnanost, sociální věci a sociální začleňování",
+      "bg": "Генерална дирекция „Трудова заетост, социални въпроси и приобщаване“",
+      "ro": "Direcția Generală Ocuparea Forței de Muncă, Afaceri Sociale și Incluziune",
+      "en": "Directorate-General for Employment, Social Affairs and Inclusion",
+      "lv": "Nodarbinātības, sociālo lietu un iekļautības ģenerāldirektorāts",
+      "ga": "An Ard-Stiúrthóireacht um Fhostaíocht, Gnóthaí Sóisialta agus Cuimsiú",
+      "de": "Generaldirektion Beschäftigung, Soziales und Integration",
+      "uk": "Генеральна дирекція з питань зайнятості, соціальних питань та інклюзії",
+      "sl": "Generalni direktorat za zaposlovanje, socialne zadeve in vključevanje",
+      "es": "Dirección General de Empleo, Asuntos Sociales e Inclusión",
+      "fr": "Direction générale de l’emploi, des affaires sociales et de l’inclusion",
+      "mt": "Id-Direttorat Ġenerali tal-Impjiegi, l-Affarijiet Soċjali u l-Inklużjoni",
+      "hr": "Glavna uprava za zapošljavanje, socijalna pitanja i uključivanje",
+      "sv": "Generaldirektoratet för sysselsättning, socialpolitik och inkludering",
+      "it": "Direzione generale per l'Occupazione, gli affari sociali e l'inclusione",
+      "lt": "Užimtumo, socialinių reikalų ir įtraukties generalinis direktoratas",
+      "fi": "Työllisyys-, sosiaali- ja osallisuusasioiden pääosasto",
+      "hu": "A Foglalkoztatás, a Szociális Ügyek és a Társadalmi Befogadás Főigazgatósága",
+      "pl": "Dyrekcja Generalna ds. Zatrudnienia, Spraw Społecznych i Włączenia Społecznego",
+      "da": "Generaldirektoratet for Beskæftigelse, Sociale Anliggender, Arbejdsmarkedsforhold og Inklusion",
+      "sk": "Generálne riaditeľstvo pre zamestnanosť, sociálne záležitosti a začlenenie"
+    },
+    "title": {
+      "bg": "Генерална дирекция „Трудова заетост, социални въпроси и приобщаване“",
+      "uk": "Генеральна дирекція з питань зайнятості, соціальних питань та інклюзії",
+      "hu": "A Foglalkoztatás, a Szociális Ügyek és a Társadalmi Befogadás Főigazgatósága",
+      "ga": "An Ard-Stiúrthóireacht um Fhostaíocht, Gnóthaí Sóisialta agus Cuimsiú",
+      "lt": "Užimtumo, socialinių reikalų ir įtraukties generalinis direktoratas",
+      "cs": "Generální ředitelství pro zaměstnanost, sociální věci a sociální začleňování",
+      "en": "Directorate-General for Employment, Social Affairs and Inclusion",
+      "sv": "Generaldirektoratet för sysselsättning, socialpolitik och inkludering",
+      "it": "Direzione generale per l'Occupazione, gli affari sociali e l'inclusione",
+      "fr": "Direction générale de l’emploi, des affaires sociales et de l’inclusion",
+      "nl": "Directoraat-generaal Werkgelegenheid, Sociale Zaken en Inclusie",
+      "pl": "Dyrekcja Generalna ds. Zatrudnienia, Spraw Społecznych i Włączenia Społecznego",
+      "sl": "Generalni direktorat za zaposlovanje, socialne zadeve in vključevanje",
+      "fi": "Työllisyys-, sosiaali- ja osallisuusasioiden pääosasto",
+      "sk": "Generálne riaditeľstvo pre zamestnanosť, sociálne záležitosti a začlenenie",
+      "lv": "Nodarbinātības, sociālo lietu un iekļautības ģenerāldirektorāts",
+      "de": "Generaldirektion Beschäftigung, Soziales und Integration",
+      "el": "Γενική Διεύθυνση Απασχόλησης, Κοινωνικών Υποθέσεων και Ένταξης",
+      "da": "Generaldirektoratet for Beskæftigelse, Sociale Anliggender, Arbejdsmarkedsforhold og Inklusion",
+      "hr": "Glavna uprava za zapošljavanje, socijalna pitanja i uključivanje",
+      "ro": "Direcția Generală Ocuparea Forței de Muncă, Afaceri Sociale și Incluziune",
+      "pt": "Direção-Geral do Emprego, dos Assuntos Sociais e da Inclusão",
+      "es": "Dirección General de Empleo, Asuntos Sociales e Inclusión",
+      "mt": "Id-Direttorat Ġenerali tal-Impjiegi, l-Affarijiet Soċjali u l-Inklużjoni",
+      "et": "Tööhõive, sotsiaalküsimuste ja sotsiaalse kaasatuse peadirektoraat"
+    },
+    "issued": "2021-12-03T11:20:24Z",
+    "source_type": "euodp-legacy",
+    "language": [
+      {
+        "id": "en",
+        "label": "English",
+        "resource": "http://publications.europa.eu/resource/authority/language/ENG"
+      }
+    ],
+    "modified": "2021-12-03T11:20:24Z",
+    "country": {
+      "label": "Europe",
+      "id": "EUROPE",
+      "resource": "http://publications.europa.eu/resource/authority/continent/EUROPE"
+    },
+    "spatial_resource": [
+      {
+        "label": "Europe",
+        "id": "EUROPE",
+        "resource": "http://publications.europa.eu/resource/authority/continent/EUROPE"
+      }
+    ],
+    "publisher": {
+      "type": "http://publications.europa.eu/resource/authority/corporate-body-classification/DIR_GEN",
+      "name": "Directorate-General for Employment, Social Affairs and Inclusion",
+      "homepage": "https://commission.europa.eu/about/departments-and-executive-agencies/employment-social-affairs-and-inclusion",
+      "resource": "http://publications.europa.eu/resource/authority/corporate-body/EMPL"
+    },
+    "is_part_of": "european-union-open-data-portal",
+    "translation_meta": {
+      "details": {
+        "bg": {
+          "machine_translated": true,
+          "original_language": "en"
+        },
+        "uk": {
+          "machine_translated": true,
+          "original_language": "en"
+        },
+        "hu": {
+          "machine_translated": true,
+          "original_language": "en"
+        },
+        "ga": {
+          "machine_translated": true,
+          "original_language": "en"
+        },
+        "lt": {
+          "machine_translated": true,
+          "original_language": "en"
+        },
+        "cs": {
+          "machine_translated": true,
+          "original_language": "en"
+        },
+        "en": {
+          "machine_translated": false
+        },
+        "sv": {
+          "machine_translated": true,
+          "original_language": "en"
+        },
+        "it": {
+          "machine_translated": true,
+          "original_language": "en"
+        },
+        "fr": {
+          "machine_translated": true,
+          "original_language": "en"
+        },
+        "nl": {
+          "machine_translated": true,
+          "original_language": "en"
+        },
+        "pl": {
+          "machine_translated": true,
+          "original_language": "en"
+        },
+        "sl": {
+          "machine_translated": true,
+          "original_language": "en"
+        },
+        "fi": {
+          "machine_translated": true,
+          "original_language": "en"
+        },
+        "sk": {
+          "machine_translated": true,
+          "original_language": "en"
+        },
+        "lv": {
+          "machine_translated": true,
+          "original_language": "en"
+        },
+        "de": {
+          "machine_translated": true,
+          "original_language": "en"
+        },
+        "el": {
+          "machine_translated": true,
+          "original_language": "en"
+        },
+        "da": {
+          "machine_translated": true,
+          "original_language": "en"
+        },
+        "hr": {
+          "machine_translated": true,
+          "original_language": "en"
+        },
+        "ro": {
+          "machine_translated": true,
+          "original_language": "en"
+        },
+        "pt": {
+          "machine_translated": true,
+          "original_language": "en"
+        },
+        "es": {
+          "machine_translated": true,
+          "original_language": "en"
+        },
+        "mt": {
+          "machine_translated": true,
+          "original_language": "en"
+        },
+        "et": {
+          "machine_translated": true,
+          "original_language": "en"
+        }
+      },
+      "full_available_languages": [
+        "bg",
+        "uk",
+        "hu",
+        "ga",
+        "lt",
+        "cs",
+        "en",
+        "sv",
+        "it",
+        "fr",
+        "nl",
+        "pl",
+        "sl",
+        "fi",
+        "sk",
+        "lv",
+        "de",
+        "el",
+        "da",
+        "hr",
+        "ro",
+        "pt",
+        "es",
+        "mt",
+        "et"
+      ],
+      "status": "unknown"
+    }
+  },
+  "subject": [
+    {
+      "resource": "http://eurovoc.europa.eu/1802",
+      "id": "1802",
+      "label": {
+        "de": "Arbeitsmarkt",
+        "fi": "työmarkkinat",
+        "pt": "mercado do trabalho",
+        "bg": "пазар на работна сила",
+        "lt": "darbo rinka",
+        "lv": "darba tirgus",
+        "hr": "tržište rada",
+        "fr": "marché du travail",
+        "hu": "munkaerőpiac",
+        "sk": "pracovný trh",
+        "sl": "trg dela",
+        "ga": "margadh an tsaothair",
+        "mk": "пазар на труд",
+        "sq": "treg i punës",
+        "sr": "тржиште рада",
+        "sv": "arbetsmarknad",
+        "el": "αγορά της εργασίας",
+        "mt": "suq tax-xogħol",
+        "en": "labour market",
+        "it": "mercato del lavoro",
+        "es": "mercado laboral",
+        "et": "tööturg",
+        "cs": "trh práce",
+        "pl": "rynek pracy",
+        "ro": "piața muncii",
+        "da": "arbejdsmarked",
+        "nl": "arbeidsmarkt"
+      }
+    },
+    {
+      "resource": "http://eurovoc.europa.eu/2868",
+      "id": "2868",
+      "label": {
+        "de": "Qualifikation",
+        "fi": "ammatillinen pätevyys",
+        "pt": "qualificação profissional",
+        "bg": "професионална квалификация",
+        "lt": "profesinė kvalifikacija",
+        "hr": "stručna sprema",
+        "lv": "profesionālā kvalifikācija",
+        "fr": "qualification professionnelle",
+        "hu": "szakképesítés",
+        "sk": "profesijné kvalifikácie",
+        "sl": "poklicna kvalifikacija",
+        "ga": "cáilíochtaí gairmiúla",
+        "sq": "kualifikime profesionale",
+        "mk": "професионални квалификации",
+        "sr": "стручна спрема",
+        "sv": "yrkeskvalifikation",
+        "el": "επαγγελματικά προσόντα",
+        "mt": "kwalifiki professjonali",
+        "en": "professional qualifications",
+        "it": "qualificazione professionale",
+        "es": "cualificación profesional",
+        "et": "kutsekvalifikatsioon",
+        "cs": "odborná kvalifikace",
+        "pl": "kwalifikacje zawodowe",
+        "da": "faglig kvalifikation",
+        "ro": "calificare profesională",
+        "nl": "beroepskwalificatie"
+      }
+    },
+    {
+      "resource": "http://eurovoc.europa.eu/6099",
+      "id": "6099",
+      "label": {
+        "de": "Anerkennung der beruflichen Befähigungsnachweise",
+        "fi": "ammatillisen pätevyyden tunnustaminen",
+        "pt": "reconhecimento das qualificações profissionais",
+        "bg": "признаване на удостоверенията за професионална подготовка",
+        "lt": "profesinių kvalifikacijų pripažinimas",
+        "hr": "priznavanje kvalifikacija u strukovnoj izobrazbi",
+        "lv": "profesionālās kvalifikācijas dokumentu atzīšana",
+        "fr": "reconnaissance des qualifications professionnelles",
+        "hu": "szakképesítések elismerése",
+        "sk": "uznávanie kvalifikácií",
+        "sl": "priznavanje poklicnih kvalifikacij",
+        "ga": "cáilíochtaí gairmoiliúna a aithint",
+        "sq": "njohje e kualifikimeve të formimit profesional",
+        "mk": "признавање на професионални квалификации",
+        "sr": "признавање стручних квалификација",
+        "sv": "erkännande av yrkesutbildningskvalifikationer",
+        "mt": "recognition of vocational training qualifications",
+        "el": "αναγνώριση επαγγελματικών προσόντων",
+        "en": "recognition of vocational training qualifications",
+        "it": "riconoscimento delle qualifiche professionali",
+        "es": "reconocimiento de las cualificaciones profesionales",
+        "et": "kutsekvalifikatsioonide tunnustamine",
+        "cs": "uznání dokladů o odborné kvalifikaci",
+        "pl": "uznawanie kwalifikacji zawodowych",
+        "da": "anerkendelse af faglige kvalifikationer",
+        "ro": "recunoașterea calificării profesionale",
+        "nl": "erkenning van getuigschriften van vakbekwaamheid"
+      }
+    },
+    {
+      "resource": "http://eurovoc.europa.eu/6004",
+      "id": "6004",
+      "label": {
+        "de": "Klassifikation",
+        "fi": "luokitus",
+        "pt": "classificação",
+        "bg": "класификация",
+        "lt": "klasifikacija",
+        "lv": "klasifikācija",
+        "hr": "klasificiranje",
+        "fr": "classification",
+        "hu": "osztályozás",
+        "sk": "klasifikácia",
+        "sl": "klasifikacija",
+        "ga": "aicmiúchán",
+        "sq": "klasifikim",
+        "mk": "класификација",
+        "sr": "класификација",
+        "sv": "klassificering",
+        "el": "ταξινόμηση",
+        "mt": "klassifikazzjoni",
+        "en": "classification",
+        "it": "classificazione",
+        "es": "clasificación",
+        "et": "klassifikatsioon",
+        "cs": "klasifikace",
+        "pl": "klasyfikacja",
+        "ro": "clasificare documentară",
+        "da": "klassifikation",
+        "nl": "classificatie"
+      }
+    },
+    {
+      "resource": "http://eurovoc.europa.eu/414",
+      "id": "414",
+      "label": {
+        "de": "Stellenbeschreibung",
+        "fi": "toimenkuva",
+        "pt": "descrição de funções",
+        "bg": "описание на работата",
+        "lt": "pareigybės aprašymas",
+        "lv": "darba apraksts",
+        "hr": "opis radnoga mjesta",
+        "fr": "description d'emploi",
+        "hu": "munkakör",
+        "sk": "opis práce",
+        "sl": "opis delovnega mesta",
+        "ga": "sainchuntas poist",
+        "sq": "përshkrim pune",
+        "mk": "опис на работно место",
+        "sr": "опис посла",
+        "sv": "befattningsbeskrivning",
+        "el": "περιγραφή καθηκόντων εργασίας",
+        "mt": "deskrizzjoni ta’ kariga",
+        "en": "job description",
+        "it": "descrizione dell'impiego",
+        "es": "descripción de funciones",
+        "et": "töökirjeldus",
+        "cs": "popis práce",
+        "pl": "opis pracy",
+        "ro": "fișa de atribuții pe post",
+        "da": "stillingsbeskrivelse",
+        "nl": "functieomschrijving"
+      }
+    },
+    {
+      "resource": "http://eurovoc.europa.eu/545",
+      "id": "545",
+      "label": {
+        "de": "Zugang zum Beruf",
+        "fi": "ammattiin pääsy",
+        "pt": "acesso à profissão",
+        "bg": "достъп до професия",
+        "lt": "profesijos įsigijimo galimybė",
+        "hr": "pristup zanimanju",
+        "lv": "profesijas pieejamība",
+        "fr": "accès à la profession",
+        "hu": "szakmába történő bejutás",
+        "sk": "prístup k povolaniu",
+        "sl": "dostop do poklica",
+        "ga": "rochtain ar ghairm",
+        "sq": "aksesi në një profesion",
+        "mk": "пристап до професија",
+        "sr": "право на обављање професије",
+        "sv": "tillgång till ett yrke",
+        "el": "πρόσβαση σε επάγγελμα",
+        "mt": "aċċess għal professjoni",
+        "en": "access to a profession",
+        "it": "accesso alla professione",
+        "es": "acceso a la profesión",
+        "et": "juurdepääs kutsealale",
+        "cs": "přístup k povolání",
+        "pl": "dostęp do zawodu",
+        "da": "adgang til erhverv",
+        "ro": "acces la o profesie",
+        "nl": "toegang tot het beroepsleven"
+      }
+    },
+    {
+      "resource": "http://eurovoc.europa.eu/4054",
+      "id": "4054",
+      "label": {
+        "de": "EURES",
+        "fi": "EURES",
+        "pt": "EURES",
+        "bg": "ЕУРЕС",
+        "lt": "EURES",
+        "lv": "EURES",
+        "hr": "EURES",
+        "fr": "EURES",
+        "hu": "EURES",
+        "sk": "EURES",
+        "sl": "EURES",
+        "ga": "EURES",
+        "sq": "EURES",
+        "mk": "ЕУРЕС",
+        "sr": "EURES",
+        "sv": "EURES",
+        "el": "EURES",
+        "mt": "EURES",
+        "en": "EURES",
+        "it": "EURES",
+        "es": "EURES",
+        "et": "EURES",
+        "cs": "systém EURES",
+        "pl": "EURES",
+        "ro": "EURES",
+        "da": "Eures",
+        "nl": "Eures"
+      }
+    },
+    {
+      "resource": "http://eurovoc.europa.eu/2126",
+      "id": "2126",
+      "label": {
+        "de": "offene Stelle",
+        "fi": "avoimet työpaikat",
+        "pt": "oferta de emprego",
+        "bg": "свободни работни места",
+        "lt": "laisva darbo vieta",
+        "hr": "slobodno radno mjesto",
+        "lv": "brīva darbvieta",
+        "fr": "offre d'emploi",
+        "hu": "munkahelyi üresedés",
+        "sk": "voľné pracovné miesto",
+        "sl": "prosto delovno mesto",
+        "ga": "folúntas",
+        "sq": "vend vakante pune",
+        "mk": "слободно работно место",
+        "sr": "слободно радно место",
+        "sv": "ledig plats",
+        "mt": "vakanza ta' impjieg",
+        "el": "προσφορά εργασίας",
+        "en": "job vacancy",
+        "it": "offerta di impiego",
+        "es": "oferta de empleo",
+        "et": "vaba ametikoht",
+        "cs": "nabídka zaměstnání",
+        "pl": "oferta miejsc pracy",
+        "ro": "ofertă de locuri de muncă",
+        "da": "udbud af stillinger",
+        "nl": "banenaanbod"
+      }
+    }
+  ],
+  "translation_meta": {
+    "details": {
+      "de": {
+        "machine_translated": true,
+        "original_language": "en",
+        "received": "2022-02-01T21:58:59Z",
+        "issued": "2022-02-01T10:08:12Z"
+      },
+      "sv": {
+        "machine_translated": true,
+        "original_language": "en",
+        "received": "2022-02-01T21:58:59Z",
+        "issued": "2022-02-01T10:08:12Z"
+      },
+      "fi": {
+        "machine_translated": false,
+        "received": "2022-02-01T21:58:59Z",
+        "issued": "2022-02-01T10:08:12Z"
+      },
+      "pt": {
+        "machine_translated": false,
+        "received": "2022-02-01T21:58:59Z",
+        "issued": "2022-02-01T10:08:12Z"
+      },
+      "bg": {
+        "machine_translated": false,
+        "received": "2022-02-01T21:58:59Z",
+        "issued": "2022-02-01T10:08:12Z"
+      },
+      "el": {
+        "machine_translated": false,
+        "received": "2022-02-01T21:58:59Z",
+        "issued": "2022-02-01T10:08:12Z"
+      },
+      "mt": {
+        "machine_translated": false,
+        "received": "2022-02-01T21:58:59Z",
+        "issued": "2022-02-01T10:08:12Z"
+      },
+      "lt": {
+        "machine_translated": false,
+        "received": "2022-02-01T21:58:59Z",
+        "issued": "2022-02-01T10:08:12Z"
+      },
+      "en": {
+        "machine_translated": false,
+        "received": "2022-02-01T21:58:59Z",
+        "issued": "2022-02-01T10:08:12Z"
+      },
+      "lv": {
+        "machine_translated": false,
+        "received": "2022-02-01T21:58:59Z",
+        "issued": "2022-02-01T10:08:12Z"
+      },
+      "hr": {
+        "machine_translated": true,
+        "original_language": "en",
+        "received": "2022-02-01T21:58:59Z",
+        "issued": "2022-02-01T10:08:12Z"
+      },
+      "it": {
+        "machine_translated": false,
+        "received": "2022-02-01T21:58:59Z",
+        "issued": "2022-02-01T10:08:12Z"
+      },
+      "fr": {
+        "machine_translated": false,
+        "received": "2022-02-01T21:58:59Z",
+        "issued": "2022-02-01T10:08:12Z"
+      },
+      "hu": {
+        "machine_translated": false,
+        "received": "2022-02-01T21:58:59Z",
+        "issued": "2022-02-01T10:08:12Z"
+      },
+      "es": {
+        "machine_translated": false,
+        "received": "2022-02-01T21:58:59Z",
+        "issued": "2022-02-01T10:08:12Z"
+      },
+      "et": {
+        "machine_translated": true,
+        "original_language": "en",
+        "received": "2022-02-01T21:58:59Z",
+        "issued": "2022-02-01T10:08:12Z"
+      },
+      "cs": {
+        "machine_translated": false,
+        "received": "2022-02-01T21:58:59Z",
+        "issued": "2022-02-01T10:08:12Z"
+      },
+      "sk": {
+        "machine_translated": false,
+        "received": "2022-02-01T21:58:59Z",
+        "issued": "2022-02-01T10:08:12Z"
+      },
+      "sl": {
+        "machine_translated": false,
+        "received": "2022-02-01T21:58:59Z",
+        "issued": "2022-02-01T10:08:12Z"
+      },
+      "ga": {
+        "machine_translated": true,
+        "original_language": "en",
+        "received": "2022-02-01T21:58:59Z",
+        "issued": "2022-02-01T10:08:12Z"
+      },
+      "pl": {
+        "machine_translated": false,
+        "received": "2022-02-01T21:58:59Z",
+        "issued": "2022-02-01T10:08:12Z"
+      },
+      "da": {
+        "machine_translated": false,
+        "received": "2022-02-01T21:58:59Z",
+        "issued": "2022-02-01T10:08:12Z"
+      },
+      "ro": {
+        "machine_translated": false,
+        "received": "2022-02-01T21:58:59Z",
+        "issued": "2022-02-01T10:08:12Z"
+      },
+      "nl": {
+        "machine_translated": false,
+        "received": "2022-02-01T21:58:59Z",
+        "issued": "2022-02-01T10:08:12Z"
+      }
+    },
+    "full_available_languages": [
+      "da",
+      "lv",
+      "bg",
+      "pl",
+      "el",
+      "cs",
+      "hr",
+      "en",
+      "sk",
+      "mt",
+      "sl",
+      "es",
+      "nl",
+      "fr",
+      "pt",
+      "it",
+      "de",
+      "et",
+      "sv",
+      "ro",
+      "ga",
+      "hu",
+      "lt",
+      "fi"
+    ],
+    "status": "completed"
+  },
+  "description": {
+    "de": "ESCO ist die mehrsprachige Klassifikation europäischer Kompetenzen, Kompetenzen, Qualifikationen und Berufe. ESCO ist Teil der Strategie Europa 2020. In der ESCO-Klassifikation werden Kompetenzen, Kompetenzen, Qualifikationen und Berufe genannt, die für den EU-Arbeitsmarkt und die allgemeine und berufliche Bildung relevant sind. Sie zeigt systematisch die Beziehungen zwischen den verschiedenen Konzepten. ESCO wurde in einem offenen IT-Format entwickelt, steht von allen kostenlos zur Verfügung und kann über das ESCO-Portal abgerufen werden.  \nESCO ist eine Initiative der GD Beschäftigung, Soziales und Integration, die vom Europäischen Zentrum für die Förderung der Berufsbildung (Cedefop) unterstützt wird.",
+    "fi": "ESCO on eurooppalaisen osaamisen, osaamisen, tutkintojen ja ammattien monikielinen luokitus. ESCO on osa Eurooppa 2020 -strategiaa. ESCO-luokituksessa yksilöidään ja luokitellaan taidot, pätevyydet, pätevyydet ja ammatit, jotka ovat merkityksellisiä EU:n työmarkkinoiden ja koulutuksen kannalta. Se osoittaa järjestelmällisesti eri käsitteiden väliset suhteet. ESCO on kehitetty avoimessa IT-muodossa, se on kaikkien käytettävissä maksutta ja siihen voi tutustua ESCO-portaalin kautta.  \nESCO on työllisyys-, sosiaali- ja osallisuusasioiden pääosaston aloite, jota tukee Euroopan ammatillisen koulutuksen kehittämiskeskus (Cedefop).",
+    "pt": "A ESCO é a classificação multilingue de Competências, Competências, Qualificações e Profissões na Europa. A ESCO faz parte da Estratégia Europa 2020. A classificação ESCO identifica e categoriza as aptidões, competências, qualificações e profissões relevantes para o mercado de trabalho da UE e para a educação e a formação.\nMostra sistematicamente as relações entre os diferentes conceitos.\nA ESCO foi desenvolvida num formato informático aberto, está disponível para utilização gratuita por todos e pode ser consultada através do portal ESCO.\n\n\nA ESCO é uma iniciativa da DG Emprego, Assuntos Sociais e Inclusão, apoiada pelo Centro Europeu para o Desenvolvimento da Formação Profissional (Cedefop).",
+    "bg": "ESCO е многоезиковата класификация на европейските умения, компетентности, квалификации и професии. ESCO е част от стратегията „Европа 2020“. Класификацията ESCO определя и категоризира уменията, компетентностите, квалификациите и професиите, които са от значение за пазара на труда в ЕС и за образованието и обучението. Тя систематично показва връзките между различните понятия. ESCO е разработен в отворен ИТ формат, достъпен е за ползване безплатно от всички и може да бъде достъпен чрез портала ESCO.  \nESCO е инициатива на ГД „Трудова заетост, социални въпроси и приобщаване“, подкрепена от Европейския център за развитие на професионалното обучение (Cedefop).",
+    "lt": "ESCO yra daugiakalbis Europos įgūdžių, gebėjimų, kvalifikacijų ir profesijų klasifikatorius. ESCO yra strategijos „Europa 2020“ dalis. ESCO klasifikatoriuje nustatomi ir suskirstomi ES darbo rinkai ir švietimui bei mokymui svarbūs įgūdžiai, gebėjimai, kvalifikacijos ir profesijos. Jis sistemingai parodo ryšius tarp skirtingų sąvokų. ESCO sukurta atviru IT formatu, ja nemokamai gali naudotis visi, o prie jos galima prisijungti per ESCO portalą.  \nESCO yra Užimtumo, socialinių reikalų ir įtraukties GD iniciatyva, remiama Europos profesinio mokymo plėtros centro (CEDEFOP).",
+    "hr": "ESCO je višejezična klasifikacija europskih vještina, kompetencija, kvalifikacija i zanimanja. ESCO je dio strategije Europa 2020. U klasifikaciji ESCO utvrđuju se i kategoriziraju vještine, kompetencije, kvalifikacije i zanimanja relevantna za tržište rada EU-a te obrazovanje i osposobljavanje. Ona sustavno prikazuje odnose između različitih koncepata. ESCO je razvijen u otvorenom IT formatu, dostupan je za besplatno korištenje svima i može mu se pristupiti putem portala ESCO.  \nESCO je inicijativa Glavne uprave za zapošljavanje, socijalna pitanja i uključivanje, koju podupire Europski centar za razvoj strukovnog osposobljavanja (Cedefop).",
+    "lv": "ESCO ir Eiropas prasmju, kompetenču, kvalifikāciju un profesiju daudzvalodu klasifikācija. ESCO ir daļa no stratēģijas “Eiropa 2020”. ESCO klasifikācijā ir noteiktas un iedalītas prasmes, kompetences, kvalifikācijas un profesijas, kas attiecas uz ES darba tirgu un izglītību un apmācību. Tas sistemātiski parāda attiecības starp dažādiem jēdzieniem. ESCO ir izstrādāta atvērtā IT formātā, ir pieejama bezmaksas lietošanai ikvienam, un tai var piekļūt, izmantojot ESCO portālu.  \nESCO ir Nodarbinātības, sociālo lietu un iekļautības ģenerāldirektorāta iniciatīva, ko atbalsta Eiropas Profesionālās izglītības attīstības centrs (Cedefop).",
+    "fr": "L’ESCO est la classification multilingue des compétences, compétences, qualifications et professions européennes. L’ESCO fait partie de la stratégie Europe 2020. La classification ESCO identifie et catégorise les aptitudes, les compétences, les qualifications et les professions pertinentes pour le marché du travail de l’UE et pour l’éducation et la formation. Il montre systématiquement les relations entre les différents concepts.\nESCO a été développé dans un format informatique ouvert, est disponible gratuitement par tout le monde et est accessible via le portail ESCO.\n\n\nL’ESCO est une initiative de la DG Emploi, affaires sociales et inclusion, soutenue par le Centre européen pour le développement de la formation professionnelle (Cedefop).",
+    "hu": "Az ESCO az európai készségek, kompetenciák, képesítések és foglalkozások többnyelvű osztályozása. Az ESCO az Európa 2020 stratégia része. Az ESCO-osztályozás azonosítja és kategorizálja az uniós munkaerőpiac, valamint az oktatás és képzés szempontjából releváns készségeket, kompetenciákat, képesítéseket és foglalkozásokat. Szisztematikusan bemutatja a különböző fogalmak közötti kapcsolatokat. Az ESCO-t nyílt informatikai formátumban fejlesztették ki, amely mindenki számára ingyenesen elérhető, és az ESCO-portálon keresztül érhető el.  \nAz ESCO a Foglalkoztatás, a Szociális Ügyek és a Társadalmi Befogadás Főigazgatóságának kezdeményezése, amelyet az Európai Szakképzésfejlesztési Központ (Cedefop) támogat.",
+    "sk": "ESCO je viacjazyčná klasifikácia európskych zručností, kompetencií, kvalifikácií a povolaní. ESCO je súčasťou stratégie Európa 2020. V klasifikácii ESCO sa identifikujú a kategorizujú zručnosti, kompetencie, kvalifikácie a povolania relevantné pre trh práce EÚ a vzdelávanie a odbornú prípravu. Systematicky ukazuje vzťahy medzi rôznymi pojmami. ESCO bola vyvinutá v otvorenom IT formáte, je dostupná bezplatne pre všetkých a je prístupná prostredníctvom portálu ESCO.   ESCO je iniciatíva GR pre zamestnanosť, sociálne záležitosti a začlenenie s podporou Európskeho strediska pre rozvoj odborného vzdelávania (Cedefop). ESCO je viacjazyčná klasifikácia európskych zručností, kompetencií, kvalifikácií a povolaní. ESCO je súčasťou stratégie Európa 2020. V klasifikácii ESCO sa identifikujú a kategorizujú zručnosti, kompetencie, kvalifikácie a povolania relevantné pre trh práce EÚ a vzdelávanie a odbornú prípravu. Systematicky ukazuje vzťahy medzi rôznymi pojmami.\nESCO bola vyvinutá v otvorenom IT formáte, je dostupná bezplatne pre všetkých a je prístupná prostredníctvom portálu ESCO.\n\n\nESCO je iniciatíva GR pre zamestnanosť, sociálne záležitosti a začlenenie s podporou Európskeho strediska pre rozvoj odborného vzdelávania (Cedefop).",
+    "sl": "ESCO je večjezična klasifikacija evropskih spretnosti, kompetenc, kvalifikacij in poklicev. ESCO je del strategije Evropa 2020. Klasifikacija ESCO opredeljuje in razvršča spretnosti, kompetence, kvalifikacije in poklice, ki so pomembni za trg dela EU ter izobraževanje in usposabljanje. Sistematično prikazuje razmerja med različnimi koncepti. ESCO je bil razvit v odprtem formatu IT, je na voljo brezplačno za vsakogar in je dostopen prek portala ESCO.   ESCO je pobuda GD za zaposlovanje, socialne zadeve in vključevanje, ki jo podpira Evropski center za razvoj poklicnega usposabljanja (Cedefop). ESCO je večjezična klasifikacija evropskih spretnosti, kompetenc, kvalifikacij in poklicev. ESCO je del strategije Evropa 2020. Klasifikacija ESCO opredeljuje in razvršča spretnosti, kompetence, kvalifikacije in poklice, ki so pomembni za trg dela EU ter izobraževanje in usposabljanje. Sistematično prikazuje razmerja med različnimi koncepti.\nESCO je bil razvit v odprtem formatu IT, je na voljo brezplačno za vsakogar in je dostopen prek portala ESCO.\n\n\nESCO je pobuda GD za zaposlovanje, socialne zadeve in vključevanje, ki jo podpira Evropski center za razvoj poklicnega usposabljanja (Cedefop).",
+    "ga": "Is é ESCO an t-aicmiú ilteangach ar Scileanna, Inniúlachtaí, Cáilíochtaí agus Gairmeacha Eorpacha. Is cuid den straitéis Eoraip 2020 é ESCO. Déanann aicmiú ESCO na scileanna, na hinniúlachtaí, na cáilíochtaí agus na gairmeacha atá ábhartha do mhargadh saothair an Aontais agus don oideachas agus don oiliúint a shainaithint agus a aicmiú. Taispeánann sé go córasach na caidrimh idir na coincheapa éagsúla. Forbraíodh ESCO i bhformáid oscailte TF, tá sé ar fáil le húsáid saor in aisce ag gach duine agus is féidir rochtain a fháil air trí thairseach ESCO.  \nIs tionscnamh é ESCO ón Ard-Stiúrthóireacht um Fhostaíocht, Gnóthaí Sóisialta agus Cuimsiú, le tacaíocht ón Lárionad Eorpach um Fhorbairt na Gairmoiliúna (Cedefop).",
+    "sv": "Esco är den flerspråkiga klassificeringen av europeiska färdigheter, färdigheter, kvalifikationer och yrken.\nEsco är en del av Europa 2020-strategin.\nEsco-klassificeringen identifierar och kategoriserar färdigheter, kompetenser, kvalifikationer och yrken som är relevanta för EU:s arbetsmarknad och utbildning.\nDen visar systematiskt sambanden mellan de olika begreppen.\nEsco har utvecklats i ett öppet IT-format, kan användas kostnadsfritt av alla och kan nås via Esco-portalen.\n\n\nEsco är ett initiativ från GD Sysselsättning, socialpolitik och inkludering, som stöds av Europeiskt centrum för utveckling av yrkesutbildning (Cedefop).",
+    "el": "Το ESCO είναι η πολύγλωσση ταξινόμηση των ευρωπαϊκών δεξιοτήτων, ικανοτήτων, προσόντων και επαγγελμάτων. Το ESCO αποτελεί μέρος της στρατηγικής «Ευρώπη 2020». Η ταξινόμηση ESCO προσδιορίζει και κατηγοριοποιεί τις δεξιότητες, τις ικανότητες, τα επαγγελματικά προσόντα και τα επαγγέλματα που σχετίζονται με την αγορά εργασίας της ΕΕ και την εκπαίδευση και κατάρτιση. Δείχνει συστηματικά τις σχέσεις μεταξύ των διαφόρων εννοιών. Το ESCO αναπτύχθηκε σε ανοικτό μορφότυπο ΤΠ, διατίθεται δωρεάν για όλους και είναι προσβάσιμο μέσω της διαδικτυακής πύλης ESCO.  \nΤο ESCO είναι μια πρωτοβουλία της ΓΔ Απασχόλησης, Κοινωνικών Υποθέσεων και Ένταξης, με την υποστήριξη του Ευρωπαϊκού Κέντρου για την Ανάπτυξη της Επαγγελματικής Κατάρτισης (Cedefop).",
+    "mt": "L-ESCO hija l-klassifikazzjoni multilingwi ta’ Ħiliet, Kompetenzi, Kwalifiki u Impjiegi Ewropej. L-ESCO hija parti mill-istrateġija Ewropa 2020. Il-klassifikazzjoni ESCO tidentifika u tikkategorizza l-ħiliet, il-kompetenzi, il-kwalifiki u l-okkupazzjonijiet rilevanti għas-suq tax-xogħol tal-UE u l-edukazzjoni u t-taħriġ. Hija turi sistematikament ir-relazzjonijiet bejn il-kunċetti differenti. L-ESCO ġiet żviluppata f’format miftuħ tal-IT, hija disponibbli għall-użu mingħajr ħlas minn kulħadd u tista’ tiġi aċċessata permezz tal-portal tal-ESCO.  \nL-ESCO hija inizjattiva tad-DĠ Impjiegi, Affarijiet Soċjali u Inklużjoni, appoġġata miċ-Ċentru Ewropew għall-Iżvilupp ta’ Taħriġ Vokazzjonali (Cedefop).",
+    "en": "ESCO is the multilingual classification of European Skills, Competences, Qualifications and Occupations. ESCO is part of the Europe 2020 strategy. The ESCO classification identifies and categorises skills, competences, qualifications and occupations relevant for the EU labour market and education and training. It systematically shows the relationships between the different concepts. ESCO has been developed in an open IT format, is available for use free of charge by everyone and can be accessed via the ESCO portal.\r\nESCO is an initiative by DG Employment, Social Affairs and Inclusion, supported by the European Centre for the Development of Vocational Training (Cedefop).",
+    "it": "ESCO è la classificazione multilingue di competenze, competenze, qualifiche e occupazioni europee. L'ESCO fa parte della strategia Europa 2020. La classificazione ESCO identifica e classifica le abilità, le competenze, le qualifiche e le professioni pertinenti per il mercato del lavoro dell'UE e per l'istruzione e la formazione. Mostra sistematicamente le relazioni tra i diversi concetti. ESCO è stato sviluppato in un formato IT aperto, è disponibile per l'uso gratuito da tutti e può essere accessibile tramite il portale ESCO.  \nESCO è un'iniziativa della DG Occupazione, affari sociali e inclusione, sostenuta dal Centro europeo per lo sviluppo della formazione professionale (Cedefop).",
+    "es": "ESCO es la clasificación multilingüe de capacidades, competencias, cualificaciones y ocupaciones europeas. ESCO forma parte de la Estrategia Europa 2020. La clasificación ESCO identifica y clasifica las capacidades, competencias, cualificaciones y ocupaciones pertinentes para el mercado laboral de la UE y para la educación y la formación. Muestra sistemáticamente las relaciones entre los diferentes conceptos. ESCO se ha desarrollado en un formato informático abierto, está disponible para su uso gratuito por todos y se puede acceder a través del portal ESCO.  \nESCO es una iniciativa de la DG Empleo, Asuntos Sociales e Inclusión, apoyada por el Centro Europeo para el Desarrollo de la Formación Profesional (Cedefop).",
+    "et": "ESCO on Euroopa oskuste, pädevuste, kvalifikatsioonide ja ametite mitmekeelne klassifikaator. ESCO on osa strateegiast „Euroopa 2020“. ESCO klassifikatsioonis määratakse kindlaks ja liigitatakse ELi tööturu ning hariduse ja koolituse jaoks olulised oskused, pädevused, kvalifikatsioonid ja ametid. See näitab süstemaatiliselt seoseid erinevate mõistete vahel. ESCO on välja töötatud avatud IT-vormingus, see on kõigile tasuta kasutamiseks kättesaadav ja sellele pääseb ligi ESCO portaali kaudu.  \nESCO on tööhõive, sotsiaalküsimuste ja sotsiaalse kaasatuse peadirektoraadi algatus, mida toetab Euroopa Kutseõppe Arenduskeskus (Cedefop).",
+    "cs": "ESCO je mnohojazyčná klasifikace evropských dovedností, kompetencí, kvalifikací a povolání. ESCO je součástí strategie Evropa 2020. Klasifikace ESCO určuje a kategorizuje dovednosti, kompetence, kvalifikace a povolání relevantní pro trh práce EU a vzdělávání a odbornou přípravu. Systematicky ukazuje vztahy mezi různými pojmy. ESCO byla vyvinuta v otevřeném formátu IT, je k dispozici zdarma pro všechny a je přístupná prostřednictvím portálu ESCO.  \nESCO je iniciativa GŘ pro zaměstnanost, sociální věci a sociální začleňování, kterou podporuje Evropské středisko pro rozvoj odborného vzdělávání (Cedefop).",
+    "pl": "ESCO to wielojęzyczna klasyfikacja europejskich umiejętności, kompetencji, kwalifikacji i zawodów. ESCO jest częścią strategii „Europa 2020”. Klasyfikacja ESCO określa i kategoryzuje umiejętności, kompetencje, kwalifikacje i zawody istotne dla unijnego rynku pracy oraz kształcenia i szkolenia. Systematycznie pokazuje relacje między różnymi pojęciami. ESCO został opracowany w otwartym formacie IT, jest dostępny bezpłatnie dla wszystkich i jest dostępny za pośrednictwem portalu ESCO.  \nESCO jest inicjatywą DG ds. Zatrudnienia, Spraw Społecznych i Włączenia Społecznego, wspieraną przez Europejskie Centrum Rozwoju Kształcenia Zawodowego (Cedefop).",
+    "da": "ESCO er den flersprogede klassifikation af europæiske færdigheder, kompetencer, kvalifikationer og erhverv. ESCO er en del af Europa 2020-strategien. ESCO-klassifikationen identificerer og kategoriserer færdigheder, kompetencer, kvalifikationer og erhverv, der er relevante for EU's arbejdsmarked og uddannelse. Den viser systematisk forholdet mellem de forskellige begreber. ESCO er udviklet i et åbent IT-format, er gratis tilgængelig for alle og kan tilgås via ESCO-portalen.  \nESCO er et initiativ fra GD for Beskæftigelse, Sociale Anliggender, Arbejdsmarkedsforhold og Inklusion, der støttes af Det Europæiske Center for Udvikling af Erhvervsuddannelse (Cedefop).",
+    "ro": "ESCO este clasificarea multilingvă a aptitudinilor, competențelor, calificărilor și ocupațiilor europene. ESCO face parte din Strategia Europa 2020. Clasificarea ESCO identifică și clasifică aptitudinile, competențele, calificările și ocupațiile relevante pentru piața muncii din UE și pentru educație și formare. Acesta arată în mod sistematic relațiile dintre diferitele concepte. ESCO a fost dezvoltat într-un format IT deschis, este disponibil pentru utilizare gratuită de către toată lumea și poate fi accesat prin intermediul portalului ESCO.   ESCO este o inițiativă a DG Ocuparea Forței de Muncă, Afaceri Sociale și Incluziune, sprijinită de Centrul European pentru Dezvoltarea Formării Profesionale (Cedefop). ESCO este clasificarea multilingvă a aptitudinilor, competențelor, calificărilor și ocupațiilor europene. ESCO face parte din Strategia Europa 2020. Clasificarea ESCO identifică și clasifică aptitudinile, competențele, calificările și ocupațiile relevante pentru piața muncii din UE și pentru educație și formare. Acesta arată în mod sistematic relațiile dintre diferitele concepte.\nESCO a fost dezvoltat într-un format IT deschis, este disponibil pentru utilizare gratuită de către toată lumea și poate fi accesat prin intermediul portalului ESCO.\n\n\nESCO este o inițiativă a DG Ocuparea Forței de Muncă, Afaceri Sociale și Incluziune, sprijinită de Centrul European pentru Dezvoltarea Formării Profesionale (Cedefop).",
+    "nl": "ESCO is de meertalige classificatie van Europese vaardigheden, competenties, kwalificaties en beroepen. ESCO maakt deel uit van de Europa 2020-strategie. De ESCO-classificatie identificeert en categoriseert vaardigheden, competenties, kwalificaties en beroepen die relevant zijn voor de EU-arbeidsmarkt en onderwijs en opleiding.\nHet toont systematisch de relaties tussen de verschillende concepten.\nESCO is ontwikkeld in een open IT-formaat, is gratis beschikbaar voor iedereen en is toegankelijk via het ESCO-portaal.\n\n\nESCO is een initiatief van DG Werkgelegenheid, Sociale Zaken en Inclusie, gesteund door het Europees Centrum voor de ontwikkeling van de beroepsopleiding (Cedefop)."
+  },
+  "landing_page": [
+    {
+      "resource": "https://ec.europa.eu/esco"
+    }
+  ],
+  "language": [
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/ARA",
+      "id": "ar",
+      "label": "Arabic"
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/LIT",
+      "id": "lt",
+      "label": "Lithuanian"
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/DAN",
+      "id": "da",
+      "label": "Danish"
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/ITA",
+      "id": "it",
+      "label": "Italian"
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/HRV",
+      "id": "hr",
+      "label": "Croatian"
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/ISL",
+      "id": "is",
+      "label": "Icelandic"
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/POR",
+      "id": "pt",
+      "label": "Portuguese"
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/SWE",
+      "id": "sv",
+      "label": "Swedish"
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/SLV",
+      "id": "sl",
+      "label": "Slovenian"
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/HUN",
+      "id": "hu",
+      "label": "Hungarian"
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/NOR",
+      "id": "no",
+      "label": "Norwegian"
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/MLT",
+      "id": "mt",
+      "label": "Maltese"
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/LAV",
+      "id": "lv",
+      "label": "Latvian"
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/RON",
+      "id": "ro",
+      "label": "Romanian"
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/ENG",
+      "id": "en",
+      "label": "English"
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/CES",
+      "id": "cs",
+      "label": "Czech"
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/POL",
+      "id": "pl",
+      "label": "Polish"
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/DEU",
+      "id": "de",
+      "label": "German"
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/SLK",
+      "id": "sk",
+      "label": "Slovak"
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/SPA",
+      "id": "es",
+      "label": "Spanish"
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/EST",
+      "id": "et",
+      "label": "Estonian"
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/FIN",
+      "id": "fi",
+      "label": "Finnish"
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/FRA",
+      "id": "fr",
+      "label": "French"
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/BUL",
+      "id": "bg",
+      "label": "Bulgarian"
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/NLD",
+      "id": "nl",
+      "label": "Dutch"
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/ELL",
+      "id": "el",
+      "label": "Greek"
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/language/GLE",
+      "id": "ga",
+      "label": "Irish"
+    }
+  ],
+  "version_info": "V.1.0.3",
+  "title": {
+    "de": "Europäische Kompetenzen, Kompetenzen, Qualifikationen und Berufe (ESCO)",
+    "fi": "Taitojen, Osaamisten, Pätevyyksien ja Ammattien eurooppalainen luokitus (ESCO)",
+    "pt": "Uma taxonomia das Qualificações, Competências e Profissões Europeias (ESCO)",
+    "bg": "Европейска класификация иa Умениятa, Компетенцииocтите, Квалификации и Професиите (ESCO)",
+    "lt": "Europos Įgūdžių, Gebėjimų, Kvalifikacijų ir Profesijų klasifikatorius (ESCO)",
+    "lv": "Eiropas Prasmju, Kompetenču, Kvalifikāciju un Profesiju klasifikācija (ESCO)",
+    "hr": "Europske vještine, kompetencije, kvalifikacije i zanimanja (ESCO)",
+    "fr": "Classification européennes des Aptitudes, Compétences, Certifications et Professions (ESCO)",
+    "hu": "Készségek, Kompetenciák, Képesítések és Foglalkozások európai osztályozása (ESCO)",
+    "sk": "Európska klasifikácia Zručností, Kompetencií, Kvalifikácia a Povolaní (ESCO)",
+    "sl": "Evropska klasifikacija Spretnosti, Kompetenc, Kvalifikacij in Poklicev (ESCO)",
+    "ga": "Scileanna, Inniúlachtaí, Cáilíochtaí agus Gairmeacha Eorpacha (ESCO)",
+    "sv": "Europeiska färdigheter, kompetenser, kvalifikationer och yrken (Esco)",
+    "el": "Ευρωπαϊκή ταξινόμηση Δεξιοτήτων, ικανοτήτων, και Επαγγελμάτων (ESCO)",
+    "mt": "Klassifikazzjoni Ewropea ta' Ħiliet, Kompetenzi, Kwalifiki u Impjiegi (ESCO)",
+    "en": "European Skills, Competences, Qualifications and Occupations (ESCO)",
+    "it": "Una classificazione europea di Abilità, Competenze, Qualifiche e Occupazioni (ESCO)",
+    "es": "Clasificación europea de Capacidades, Competencias, Cualificaciones y Ocupaciones (ESCO)",
+    "et": "Euroopa oskused, pädevused, kvalifikatsioonid ja ametid (ESCO)",
+    "cs": "Evropštká klasifikace Dovedností, Kompetencí, Kvalifikací a Povolání (ESCO)",
+    "pl": "Europejska klasifikacja Umiejętności, Kompetencji, Kwalifikacji i Zawodów (ESCO)",
+    "da": "Et europæisk klassifikationssystem for Færdigheder, Kompetencer, Kvalifikationer og Stillingsbetegnelser (ESCO)",
+    "ro": "O clasificare europeăna a Aptitudinilor, Competențelor, Calificărilor și Ocupațiilor (ESCO)",
+    "nl": "Een Europese classificatie van Vaardigheden, Competenties, Kwalificaties en Beroepen (ESCO)"
+  },
+  "type": {
+    "resource": "http://publications.europa.eu/resource/authority/dataset-type/ONTOLOGY",
+    "id": "ONTOLOGY",
+    "label": "Ontology"
+  },
+  "access_right": {
+    "resource": "http://publications.europa.eu/resource/authority/access-right/PUBLIC",
+    "label": "public"
+  },
+  "distributions": [
+    {
+      "license": {
+        "resource": "http://data.europa.eu/eli/dec/2011/833/oj",
+        "description": "European Commission reuse notice",
+        "id": "COM_REUSE",
+        "label": "European Commission reuse notice"
+      },
+      "media_type": "text/html",
+      "rights": {
+        "resource": "http://publications.europa.eu/resource/authority/access-right/PUBLIC"
+      },
+      "access_url": [
+        "https://ec.europa.eu/esco/portal/home"
+      ],
+      "format": {
+        "format_types": [
+          {
+            "id": "structured",
+            "label": {
+              "en": "Structured"
+            }
+          },
+          {
+            "id": "textual",
+            "label": {
+              "en": "Textual"
+            }
+          }
+        ],
+        "resource": "http://publications.europa.eu/resource/authority/file-type/HTML",
+        "id": "HTML",
+        "label": "HTML"
+      },
+      "download_url": [
+        "https://ec.europa.eu/esco/portal/home"
+      ],
+      "description": {
+        "de": "Durchsuchen ESCO",
+        "sv": "Bläddra i ESCO",
+        "fi": "Selaa ESCOa",
+        "pt": "Navegue pela ESCO",
+        "bg": "Преглед на ESCO",
+        "mt": "Ibbrawżja l-ESCO",
+        "el": "Αναζήτηση στο ESCO",
+        "lt": "Naršyti ESCO",
+        "en": "Browse ESCO",
+        "hr": "Pretraživanje ESCO-a",
+        "lv": "Pārlūkot ESCO",
+        "it": "Sfoglia ESCO",
+        "fr": "Parcourir l’ESCO",
+        "hu": "Az ESCO böngészése",
+        "es": "Navegar por ESCO",
+        "et": "Sirvige ESCOt",
+        "cs": "Procházet ESCO",
+        "sk": "Prehľadávať ESCO",
+        "sl": "Prebrskaj ESCO",
+        "ga": "Brabhsáil ESCO",
+        "pl": "Przeglądaj ESCO",
+        "da": "Gennemse ESCO",
+        "ro": "Răsfoiți ESCO",
+        "nl": "Door ESCO bladeren"
+      },
+      "id": "8ef2f54b-83a2-4ec1-83ea-430472440b7f",
+      "title": {
+        "de": "Durchsuchen ESCO",
+        "sv": "Bläddra i ESCO",
+        "fi": "Selaa ESCOa",
+        "pt": "Navegue pela ESCO",
+        "bg": "Преглед на ESCO",
+        "mt": "Ibbrawżja l-ESCO",
+        "el": "Αναζήτηση στο ESCO",
+        "lt": "Naršyti ESCO",
+        "en": "Browse ESCO",
+        "lv": "Pārlūkot ESCO",
+        "hr": "Pretraživanje ESCO-a",
+        "it": "Sfoglia ESCO",
+        "fr": "Parcourir l’ESCO",
+        "hu": "Az ESCO böngészése",
+        "es": "Navegar por ESCO",
+        "et": "Sirvige ESCOt",
+        "cs": "Procházet ESCO",
+        "sk": "Prehľadávať ESCO",
+        "sl": "Prebrskaj ESCO",
+        "ga": "Brabhsáil ESCO",
+        "pl": "Przeglądaj ESCO",
+        "ro": "Răsfoiți ESCO",
+        "da": "Gennemse ESCO",
+        "nl": "Door ESCO bladeren"
+      },
+      "issued": "2015-01-30T14:52:56.167384+02:00",
+      "status": {
+        "resource": "http://purl.org/adms/status/Completed",
+        "label": "Completed"
+      }
+    },
+    {
+      "license": {
+        "resource": "http://data.europa.eu/eli/dec/2011/833/oj",
+        "description": "European Commission reuse notice",
+        "id": "COM_REUSE",
+        "label": "European Commission reuse notice"
+      },
+      "media_type": "text/html",
+      "rights": {
+        "resource": "http://publications.europa.eu/resource/authority/access-right/PUBLIC"
+      },
+      "access_url": [
+        "https://ec.europa.eu/esco"
+      ],
+      "download_url": [
+        "https://ec.europa.eu/esco"
+      ],
+      "format": {
+        "format_types": [
+          {
+            "id": "structured",
+            "label": {
+              "en": "Structured"
+            }
+          },
+          {
+            "id": "textual",
+            "label": {
+              "en": "Textual"
+            }
+          }
+        ],
+        "resource": "http://publications.europa.eu/resource/authority/file-type/HTML",
+        "id": "HTML",
+        "label": "HTML"
+      },
+      "description": {
+        "de": "Europäische Qualifikations-, Kompetenz-, Qualifikations- und Berufsklassifikation",
+        "fi": "Eurooppalainen taito-, osaamis-, tutkinto- ja ammattiluokitus",
+        "sv": "Klassificering av europeiska färdigheter, kompetenser, kvalifikationer och yrken",
+        "pt": "Classificação de Competências, Competências, Qualificações e Profissões na Europa",
+        "bg": "Европейска класификация на уменията, компетентностите, квалификациите и професиите",
+        "mt": "Klassifikazzjoni Ewropea tal-Ħiliet, il-Kompetenzi, il-Kwalifiki u l-Impjiegi",
+        "el": "Ευρωπαϊκή ταξινόμηση δεξιοτήτων, ικανοτήτων, προσόντων και επαγγελμάτων",
+        "lt": "Europos įgūdžių, gebėjimų, kvalifikacijų ir profesijų klasifikacija",
+        "en": "European Skills, Competences, Qualifications and Occupations classification",
+        "lv": "Eiropas prasmju, kompetenču, kvalifikāciju un profesiju klasifikācija",
+        "hr": "Klasifikacija europskih vještina, kompetencija, kvalifikacija i zanimanja",
+        "it": "Classificazione europea delle competenze, delle competenze, delle qualifiche e delle occupazioni",
+        "fr": "Classification des compétences, compétences, qualifications et professions européennes",
+        "hu": "A készségek, kompetenciák, képesítések és foglalkozások európai osztályozása",
+        "es": "Clasificación Europea de Capacidades, Competencias, Cualificaciones y Ocupaciones",
+        "et": "Oskuste, pädevuste, kvalifikatsioonide ja ametite Euroopa klassifikaator",
+        "cs": "Klasifikace evropských dovedností, kompetencí, kvalifikací a povolání",
+        "sk": "Európska klasifikácia zručností, kompetencií, kvalifikácií a povolaní",
+        "sl": "Klasifikacija evropskih spretnosti, kompetenc, kvalifikacij in poklicev",
+        "ga": "Aicmiú Eorpach Scileanna, Inniúlachtaí, Cáilíochtaí agus Gairmeacha",
+        "pl": "Europejska klasyfikacja umiejętności, kompetencji, kwalifikacji i zawodów",
+        "da": "Europæisk klassifikation af færdigheder, kompetencer, kvalifikationer og erhverv",
+        "ro": "Clasificarea europeană a aptitudinilor, competențelor, calificărilor și ocupațiilor",
+        "nl": "Europese classificatie van vaardigheden, competenties, kwalificaties en beroepen"
+      },
+      "id": "d7b37854-d95d-4d7c-afa2-ce4322aa03d9",
+      "title": {
+        "de": "Europäische Qualifikations-, Kompetenz-, Qualifikations- und Berufsklassifikation",
+        "fi": "Eurooppalainen taito-, osaamis-, tutkinto- ja ammattiluokitus",
+        "sv": "Klassificering av europeiska färdigheter, kompetenser, kvalifikationer och yrken",
+        "pt": "Classificação de Competências, Competências, Qualificações e Profissões na Europa",
+        "bg": "Европейска класификация на уменията, компетентностите, квалификациите и професиите",
+        "mt": "Klassifikazzjoni Ewropea tal-Ħiliet, il-Kompetenzi, il-Kwalifiki u l-Impjiegi",
+        "el": "Ευρωπαϊκή ταξινόμηση δεξιοτήτων, ικανοτήτων, προσόντων και επαγγελμάτων",
+        "lt": "Europos įgūdžių, gebėjimų, kvalifikacijų ir profesijų klasifikacija",
+        "en": "European Skills, Competences, Qualifications and Occupations classification",
+        "lv": "Eiropas prasmju, kompetenču, kvalifikāciju un profesiju klasifikācija",
+        "hr": "Klasifikacija europskih vještina, kompetencija, kvalifikacija i zanimanja",
+        "it": "Classificazione europea delle competenze, delle competenze, delle qualifiche e delle occupazioni",
+        "fr": "Classification des compétences, compétences, qualifications et professions européennes",
+        "hu": "A készségek, kompetenciák, képesítések és foglalkozások európai osztályozása",
+        "es": "Clasificación Europea de Capacidades, Competencias, Cualificaciones y Ocupaciones",
+        "et": "Oskuste, pädevuste, kvalifikatsioonide ja ametite Euroopa klassifikaator",
+        "cs": "Klasifikace evropských dovedností, kompetencí, kvalifikací a povolání",
+        "sk": "Európska klasifikácia zručností, kompetencií, kvalifikácií a povolaní",
+        "sl": "Klasifikacija evropskih spretnosti, kompetenc, kvalifikacij in poklicev",
+        "ga": "Aicmiú Eorpach Scileanna, Inniúlachtaí, Cáilíochtaí agus Gairmeacha",
+        "pl": "Europejska klasyfikacja umiejętności, kompetencji, kwalifikacji i zawodów",
+        "da": "Europæisk klassifikation af færdigheder, kompetencer, kvalifikationer og erhverv",
+        "ro": "Clasificarea europeană a aptitudinilor, competențelor, calificărilor și ocupațiilor",
+        "nl": "Europese classificatie van vaardigheden, competenties, kwalificaties en beroepen"
+      },
+      "issued": "2015-01-30T14:52:56.167373+02:00",
+      "status": {
+        "resource": "http://purl.org/adms/status/Completed",
+        "label": "Completed"
+      }
+    },
+    {
+      "license": {
+        "resource": "http://data.europa.eu/eli/dec/2011/833/oj",
+        "description": "European Commission reuse notice",
+        "id": "COM_REUSE",
+        "label": "European Commission reuse notice"
+      },
+      "media_type": "text/html",
+      "access_url": [
+        "https://ec.europa.eu/esco/portal/escopedia/Main_Page"
+      ],
+      "rights": {
+        "resource": "http://publications.europa.eu/resource/authority/access-right/PUBLIC"
+      },
+      "format": {
+        "format_types": [
+          {
+            "id": "structured",
+            "label": {
+              "en": "Structured"
+            }
+          },
+          {
+            "id": "textual",
+            "label": {
+              "en": "Textual"
+            }
+          }
+        ],
+        "resource": "http://publications.europa.eu/resource/authority/file-type/HTML",
+        "id": "HTML",
+        "label": "HTML"
+      },
+      "download_url": [
+        "https://ec.europa.eu/esco/portal/escopedia/Main_Page"
+      ],
+      "description": {
+        "de": "ESCOpedia",
+        "fi": "ESCOpedia",
+        "sv": "ESCOpedia",
+        "pt": "ESCOpedia",
+        "bg": "ESCOpedia",
+        "mt": "ESCOpedija",
+        "el": "ESCOpedia",
+        "lt": "ESCOpedia",
+        "en": "ESCOpedia",
+        "lv": "ESCOpedia",
+        "hr": "ESCOpedia",
+        "it": "ESCOpedia",
+        "fr": "ESCOpedia",
+        "hu": "ESCOpedia",
+        "es": "Escopedia",
+        "et": "ESCOpedia",
+        "cs": "ESCOpedia",
+        "sk": "ESCOpedia",
+        "sl": "ESCOpedija",
+        "ga": "ESCOpedia",
+        "pl": "ESCOpedia",
+        "ro": "ESCOpedia",
+        "da": "ESCOpedia",
+        "nl": "ESCOpedia"
+      },
+      "id": "12f31f42-ddbb-40f7-8dd1-dd5556406eba",
+      "issued": "2015-01-30T14:52:56.167332+02:00",
+      "title": {
+        "de": "ESCOpedia",
+        "sv": "ESCOpedia",
+        "fi": "ESCOpedia",
+        "pt": "ESCOpedia",
+        "bg": "ESCOpedia",
+        "el": "ESCOpedia",
+        "mt": "ESCOpedija",
+        "lt": "ESCOpedia",
+        "en": "ESCOpedia",
+        "lv": "ESCOpedia",
+        "hr": "ESCOpedia",
+        "it": "ESCOpedia",
+        "fr": "ESCOpedia",
+        "hu": "ESCOpedia",
+        "es": "Escopedia",
+        "et": "ESCOpedia",
+        "cs": "ESCOpedia",
+        "sk": "ESCOpedia",
+        "sl": "ESCOpedija",
+        "ga": "ESCOpedia",
+        "pl": "ESCOpedia",
+        "ro": "ESCOpedia",
+        "da": "ESCOpedia",
+        "nl": "ESCOpedia"
+      },
+      "status": {
+        "resource": "http://purl.org/adms/status/Completed",
+        "label": "Completed"
+      }
+    }
+  ],
+  "is_hvd": false,
+  "quality_meas": {
+    "scoring": 625
+  },
+  "publisher": {
+    "resource": "http://publications.europa.eu/resource/authority/corporate-body/EMPL",
+    "name": "Directorate-General for Employment, Social Affairs and Inclusion",
+    "type": "http://publications.europa.eu/resource/authority/corporate-body-classification/DIR_GEN",
+    "homepage": "https://commission.europa.eu/about/departments-and-executive-agencies/employment-social-affairs-and-inclusion"
+  },
+  "modified": "2018-06-01",
+  "id": "european-skills-competences-qualifications-and-occupations",
+  "categories": [
+    {
+      "resource": "http://publications.europa.eu/resource/authority/data-theme/SOCI",
+      "id": "SOCI",
+      "label": {
+        "nn": "Befolkning og samfunn",
+        "no": "Befolkning og samfunn",
+        "de": "Bevölkerung und Gesellschaft",
+        "fi": "Väestö ja yhteiskunta",
+        "pt": "População e sociedade",
+        "bg": "Население и общество",
+        "lt": "Gyventojų skaičius ir visuomenė",
+        "hr": "Stanovništvo i društvo",
+        "lv": "Iedzīvotāji un sabiedrība",
+        "fr": "Population et société",
+        "hu": "Népesség és társadalom",
+        "sk": "Obyvateľstvo a spoločnosť",
+        "sl": "Prebivalstvo in družba",
+        "ga": "Daonra agus sochaí",
+        "sv": "Befolkning och samhälle",
+        "mt": "Popolazzjoni u soċjetà",
+        "el": "Πληθυσμός και κοινωνία",
+        "en": "Population and society",
+        "it": "Popolazione e società",
+        "es": "Población y sociedad",
+        "et": "Elanikkond ja ühiskond",
+        "cs": "Populace a společnost",
+        "nb": "Befolkning og samfunn",
+        "pl": "Ludność i społeczeństwo",
+        "da": "Befolkning og samfund",
+        "ro": "Populaţie şi societate",
+        "nl": "Bevolking en samenleving"
+      }
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/data-theme/EDUC",
+      "id": "EDUC",
+      "label": {
+        "nn": "Utdanning, kultur og sport",
+        "no": "Utdanning, kultur og sport",
+        "de": "Bildung, Kultur und Sport",
+        "fi": "Koulutus, kulttuuri ja urheilu",
+        "pt": "Educação, cultura e desporto",
+        "bg": "Образование, култура и спорт",
+        "lt": "Švietimas, kultūra ir sportas",
+        "lv": "Izglītība, kultūra un sports",
+        "hr": "Obrazovanje, kultura i sport",
+        "fr": "Éducation, culture et sport",
+        "hu": "Oktatás, kultúra és sport",
+        "sk": "Vzdelávanie, kultúra a šport",
+        "sl": "Izobraževanje, kultura in šport",
+        "ga": "Oideachas, cultúr agus spórt",
+        "sv": "Utbildning, kultur och sport",
+        "el": "Παιδεία, πολιτιστικά θέματα και αθλητισμός",
+        "mt": "Edukazzjoni, kultura u sport",
+        "en": "Education, culture and sport",
+        "it": "Istruzione, cultura e sport",
+        "es": "Educación, cultura y deportes",
+        "et": "Haridus, kultuur ja sport",
+        "cs": "Vzdělávání, kultura a sport",
+        "nb": "Utdanning, kultur og sport",
+        "pl": "Edukacja, kultura i sport",
+        "da": "Uddannelse, kultur og sport",
+        "ro": "Educaţie, cultură şi sport",
+        "nl": "Onderwijs, cultuur en sport"
+      }
+    },
+    {
+      "resource": "http://publications.europa.eu/resource/authority/data-theme/HEAL",
+      "id": "HEAL",
+      "label": {
+        "nn": "Helse",
+        "no": "Helse",
+        "de": "Gesundheit",
+        "fi": "Terveys",
+        "pt": "Saúde",
+        "bg": "Здраве",
+        "lt": "Sveikata",
+        "lv": "Veselība",
+        "hr": "Zdravlje",
+        "fr": "Santé",
+        "hu": "Egészségügy",
+        "sk": "Zdravotníctvo",
+        "sl": "Zdravje",
+        "ga": "Sláinte",
+        "sv": "Hälsa",
+        "mt": "Saħħa",
+        "el": "Υγεία",
+        "en": "Health",
+        "it": "Salute",
+        "es": "Salud",
+        "et": "Tervis",
+        "cs": "Zdraví",
+        "nb": "Helse",
+        "pl": "Zdrowie",
+        "da": "Sundhed",
+        "ro": "Sănătate",
+        "nl": "Gezondheid"
+      }
+    }
+  ],
+  "issued": "2015-07-27",
+  "catalog_record": {
+    "modified": "2026-04-09T14:02:24Z",
+    "issued": "2021-12-03T11:44:47Z"
+  },
+  "contact_point": [
+    {
+      "resource": "http://www.w3.org/2006/vcard/ns#Kind/908f2d1f-42e1-4be2-a5b7-913abfe5edec",
+      "telephone": "tel:+3222955111",
+      "type": "Kind",
+      "email": "mailto:EMPL-ESCO-SECRETARIAT@ec.europa.eu",
+      "url": [
+        "https://ec.europa.eu/esco/contact"
+      ]
+    }
+  ]
+}

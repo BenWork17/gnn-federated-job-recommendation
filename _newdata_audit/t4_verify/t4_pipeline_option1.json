@@ -1,0 +1,60 @@
+{
+ "arshkon_skills_probe": {
+  "hf_search_jobskills": {
+   "status": 200,
+   "head": "[{\"_id\":\"63ebb1720373fa4984ee681b\",\"id\":\"maiia-bocharova/skillspan_job_ner\",\"author\":\"maiia-bocharova\",\"disabled\":false,\"gated\":false,\"lastModified\":\"2023-02-14T17:33:48.000Z\",\"likes\":1,\"trendingScore\":0,\"private\":false,\"sha\":\"c0565beb3ba83a3d2c199337aed44c35ac5b9310\",\"description\":\"\\n\\t\\n\\t\\t\\n\\t\\n\\t\\n\\t\\tDataset Card for \\\"skillspan_job_ner\\\"\\n\\t\\n\\nMore Information needed\\n\",\"downloads\":13,\"tags\":[\"size_categories:10K<n<100K\",\"format:parquet\",\"library:datasets\",\"library:pandas\",\"library:mlcroissant\",\"library:polars\",\"region:us\"],\"createdAt\":\"2023-02-14T16:06:10.000Z\",\"key\":\"\"},{\"_id\":\"675dcc5d8bb6674c200a672b\",\"id\":\"batuhanmtl/job-skill-set\",\"author\":\"batuhanmtl\",\"disabled\":false,\"gated\":false,\"lastModified\":\"2024-12-15T10:48:56.000Z\",\"likes\":6,\"trendingScore\":0,\"private\":false,\"sha\":\"7"
+  },
+  "hf_arshkon2": {
+   "status": 200,
+   "head": "[{\"_id\":\"67c56fd81793105b50b93ba9\",\"id\":\"arshkoneru/EdiThink\",\"author\":\"arshkoneru\",\"disabled\":false,\"gated\":\"manual\",\"lastModified\":\"2025-03-13T08:59:15.000Z\",\"likes\":0,\"trendingScore\":0,\"private\":false,\"sha\":\"fc14f34b2d068a0439c46240e0f5133cec206f52\",\"downloads\":3,\"tags\":[\"license:cc-by-4.0\",\"region:us\"],\"createdAt\":\"2025-03-03T09:01:12.000Z\",\"key\":\"\"}]"
+  },
+  "kaggle_arshkon_files": {
+   "status": 404
+  }
+ },
+ "pipeline_option1": {
+  "P0": {
+   "label": "P0 = toan bo CareerBuilder (moc)",
+   "interactions": 1603111,
+   "users": 321235,
+   "jobs": 365668,
+   "density_pct": 0.001365,
+   "jobs_with_occupation": 129120,
+   "jobs_with_ge1_skill": 120175,
+   "pct_jobs_with_skill": 32.86,
+   "clients": 21,
+   "client_min": 23430,
+   "client_median": 56765,
+   "client_max": 191000
+  },
+  "P1": {
+   "label": "P1 = chi giu tin map duoc sang nghe O*NET (co ky nang)",
+   "interactions": 641952,
+   "users": 214832,
+   "jobs": 129120,
+   "density_pct": 0.002314,
+   "jobs_with_occupation": 129120,
+   "jobs_with_ge1_skill": 120175,
+   "pct_jobs_with_skill": 93.07,
+   "clients": 21,
+   "client_min": 9420,
+   "client_median": 22825,
+   "client_max": 77589
+  },
+  "P2": {
+   "label": "P2 = P1 + user>=5 & job>=5",
+   "interactions": 270763,
+   "users": 32614,
+   "jobs": 32330,
+   "density_pct": 0.025679,
+   "jobs_with_occupation": 32330,
+   "jobs_with_ge1_skill": 30216,
+   "pct_jobs_with_skill": 93.46,
+   "clients": 21,
+   "client_min": 3107,
+   "client_median": 10267,
+   "client_max": 36412
+  },
+  "notes": "client = top-20 home state + REST (cau hinh G1 K=20 cua t3)"
+ }
+}

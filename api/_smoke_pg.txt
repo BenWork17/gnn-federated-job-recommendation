@@ -1,0 +1,21 @@
+PASS GET /health :: 200 {'status': 'ok', 'db': True, 'artifacts': True} (101ms)
+PASS GET /api/clients :: 200 total=3 n_items=3 item0={"client_id": 0, "name": "Alpha Corp", "n_apps": 88, "n_users": 14, "n_jobs": 20, "status": "active"} (7ms)
+PASS GET /api/clients/{client_id} :: 200 {"client_id": 0, "name": "Alpha Corp", "n_apps": 88, "status": "active"} top_skills=['skill12', 'skill15', 'skill20', 'skill1'] (10ms)
+PASS GET /api/clients/{id} 404 :: 404 {'detail': 'client_id 99999999 không tồn tại'}
+PASS GET /api/graph/summary :: 200 {"n_users": 40, "n_jobs": 60, "n_skills": 25, "n_occupations": 4, "n_edges_user_job": 157, "n_edges_job_skill": 171, "n_edges_user_skill": 117, "n_clients": 3, "sparsity_pct": 90.918367} (14ms)
+PASS POST /api/recommend :: 200 user_id=9001 tried=[1, 2, 3, 100, 150, 9001] n_items=5 item0={"job_id": 500038, "title": "occB", "score": 1.154701, "employer": "Beta LLC", "matched_skills": ["skill7", "skill24"]} (18ms)
+PASS POST /api/train/start :: 200 run_id=2294fb3a-d945-4270-9744-899e2727bba5 source=artifacts (392ms)
+PASS GET /api/train/status/{run_id} :: 200 status=done round=3/3 p50=0.2024 p95=226.9033 bytes_total=1103839 n_metrics=3 stopped=False (4ms)
+PASS status có trường 'stopped' (field cũ giữ nguyên) :: keys=['bytes_total', 'data_source', 'latency_p50_ms', 'latency_p95_ms', 'metrics', 'round', 'run_id', 'simulated_metrics', 'status', 'stopped', 'stopped_at_round', 'total_rounds']
+PASS GET /api/train/runs :: 200 n_runs=8 first={"run_id": "2294fb3a-d945-4270-9744-899e2727bba5", "started_at": "2026-11-08T21:44:14", "n_clients": 12, "rounds": 3, "status": "done"} (47ms)
+PASS POST /api/train/stop/{run_id} :: 200 body={"run_id": "1d558d90-0aad-4508-bd45-2f492e9c2e26", "status": "stopped", "stopped_at_round": 2, "already_stopped": false} reached_before_stop=2 stop_duration=609ms
+PASS status sau stop: stopped + round < total_rounds :: 200 status=stopped stopped=True round=2/40 stopped_at_round=2 n_metrics=2
+PASS stop lần 2 -> already_stopped=true :: 200 body={"run_id": "1d558d90-0aad-4508-bd45-2f492e9c2e26", "status": "stopped", "stopped_at_round": 2, "already_stopped": true}
+PASS stop run đã done -> already_stopped=true :: 200 body={"run_id": "2294fb3a-d945-4270-9744-899e2727bba5", "status": "done", "stopped_at_round": 3, "already_stopped": true} (run trước đó: 2294fb3a-d945-4270-9744-899e2727bba5)
+PASS stop run_id lạ -> 404 :: 404 {'detail': 'run_id 00000000-0000-0000-0000-000000000000 không tồn tại'}
+PASS start/stop liên tục 5 lần không rò :: rows=[(200, 'stopped', 'stopped', 1), (200, 'stopped', 'stopped', 1), (200, 'stopped', 'stopped', 1), (200, 'stopped', 'stopped', 1), (200, 'stopped', 'stopped', 1)]
+PASS WS /ws/latency :: n_ticks=5 first={"type": "tick", "run_id": "2294fb3a-d945-4270-9744-899e2727bba5", "round": 1, "client_id": 0, "latency_ms": 377.8331, "bytes_up": 38282, "bytes_down": 94847, "ts": "2026-11-08T21:44:14"}
+PASS WS /ws/train/{run_id} :: n_msgs=3 first={"type": "round", "run_id": "2294fb3a-d945-4270-9744-899e2727bba5", "round": 1, "metrics": {"round": 1, "recall20": 0.506099, "ndcg20": 0.394757, "mrr20": 0.278355, "loss": 1.019641}, "latency_ms": 0.0}
+
+=== SUMMARY ===
+18/18 checks passed

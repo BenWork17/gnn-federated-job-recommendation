@@ -1,0 +1,132 @@
+{
+ "careerbuilder": {
+  "users": 321235,
+  "jobs": 365668,
+  "interactions": 1603111,
+  "density_pct": 0.001365,
+  "apps_per_user_median": 2,
+  "apps_per_user_p90": 10,
+  "apps_per_user_max": 2473,
+  "users_ge5": 87760,
+  "users_ge5_pct": 27.32,
+  "jobs_single_app_pct": 43.44,
+  "license": "CAM — chi dung trong cuoc thi, phai huy du lieu sau khi ket thuc"
+ },
+ "P1_geography_clients": {
+  "interactions": 641952,
+  "users": 214832,
+  "jobs": 129120,
+  "density_pct": 0.002314,
+  "jobs_with_ge1_skill": 120175,
+  "pct_jobs_with_skill": 93.07,
+  "clients": 21,
+  "client_min": 9420,
+  "client_median": 22825,
+  "client_max": 77589,
+  "max_min_ratio": 8.24
+ },
+ "onet_occupation_level": {
+  "pct_jobs_mapped": 35.311,
+  "pct_apps_mapped": 40.044,
+  "pct_apps_with_onet_skill": 37.322,
+  "pct_apps_with_onet_tech": 39.729
+ },
+ "join_data_jobs": {
+  "exact_pct_apps": 11.477,
+  "loose_pct_apps": 11.284,
+  "short_pct_apps": 0.294,
+  "any_pct_apps": 23.055,
+  "semantically_valid_pct_apps": 2.977,
+  "nonsense_share_of_matches_pct": 86.92
+ },
+ "join_arshkon": {
+  "exact_pct_apps": 19.094,
+  "any_pct_apps": 24.776,
+  "employer_unique_pct": 7.106,
+  "employer_multi_pct": 39.503,
+  "employer_unmatched_pct": 53.391,
+  "median_companies_per_title": 18,
+  "max_companies_per_title": 372,
+  "skills_desc_fill_pct": 1.969
+ },
+ "skill_discrimination": {
+  "onet_skills_per_occupation_min": 35,
+  "onet_skills_per_occupation_max": 35,
+  "onet_pct_occupations_with_all_35": 100.0,
+  "onet_verdict": "KHONG PHAN BIET: moi nghe duoc gan gan nhu toan bo 35 ky nang => do thi job-skill la bipartite gan day du, nut Skill vo dung => PHAI dung ESCO (13.485 skill) lam lop Skill",
+  "onet_tech_per_occupation_mean": 37.93,
+  "onet_tech_distinct": 8775,
+  "esco_essential_mean": 20.28,
+  "esco_optional_mean": 16.24,
+  "esco_edges_per_occupation": 36.52,
+  "esco_essential_min": 5,
+  "esco_essential_max": 70,
+  "esco_n_sampled": 100
+ },
+ "graph_final": {
+  "edges_user_job": 636896,
+  "nodes_user": 213793,
+  "nodes_job": 127784,
+  "nodes_occupation": 832,
+  "nodes_skill_technology": 8316,
+  "edges_job_skill": 47567,
+  "density_pct": 0.002331,
+  "skills_per_job_mean": 57.17,
+  "pct_of_all_tech_vocab": 94.77
+ },
+ "user_side": {
+  "user_history_rows": 1753901,
+  "user_history_users": 375531,
+  "history_titles_total": 1753901,
+  "history_titles_mapped_to_occupation": 758080,
+  "pct_history_titles_mapped": 43.22,
+  "users_with_occupation": 309992,
+  "users_with_ge1_skill": 300580,
+  "pct_users_all_with_skill": 80.04,
+  "p1_users": 207672,
+  "p1_users_with_skill": 161702,
+  "pct_p1_users_with_skill": 77.86,
+  "user_occupation_edges": 343401
+ },
+ "data_jobs": {
+  "rows": 785741,
+  "users": 0,
+  "interactions": 0,
+  "job_skills_fill_pct": 85.1,
+  "distinct_skills": 252,
+  "companies": 139984,
+  "jobs_per_company_median": 2.0,
+  "jobs_per_company_p90": 9,
+  "license": "Apache-2.0 (SACH)"
+ },
+ "synthetic_group": {
+  "n_repos": 3,
+  "all_tables_byte_identical": true,
+  "tables_checked": [
+   "applications",
+   "candidates",
+   "companies",
+   "jobs",
+   "interviews",
+   "offers"
+  ],
+  "row_counts": {
+   "applications": 15000,
+   "candidates": 9000,
+   "companies": 320,
+   "jobs": 2000,
+   "interviews": 7196,
+   "offers": 938
+  },
+  "score_min": 0.35,
+  "score_max": 0.98,
+  "score_distinct": 631,
+  "license": "cc-by-nc-4.0",
+  "verdict": "LOAI — du lieu tong hop"
+ },
+ "cost": {
+  "apps_tsv_sec": 1.93,
+  "jobs_tsv_full_sec": 68.6,
+  "jobs_tsv_full_min": 1.1
+ }
+}

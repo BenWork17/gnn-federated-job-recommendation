@@ -1,0 +1,27 @@
+{
+ "basis": "graph_final: Technology Skills, 636.896 canh",
+ "edges": 636896,
+ "users": 213793,
+ "jobs": 127784,
+ "occupations": 832,
+ "clients_state_top20_rest": {
+  "n_clients": 21,
+  "min": 9352,
+  "median": 22626,
+  "max": 76993,
+  "max_min_ratio": 8.23,
+  "top1_share_pct": 12.09
+ },
+ "clients_hash_mod21": {
+  "n_clients": 21,
+  "min": 29410,
+  "median": 30178,
+  "max": 32252,
+  "max_min_ratio": 1.1
+ },
+ "jsd_on_job_id": {
+  "state": 0.0087,
+  "hash_baseline": 0.0005,
+  "uplift_pct": 1640.0
+ }
+}

@@ -1,0 +1,32 @@
+{
+ "title_buckets": {
+  "Engineering/Industrial": 95195,
+  "Other": 355965,
+  "Office/Admin": 82903,
+  "Driving/Logistics": 31418,
+  "Management": 130229,
+  "Legal/Social": 5487,
+  "Sales/Retail": 192189,
+  "Healthcare": 91964,
+  "Finance": 22690,
+  "IT/Software": 73648,
+  "Food/Hospitality": 4473,
+  "Education": 5935
+ },
+ "app_buckets": {
+  "Office/Admin": 347856,
+  "Healthcare": 86367,
+  "Management": 184198,
+  "Other": 568194,
+  "Engineering/Industrial": 80469,
+  "IT/Software": 39155,
+  "Sales/Retail": 190401,
+  "Finance": 30921,
+  "Food/Hospitality": 6650,
+  "Driving/Logistics": 56335,
+  "Legal/Social": 8438,
+  "Education": 4127
+ },
+ "src_pct": 3.73,
+ "mail_pct": 13.07
+}

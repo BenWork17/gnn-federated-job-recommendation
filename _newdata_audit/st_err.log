@@ -1,0 +1,79 @@
+2026-11-15 10:40:18.889 No ASGI app assignments found in E:\2026\DUT\DSS\SauGK\CuoiKi\app\streamlit_app.py
+2026-11-15 10:40:19.595 Filtered 274 packages down to 2 candidates for component scanning
+2026-11-15 10:40:19.595 Scanning 2 candidate packages for component manifests using 2 worker threads
+2026-11-15 10:40:19.751 Found 0 component manifests total
+2026-11-15 10:40:19.751 No asset roots to watch
+2026-11-15 10:40:19.751 File watching not started
+2026-11-15 10:40:19.752 Starting new event loop for server
+2026-11-15 10:40:19.753 Starting server...
+2026-11-15 10:40:19.754 Serving static content from C:\Users\ACER\AppData\Local\Programs\Python\Python313\Lib\site-packages\streamlit\static
+2026-11-15 10:40:19.761 Server started on port 8605
+2026-11-15 10:40:19.762 Runtime state: RuntimeState.INITIAL -> RuntimeState.NO_SESSIONS_CONNECTED
+
+  You can now view your Streamlit app in your browser.
+
+  Local URL: http://localhost:8605
+  Network URL: http://192.168.17.103:8605
+  External URL: http://171.225.185.112:8605
+
+2026-11-15 10:40:20.258 Setting up signal handler
+2026-11-15 10:40:22.054 No singleton. Registering one.
+2026-11-15 10:40:22.056 Watcher created for E:\2026\DUT\DSS\SauGK\CuoiKi\app\streamlit_app.py
+2026-11-15 10:40:22.057 AppSession initialized (id=48c9edf5-a3d4-4e1b-b5b3-5ce6db9f9d1c)
+2026-11-15 10:40:22.057 Created new session for client 2482574377376. Session ID: 48c9edf5-a3d4-4e1b-b5b3-5ce6db9f9d1c
+2026-11-15 10:40:22.057 Runtime state: RuntimeState.NO_SESSIONS_CONNECTED -> RuntimeState.ONE_OR_MORE_SESSIONS_CONNECTED
+2026-11-15 10:40:22.057 Received the following back message:
+rerun_script {
+  widget_states {
+  }
+  page_name: "ket-luan"
+  context_info {
+    timezone: "Asia/Saigon"
+    timezone_offset: -420
+    locale: "en-US"
+    url: "http://127.0.0.1:8605/ket-luan"
+    is_embedded: false
+    color_scheme: "light"
+  }
+}
+
+2026-11-15 10:40:22.059 Beginning script thread
+2026-11-15 10:40:22.060 Running script
+2026-11-15 10:40:22.060 Disconnecting files for session with ID 48c9edf5-a3d4-4e1b-b5b3-5ce6db9f9d1c
+2026-11-15 10:40:22.060 Sessions still active: dict_keys([])
+2026-11-15 10:40:22.060 Files: 0; Sessions with files: 0
+2026-11-15 10:40:24.632 Creating new DataCache (key=7b2d7cf84e9ba6555fed7dad568974aa, persist=None, max_entries=None, ttl=None)
+2026-11-15 10:40:24.632 Cache key: 519924340e6a9a6816afcd3002ce9486
+2026-11-15 10:40:24.633 Memory cache MISS: 519924340e6a9a6816afcd3002ce9486
+2026-11-15 10:40:24.633 Memory cache MISS: 519924340e6a9a6816afcd3002ce9486
+2026-11-15 10:40:25.591 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2026-11-15 10:40:25.625 Removing orphaned files...
+2026-11-15 10:40:25.625 Removing orphaned deferred callables...
+2026-11-15 10:40:27.240 Watcher created for E:\2026\DUT\DSS\SauGK\CuoiKi\app\paths.py
+2026-11-15 10:40:27.243 Watcher created for E:\2026\DUT\DSS\SauGK\CuoiKi\app\components\__init__.py
+2026-11-15 10:40:27.246 Watcher created for E:\2026\DUT\DSS\SauGK\CuoiKi\app\components\theme.py
+2026-11-15 10:40:27.249 Watcher created for E:\2026\DUT\DSS\SauGK\CuoiKi\app\views\__init__.py
+2026-11-15 10:40:27.251 Watcher created for E:\2026\DUT\DSS\SauGK\CuoiKi\app\views\do_thi_viec_lam.py
+2026-11-15 10:40:27.253 Watcher created for E:\2026\DUT\DSS\SauGK\CuoiKi\app\views\fl_sim.py
+2026-11-15 10:40:27.255 Watcher created for E:\2026\DUT\DSS\SauGK\CuoiKi\app\views\giam_sat_node.py
+2026-11-15 10:40:27.258 Watcher created for E:\2026\DUT\DSS\SauGK\CuoiKi\app\views\goi_y.py
+2026-11-15 10:40:27.260 Watcher created for E:\2026\DUT\DSS\SauGK\CuoiKi\app\views\ket_luan.py
+2026-11-15 10:40:27.263 Watcher created for E:\2026\DUT\DSS\SauGK\CuoiKi\app\views\tong_quan.py
+2026-11-15 10:40:27.273 Runtime state: RuntimeState.ONE_OR_MORE_SESSIONS_CONNECTED -> RuntimeState.NO_SESSIONS_CONNECTED
+Task exception was never retrieved
+future: <Task finished name='Task-74' coro=<WebSocketProtocol13.write_message.<locals>.wrapper() done, defined at C:\Users\ACER\AppData\Roaming\Python\Python313\site-packages\tornado\websocket.py:1111> exception=WebSocketClosedError()>
+Traceback (most recent call last):
+  File "C:\Users\ACER\AppData\Roaming\Python\Python313\site-packages\tornado\websocket.py", line 1113, in wrapper
+    await fut
+tornado.iostream.StreamClosedError: Stream is closed
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ACER\AppData\Roaming\Python\Python313\site-packages\tornado\websocket.py", line 1115, in wrapper
+    raise WebSocketClosedError()
+tornado.websocket.WebSocketClosedError

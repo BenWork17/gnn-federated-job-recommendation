@@ -1,0 +1,27 @@
+{
+ "onet_skills_discriminative": {
+  "n_occupations": 763,
+  "n_distinct_skills": 35,
+  "skills_per_occupation": {
+   "min": 35,
+   "max": 35,
+   "mean": 35.0
+  },
+  "occupations_with_all_skills": 763,
+  "pct_occupations_with_all_skills": 100.0,
+  "verdict": "KHONG PHAN BIET: moi nghe duoc gan gan nhu toan bo 35 ky nang => do thi job-skill la bipartite gan day du, nut Skill vo dung => PHAI dung ESCO (13.485 skill) lam lop Skill"
+ },
+ "onet_tech_discriminative": {
+  "n_occupations": 798,
+  "n_distinct_tech": 8775,
+  "tech_per_occupation": {
+   "min": 1,
+   "max": 594,
+   "mean": 37.93
+  },
+  "verdict": "PHAN BIET duoc (trung binh ~57/8775) nhung van la MUC NGHE, khong phai muc tin"
+ },
+ "esco_discriminative": {
+  "err": "ZeroDivisionError: division by zero"
+ }
+}

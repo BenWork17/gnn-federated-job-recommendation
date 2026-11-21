@@ -1,0 +1,42 @@
+{
+  "Skills.txt": {
+    "header": "O*NET-SOC Code\tElement ID\tElement Name\tScale ID\tData Value\tN\tStandard Error\tLower CI Bound\tUpper CI Bound\tRecommend Suppress\tNot Relevant\tDate\tDomain Source",
+    "n_lines_incl_header": 61531
+  },
+  "Occupation Data.txt": {
+    "header": "O*NET-SOC Code\tTitle\tDescription",
+    "n_lines_incl_header": 1017
+  },
+  "Technology Skills.txt": {
+    "header": "O*NET-SOC Code\tExample\tCommodity Code\tCommodity Title\tHot Technology\tIn Demand",
+    "n_lines_incl_header": 32682
+  },
+  "Tools Used.txt": {
+    "header": "O*NET-SOC Code\tExample\tCommodity Code\tCommodity Title",
+    "n_lines_incl_header": 41663
+  },
+  "Alternate Titles.txt": {
+    "header": "O*NET-SOC Code\tAlternate Title\tShort Title\tSource(s)",
+    "n_lines_incl_header": 56561
+  },
+  "Knowledge.txt": {
+    "header": "O*NET-SOC Code\tElement ID\tElement Name\tScale ID\tData Value\tN\tStandard Error\tLower CI Bound\tUpper CI Bound\tRecommend Suppress\tNot Relevant\tDate\tDomain Source",
+    "n_lines_incl_header": 58015
+  },
+  "IWA Reference.txt": {
+    "header": "Element ID\tIWA ID\tIWA Title",
+    "n_lines_incl_header": 333
+  },
+  "DWA Reference.txt": {
+    "header": "Element ID\tIWA ID\tDWA ID\tDWA Title",
+    "n_lines_incl_header": 2088
+  },
+  "rjdf_train.csv": {
+    "header": "resume_text,job_description_text,label",
+    "n_lines_incl_header": 103707
+  },
+  "rjdf_test.csv": {
+    "header": "resume_text,job_description_text,label",
+    "n_lines_incl_header": 34822
+  }
+}

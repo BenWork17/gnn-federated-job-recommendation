@@ -1,0 +1,15 @@
+{
+ "apps": 1603111,
+ "users_with_apps": 321235,
+ "jobs_with_apps": 365668,
+ "density_pct": 0.001365,
+ "job_not_found": 0,
+ "user_not_found": 0,
+ "win_mismatch_job": 0,
+ "win_mismatch_user": 0,
+ "date_outside": 88206,
+ "test_rows": 185597,
+ "jobs_total": 1092096,
+ "max_jobid": 1116314,
+ "users_total": 389708
+}

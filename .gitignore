@@ -1,0 +1,15 @@
+# Sinh tự động — không commit
+artifacts/
+results/
+__pycache__/
+*.pyc
+.pytest_cache/
+pytest-cache-files-*/
+
+# Dữ liệu tải về (tải lại bằng src/iot/download.py)
+artifacts/iot23/raw/
+
+# File tạm / rác từ quá trình phát triển
+_tmp/
+*.tmp
+*.part

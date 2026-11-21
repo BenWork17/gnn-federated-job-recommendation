@@ -1,0 +1,20 @@
+{
+ "arshkon_rows": 123849,
+ "arshkon_distinct_titles_with_company": 69792,
+ "arshkon_skills_desc_filled": 2439,
+ "arshkon_skills_desc_fill_pct": 1.969,
+ "arshkon_distinct_company_ids": 15850,
+ "cb_apps_total": 1603111,
+ "employer_attribution": {
+  "apps_unique_company": 113910,
+  "pct_unique": 7.106,
+  "users_unique": 75354,
+  "apps_multi_company": 633280,
+  "pct_multi": 39.503,
+  "users_multi": 212187,
+  "apps_unmatched": 855921,
+  "pct_unmatched": 53.391,
+  "median_companies_per_multi_title": 18,
+  "max_companies_per_title": 372
+ }
+}

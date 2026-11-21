@@ -1,0 +1,29 @@
+{
+  "n_occupations_collected": 500,
+  "n_sampled": 200,
+  "n_errors": 1,
+  "essential_skill_per_occ": {
+    "n": 199,
+    "mean": 20.85,
+    "median": 19,
+    "min": 3,
+    "max": 90,
+    "zero_frac": 0.0,
+    "p95": 36
+  },
+  "optional_skill_per_occ": {
+    "n": 199,
+    "mean": 17.03,
+    "median": 16,
+    "min": 0,
+    "max": 108,
+    "zero_frac": 0.05,
+    "p95": 36
+  },
+  "skill_type_distribution_in_essential": {
+    "knowledge": 973,
+    "skill": 3177
+  },
+  "mean_edges_per_occ": 37.88,
+  "est_total_occ_skill_edges_for_2942": 111441
+}

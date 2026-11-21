@@ -1,0 +1,620 @@
+{
+  "url": "https://huggingface.co/datasets/lof223/job_description/resolve/main/job_descriptions.csv",
+  "total_bytes": 1743166140,
+  "n_columns": 23,
+  "columns": [
+    "Job Id",
+    "Experience",
+    "Qualifications",
+    "Salary Range",
+    "location",
+    "Country",
+    "latitude",
+    "longitude",
+    "Work Type",
+    "Company Size",
+    "Job Posting Date",
+    "Preference",
+    "Contact Person",
+    "Contact",
+    "Job Title",
+    "Role",
+    "Job Portal",
+    "Job Description",
+    "Benefits",
+    "skills",
+    "Responsibilities",
+    "Company",
+    "Company Profile"
+  ],
+  "samples": [
+    {
+      "offset": 0,
+      "n_rows_parsed": 3705,
+      "fill": {
+        "Job Id": {
+          "fill_pct": 100.0,
+          "example": "Job Id"
+        },
+        "Experience": {
+          "fill_pct": 100.0,
+          "example": "Experience"
+        },
+        "Qualifications": {
+          "fill_pct": 100.0,
+          "example": "Qualifications"
+        },
+        "Salary Range": {
+          "fill_pct": 100.0,
+          "example": "Salary Range"
+        },
+        "location": {
+          "fill_pct": 100.0,
+          "example": "location"
+        },
+        "Country": {
+          "fill_pct": 100.0,
+          "example": "Country"
+        },
+        "latitude": {
+          "fill_pct": 100.0,
+          "example": "latitude"
+        },
+        "longitude": {
+          "fill_pct": 100.0,
+          "example": "longitude"
+        },
+        "Work Type": {
+          "fill_pct": 100.0,
+          "example": "Work Type"
+        },
+        "Company Size": {
+          "fill_pct": 100.0,
+          "example": "Company Size"
+        },
+        "Job Posting Date": {
+          "fill_pct": 100.0,
+          "example": "Job Posting Date"
+        },
+        "Preference": {
+          "fill_pct": 100.0,
+          "example": "Preference"
+        },
+        "Contact Person": {
+          "fill_pct": 100.0,
+          "example": "Contact Person"
+        },
+        "Contact": {
+          "fill_pct": 100.0,
+          "example": "Contact"
+        },
+        "Job Title": {
+          "fill_pct": 100.0,
+          "example": "Job Title"
+        },
+        "Role": {
+          "fill_pct": 100.0,
+          "example": "Role"
+        },
+        "Job Portal": {
+          "fill_pct": 100.0,
+          "example": "Job Portal"
+        },
+        "Job Description": {
+          "fill_pct": 100.0,
+          "example": "Job Description"
+        },
+        "Benefits": {
+          "fill_pct": 100.0,
+          "example": "Benefits"
+        },
+        "skills": {
+          "fill_pct": 100.0,
+          "example": "skills"
+        },
+        "Responsibilities": {
+          "fill_pct": 100.0,
+          "example": "Responsibilities"
+        },
+        "Company": {
+          "fill_pct": 100.0,
+          "example": "Company"
+        },
+        "Company Profile": {
+          "fill_pct": 99.8,
+          "example": "Company Profile"
+        }
+      }
+    },
+    {
+      "offset": 348633228,
+      "n_rows_parsed": 3702,
+      "fill": {
+        "Job Id": {
+          "fill_pct": 100.0,
+          "example": "1895936028586175"
+        },
+        "Experience": {
+          "fill_pct": 100.0,
+          "example": "2 to 13 Years"
+        },
+        "Qualifications": {
+          "fill_pct": 100.0,
+          "example": "MCA"
+        },
+        "Salary Range": {
+          "fill_pct": 100.0,
+          "example": "$62K-$115K"
+        },
+        "location": {
+          "fill_pct": 100.0,
+          "example": "Papeete"
+        },
+        "Country": {
+          "fill_pct": 100.0,
+          "example": "French Polynesia"
+        },
+        "latitude": {
+          "fill_pct": 100.0,
+          "example": "-17.6797"
+        },
+        "longitude": {
+          "fill_pct": 100.0,
+          "example": "-149.4068"
+        },
+        "Work Type": {
+          "fill_pct": 100.0,
+          "example": "Temporary"
+        },
+        "Company Size": {
+          "fill_pct": 100.0,
+          "example": "16069"
+        },
+        "Job Posting Date": {
+          "fill_pct": 100.0,
+          "example": "2022-02-14"
+        },
+        "Preference": {
+          "fill_pct": 100.0,
+          "example": "Female"
+        },
+        "Contact Person": {
+          "fill_pct": 100.0,
+          "example": "Tony Smith"
+        },
+        "Contact": {
+          "fill_pct": 100.0,
+          "example": "(560)559-5027"
+        },
+        "Job Title": {
+          "fill_pct": 100.0,
+          "example": "Pharmaceutical Sales Representative"
+        },
+        "Role": {
+          "fill_pct": 100.0,
+          "example": "Medical Sales Specialist"
+        },
+        "Job Portal": {
+          "fill_pct": 100.0,
+          "example": "Internships.com"
+        },
+        "Job Description": {
+          "fill_pct": 100.0,
+          "example": "Medical Sales Specialists focus on selling medical devices, pharmaceuticals, or healthcare products to healthcare professionals and institutions."
+        },
+        "Benefits": {
+          "fill_pct": 100.0,
+          "example": "{'Life and Disability Insurance, Stock Options or Equity Grants, Employee Recognition Programs, Health Insurance, Social and Recreational Activities'}"
+        },
+        "skills": {
+          "fill_pct": 100.0,
+          "example": "Medical product knowledge Understanding of healthcare regulations Relationship building with healthcare professionals Sales forecasting and planning Medical sales techniques"
+        },
+        "Responsibilities": {
+          "fill_pct": 100.0,
+          "example": "Focus on medical equipment or devices sales to healthcare facilities and providers. Conduct product demonstrations and training. Understand and comply with industry regulations."
+        },
+        "Company": {
+          "fill_pct": 100.0,
+          "example": "Pfizer"
+        },
+        "Company Profile": {
+          "fill_pct": 99.6,
+          "example": "{\"Sector\":\"Healthcare\",\"Industry\":\"Pharmaceuticals\",\"City\":\"New York\",\"State\":\"New York\",\"Zip\":\"10001\",\"Website\":\"www.pfizer.com\",\"Ticker\":\"PFE\",\"CEO\":\"Albert Bourla\"}"
+        }
+      }
+    },
+    {
+      "offset": 697266456,
+      "n_rows_parsed": 3705,
+      "fill": {
+        "Job Id": {
+          "fill_pct": 100.0,
+          "example": "2984633700355956"
+        },
+        "Experience": {
+          "fill_pct": 100.0,
+          "example": "3 to 15 Years"
+        },
+        "Qualifications": {
+          "fill_pct": 100.0,
+          "example": "BCA"
+        },
+        "Salary Range": {
+          "fill_pct": 100.0,
+          "example": "$57K-$98K"
+        },
+        "location": {
+          "fill_pct": 100.0,
+          "example": "N'Djamena"
+        },
+        "Country": {
+          "fill_pct": 100.0,
+          "example": "Chad"
+        },
+        "latitude": {
+          "fill_pct": 100.0,
+          "example": "15.4542"
+        },
+        "longitude": {
+          "fill_pct": 100.0,
+          "example": "18.7322"
+        },
+        "Work Type": {
+          "fill_pct": 100.0,
+          "example": "Contract"
+        },
+        "Company Size": {
+          "fill_pct": 100.0,
+          "example": "39881"
+        },
+        "Job Posting Date": {
+          "fill_pct": 100.0,
+          "example": "2022-09-25"
+        },
+        "Preference": {
+          "fill_pct": 100.0,
+          "example": "Male"
+        },
+        "Contact Person": {
+          "fill_pct": 100.0,
+          "example": "Betty Ryan"
+        },
+        "Contact": {
+          "fill_pct": 100.0,
+          "example": "(294)933-2425"
+        },
+        "Job Title": {
+          "fill_pct": 100.0,
+          "example": "Research Analyst"
+        },
+        "Role": {
+          "fill_pct": 100.0,
+          "example": "Social Science Researcher"
+        },
+        "Job Portal": {
+          "fill_pct": 100.0,
+          "example": "The Muse"
+        },
+        "Job Description": {
+          "fill_pct": 100.0,
+          "example": "A Social Science Researcher conducts research in fields such as sociology, psychology, or anthropology to study human behavior and social phenomena, contributing to academic knowle"
+        },
+        "Benefits": {
+          "fill_pct": 100.0,
+          "example": "{'Life and Disability Insurance, Stock Options or Equity Grants, Employee Recognition Programs, Health Insurance, Social and Recreational Activities'}"
+        },
+        "skills": {
+          "fill_pct": 100.0,
+          "example": "Social science research methods Qualitative and quantitative data analysis Survey design and implementation Ethnographic research Interviewing skills Research ethics Statistical so"
+        },
+        "Responsibilities": {
+          "fill_pct": 100.0,
+          "example": "Conduct research in social sciences, gathering and analyzing data on social phenomena, human behavior, and public policy. Publish research findings in academic journals. Contribute"
+        },
+        "Company": {
+          "fill_pct": 100.0,
+          "example": "Insurance Australia Group (IAG)"
+        },
+        "Company Profile": {
+          "fill_pct": 99.6,
+          "example": "{\"Sector\":\"Insurance\",\"Industry\":\"Insurance\",\"City\":\"Sydney\",\"State\":\"NSW\",\"Zip\":\"2000\",\"Website\":\"https://www.iag.com.au/\",\"Ticker\":\"IAG\",\"CEO\":\"Nick Hawkins\"}"
+        }
+      }
+    },
+    {
+      "offset": 1045899684,
+      "n_rows_parsed": 3709,
+      "fill": {
+        "Job Id": {
+          "fill_pct": 100.0,
+          "example": "319815225642563"
+        },
+        "Experience": {
+          "fill_pct": 100.0,
+          "example": "4 to 14 Years"
+        },
+        "Qualifications": {
+          "fill_pct": 100.0,
+          "example": "BCA"
+        },
+        "Salary Range": {
+          "fill_pct": 100.0,
+          "example": "$59K-$106K"
+        },
+        "location": {
+          "fill_pct": 100.0,
+          "example": "Copenhagen"
+        },
+        "Country": {
+          "fill_pct": 100.0,
+          "example": "Denmark"
+        },
+        "latitude": {
+          "fill_pct": 100.0,
+          "example": "56.2639"
+        },
+        "longitude": {
+          "fill_pct": 100.0,
+          "example": "9.5018"
+        },
+        "Work Type": {
+          "fill_pct": 100.0,
+          "example": "Part-Time"
+        },
+        "Company Size": {
+          "fill_pct": 100.0,
+          "example": "50542"
+        },
+        "Job Posting Date": {
+          "fill_pct": 100.0,
+          "example": "2022-09-13"
+        },
+        "Preference": {
+          "fill_pct": 100.0,
+          "example": "Female"
+        },
+        "Contact Person": {
+          "fill_pct": 100.0,
+          "example": "Pamela Jimenez"
+        },
+        "Contact": {
+          "fill_pct": 100.0,
+          "example": "(703)899-9223"
+        },
+        "Job Title": {
+          "fill_pct": 100.0,
+          "example": "Data Scientist"
+        },
+        "Role": {
+          "fill_pct": 100.0,
+          "example": "Data Engineer"
+        },
+        "Job Portal": {
+          "fill_pct": 100.0,
+          "example": "SimplyHired"
+        },
+        "Job Description": {
+          "fill_pct": 100.0,
+          "example": "Data Engineers design and maintain data pipelines, ensuring data availability and quality for analysis and reporting purposes."
+        },
+        "Benefits": {
+          "fill_pct": 100.0,
+          "example": "{'Life and Disability Insurance, Stock Options or Equity Grants, Employee Recognition Programs, Health Insurance, Social and Recreational Activities'}"
+        },
+        "skills": {
+          "fill_pct": 100.0,
+          "example": "Data integration ETL (Extract, Transform, Load) Big data technologies (e.g., Hadoop, Spark) Database management Data warehousing"
+        },
+        "Responsibilities": {
+          "fill_pct": 100.0,
+          "example": "Design, build, and maintain data pipelines and ETL (Extract, Transform, Load) processes. Ensure data accessibility and availability for analytics and reporting. Collaborate with da"
+        },
+        "Company": {
+          "fill_pct": 100.0,
+          "example": "Automatic Data Processing"
+        },
+        "Company Profile": {
+          "fill_pct": 99.6,
+          "example": "{\"Sector\":\"Payroll & HR Services\",\"Industry\":\"Diversified Outsourcing Services\",\"City\":\"Roseland\",\"State\":\"New Jersey\",\"Zip\":\"7068\",\"Website\":\"www.adp.com\",\"Ticker\":\"ADP\",\"CEO\":\"Ma"
+        }
+      }
+    },
+    {
+      "offset": 1394532912,
+      "n_rows_parsed": 3712,
+      "fill": {
+        "Job Id": {
+          "fill_pct": 100.0,
+          "example": "489008485138139"
+        },
+        "Experience": {
+          "fill_pct": 100.0,
+          "example": "3 to 12 Years"
+        },
+        "Qualifications": {
+          "fill_pct": 100.0,
+          "example": "B.Com"
+        },
+        "Salary Range": {
+          "fill_pct": 100.0,
+          "example": "$62K-$93K"
+        },
+        "location": {
+          "fill_pct": 100.0,
+          "example": "BogotÃ¡"
+        },
+        "Country": {
+          "fill_pct": 100.0,
+          "example": "Colombia"
+        },
+        "latitude": {
+          "fill_pct": 100.0,
+          "example": "4.5709"
+        },
+        "longitude": {
+          "fill_pct": 100.0,
+          "example": "-74.2973"
+        },
+        "Work Type": {
+          "fill_pct": 100.0,
+          "example": "Temporary"
+        },
+        "Company Size": {
+          "fill_pct": 100.0,
+          "example": "66820"
+        },
+        "Job Posting Date": {
+          "fill_pct": 100.0,
+          "example": "2022-09-02"
+        },
+        "Preference": {
+          "fill_pct": 100.0,
+          "example": "Both"
+        },
+        "Contact Person": {
+          "fill_pct": 100.0,
+          "example": "Lori Williams"
+        },
+        "Contact": {
+          "fill_pct": 100.0,
+          "example": "987.733.4579x881"
+        },
+        "Job Title": {
+          "fill_pct": 100.0,
+          "example": "Investment Analyst"
+        },
+        "Role": {
+          "fill_pct": 100.0,
+          "example": "Risk Analyst"
+        },
+        "Job Portal": {
+          "fill_pct": 100.0,
+          "example": "Idealist"
+        },
+        "Job Description": {
+          "fill_pct": 100.0,
+          "example": "A Risk Analyst assesses and manages financial risks within an organization. They use data analysis and modeling to evaluate potential risks and recommend mitigation strategies."
+        },
+        "Benefits": {
+          "fill_pct": 100.0,
+          "example": "{'Childcare Assistance, Paid Time Off (PTO), Relocation Assistance, Flexible Work Arrangements, Professional Development'}"
+        },
+        "skills": {
+          "fill_pct": 100.0,
+          "example": "Risk assessment Data analysis Financial modeling Risk management tools Regulatory compliance knowledge"
+        },
+        "Responsibilities": {
+          "fill_pct": 100.0,
+          "example": "Evaluate investment risks, including market, credit, and operational risks. Develop risk models and stress tests. Implement risk management strategies and controls."
+        },
+        "Company": {
+          "fill_pct": 100.0,
+          "example": "Admiral Group"
+        },
+        "Company Profile": {
+          "fill_pct": 99.5,
+          "example": "{\"Sector\":\"Insurance\",\"Industry\":\"Insurance - Property/Casualty\",\"City\":\"Cardiff\",\"State\":\"N/A\",\"Zip\":\"N/A\",\"Website\":\"www.admiralgroup.co.uk\",\"Ticker\":\"ADM.L\",\"CEO\":\"Milena Mondin"
+        }
+      }
+    },
+    {
+      "offset": 1740166140,
+      "n_rows_parsed": 2770,
+      "fill": {
+        "Job Id": {
+          "fill_pct": 100.0,
+          "example": "3078679076477864"
+        },
+        "Experience": {
+          "fill_pct": 100.0,
+          "example": "0 to 9 Years"
+        },
+        "Qualifications": {
+          "fill_pct": 100.0,
+          "example": "MBA"
+        },
+        "Salary Range": {
+          "fill_pct": 100.0,
+          "example": "$58K-$115K"
+        },
+        "location": {
+          "fill_pct": 100.0,
+          "example": "ReykjavÃ­k"
+        },
+        "Country": {
+          "fill_pct": 100.0,
+          "example": "Iceland"
+        },
+        "latitude": {
+          "fill_pct": 100.0,
+          "example": "64.9631"
+        },
+        "longitude": {
+          "fill_pct": 100.0,
+          "example": "-19.0208"
+        },
+        "Work Type": {
+          "fill_pct": 100.0,
+          "example": "Intern"
+        },
+        "Company Size": {
+          "fill_pct": 100.0,
+          "example": "73457"
+        },
+        "Job Posting Date": {
+          "fill_pct": 100.0,
+          "example": "2023-06-08"
+        },
+        "Preference": {
+          "fill_pct": 100.0,
+          "example": "Female"
+        },
+        "Contact Person": {
+          "fill_pct": 100.0,
+          "example": "Sharon Griffin"
+        },
+        "Contact": {
+          "fill_pct": 100.0,
+          "example": "7825364114"
+        },
+        "Job Title": {
+          "fill_pct": 100.0,
+          "example": "Civil Engineer"
+        },
+        "Role": {
+          "fill_pct": 100.0,
+          "example": "Water Resources Engineer"
+        },
+        "Job Portal": {
+          "fill_pct": 100.0,
+          "example": "USAJOBS"
+        },
+        "Job Description": {
+          "fill_pct": 100.0,
+          "example": "A Water Resources Engineer manages and develops water-related projects, such as dams, irrigation systems, and flood control measures, to ensure water resource sustainability."
+        },
+        "Benefits": {
+          "fill_pct": 100.0,
+          "example": "{'Flexible Spending Accounts (FSAs), Relocation Assistance, Legal Assistance, Employee Recognition Programs, Financial Counseling'}"
+        },
+        "skills": {
+          "fill_pct": 100.0,
+          "example": "Water resources engineering Hydrology and hydraulics Environmental impact assessment Water resource modeling software Watershed management"
+        },
+        "Responsibilities": {
+          "fill_pct": 100.0,
+          "example": "Focus on water-related projects, such as flood control, water supply, and wastewater treatment. Design and manage water resource systems and infrastructure. Address water quality a"
+        },
+        "Company": {
+          "fill_pct": 100.0,
+          "example": "Par Pacific Holdings"
+        },
+        "Company Profile": {
+          "fill_pct": 99.6,
+          "example": "{\"Sector\":\"Energy\",\"Industry\":\"Petroleum Refining\",\"City\":\"Houston\",\"State\":\"Texas\",\"Zip\":\"77024\",\"Website\":\"www.parpacific.com\",\"Ticker\":\"PARR\",\"CEO\":\"William C. Pate\"}"
+        }
+      }
+    }
+  ]
+}

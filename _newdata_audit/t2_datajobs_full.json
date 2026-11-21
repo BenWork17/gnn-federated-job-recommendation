@@ -1,0 +1,94 @@
+{
+  "hf_id": "lukebarousse/data_jobs",
+  "license": "apache-2.0",
+  "csv_bytes": 231152089,
+  "n_rows": 785741,
+  "columns": [
+    "job_title_short",
+    "job_title",
+    "job_location",
+    "job_via",
+    "job_schedule_type",
+    "job_work_from_home",
+    "search_location",
+    "job_posted_date",
+    "job_no_degree_mention",
+    "job_health_insurance",
+    "job_country",
+    "salary_rate",
+    "salary_year_avg",
+    "salary_hour_avg",
+    "company_name",
+    "job_skills",
+    "job_type_skills"
+  ],
+  "job_skills": {
+    "nonnull": 668704,
+    "nonnull_pct": 85.1,
+    "parses_to_nonempty_list": 668704,
+    "pct_of_all_rows": 85.1,
+    "parse_fail": 0,
+    "empty_list": 0,
+    "mean_skills_per_job_sampled_200k": 5.45,
+    "distinct_skills_sampled_200k": 246,
+    "top_skills_sampled_200k": [
+      [
+        "sql",
+        114809
+      ],
+      [
+        "python",
+        113999
+      ],
+      [
+        "aws",
+        43259
+      ],
+      [
+        "azure",
+        39349
+      ],
+      [
+        "r",
+        39243
+      ],
+      [
+        "excel",
+        38073
+      ],
+      [
+        "tableau",
+        37869
+      ],
+      [
+        "spark",
+        34190
+      ],
+      [
+        "power bi",
+        29280
+      ],
+      [
+        "java",
+        25397
+      ],
+      [
+        "sas",
+        24946
+      ],
+      [
+        "hadoop",
+        19400
+      ]
+    ]
+  },
+  "job_type_skills_nonnull_pct": 85.1,
+  "company_name": {
+    "fill_pct": 100.0,
+    "distinct": 139982
+  },
+  "has_user_column": false,
+  "has_interaction_column": false,
+  "job_posted_date_min": "2023-01-01 00:00:04",
+  "job_posted_date_max": "2023-12-31 23:59:58"
+}

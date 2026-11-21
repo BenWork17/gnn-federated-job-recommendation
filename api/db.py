@@ -1,0 +1,780 @@
+"""db.py — lớp truy cập dữ liệu cho WebAPI.
+
+Hai backend cùng một giao diện:
+  * PgStore        — PostgreSQL thật (psycopg 3), dùng COPY ở load_to_pg.py
+  * InMemoryStore  — dữ liệu trong RAM (chế độ --dry-run, hoặc khi DB chưa nạp)
+
+``make_store()`` tự chọn: nếu kết nối được PostgreSQL và bảng employers có dữ
+liệu thì dùng PgStore, ngược lại rơi về InMemoryStore và báo rõ nguồn.
+"""
+from __future__ import annotations
+
+import math
+import os
+import sys
+import threading
+import time
+import uuid
+from collections import defaultdict
+from datetime import datetime, timezone
+
+import numpy as np
+
+try:  # chạy như package (uvicorn api.main:app)
+    from .artifacts import Dataset, get_dataset, client_status
+except ImportError:  # chạy trực tiếp trong thư mục api/
+    from artifacts import Dataset, get_dataset, client_status
+
+# console Windows mặc định cp1252 -> log tiếng Việt sẽ ném UnicodeEncodeError
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
+DEFAULT_DSN = os.environ.get(
+    "DSS_PG_DSN", "postgresql://postgres:postgres@127.0.0.1:5432/dss_jobs"
+)
+
+
+def _now() -> datetime:
+    return datetime.now(timezone.utc)
+
+
+VALID_STATUS = ("running", "stopping", "stopped", "done", "failed")
+
+
+def _ok_status(v: str) -> str:
+    return v if v in VALID_STATUS else "running"
+
+
+class _CSR:
+    """Ma trận thưa nhị phân dạng CSR từ cặp chỉ số (rows, cols).
+
+    Bộ nhớ ~ (N+E) * 8 byte thay vì list[set[int]] (tốn 50–100 byte/phần tử).
+    """
+
+    __slots__ = ("n_rows", "indptr", "indices")
+
+    def __init__(self, pairs: np.ndarray, n_rows: int):
+        self.n_rows = int(n_rows)
+        if pairs.size == 0:
+            self.indptr = np.zeros(self.n_rows + 1, dtype=np.int64)
+            self.indices = np.zeros(0, dtype=np.int64)
+            return
+        rows = np.asarray(pairs[0], dtype=np.int64)
+        cols = np.asarray(pairs[1], dtype=np.int64)
+        order = np.lexsort((cols, rows))
+        rows, cols = rows[order], cols[order]
+        self.indptr = np.zeros(self.n_rows + 1, dtype=np.int64)
+        np.add.at(self.indptr, rows + 1, 1)
+        np.cumsum(self.indptr, out=self.indptr)
+        self.indices = cols
+
+    def row(self, i: int) -> np.ndarray:
+        if i < 0 or i >= self.n_rows:
+            return np.zeros(0, dtype=np.int64)
+        return self.indices[self.indptr[i]: self.indptr[i + 1]]
+
+    def __len__(self) -> int:
+        return int(self.indptr[-1])
+
+
+def _csr_intersection(a: np.ndarray, b: np.ndarray) -> np.ndarray:
+    """Giao hai mảng chỉ số đã sắp xếp (như np.intersect1d nhưng nhẹ hơn)."""
+    if a.size == 0 or b.size == 0:
+        return np.zeros(0, dtype=np.int64)
+    return np.intersect1d(a, b, assume_unique=False)
+
+
+# =========================================================================
+# In-memory store
+# =========================================================================
+class InMemoryStore:
+    """Toàn bộ dữ liệu trong RAM, dựng từ Dataset (artifacts hoặc demo).
+
+    Dùng CSR (indptr + indices) thay vì list-of-set để chịu được đồ thị thật
+    (~1,09M job, ~1,6M app) trong 3,9 GB RAM.
+    """
+
+    kind = "memory"
+    pg_ok = False
+
+    def __init__(self, dataset: Dataset):
+        self.ds = dataset
+        self._runs: dict[str, dict] = {}
+        self._lock = threading.Lock()
+
+        ds = dataset
+        self._user_pos = {int(uid): i for i, uid in enumerate(ds.user_ids.tolist())}
+        self._job_skills = _CSR(ds.js, ds.n_jobs)
+        self._user_skills = _CSR(ds.us, ds.n_users)
+        self._user_jobs = _CSR(ds.uj, ds.n_users)
+        self._popularity = np.bincount(ds.uj[1], minlength=ds.n_jobs).astype(np.int64)
+        # inverted index skill -> jobs (CSR theo skill)
+        self._skill_jobs = _CSR(ds.js[::-1], ds.n_skills)  # (job, skill) -> (skill, job)
+        self._occ_of_job = ds.occ_ids
+        self._js_count = np.diff(self._job_skills.indptr).astype(np.float64)
+        self._clients = ds.client_rows()
+        self._client_index = {c["client_id"]: c for c in self._clients}
+        self._skills_cache: dict[int, list[str]] = {}
+        self._skills_cache_lock = threading.Lock()
+
+    # ---- đọc ----
+    def db_ok(self) -> bool:
+        # chế độ in-memory: KHÔNG có PostgreSQL -> /health.db phải là false
+        return False
+
+    def clients(self, limit: int, offset: int):
+        rows = self._clients
+        return len(rows), rows[offset: offset + limit]
+
+    def client_detail(self, client_id: int):
+        row = self._client_index.get(int(client_id))
+        if row is None:
+            return None
+        out = dict(row)
+        out["top_skills"] = self._top_skills(int(client_id))
+        return out
+
+    def _top_skills(self, client_id: int, k: int = 10) -> list[str]:
+        """Top skill của client, có cache (client lớn có thể giữ hàng trăm nghìn job)."""
+        with self._skills_cache_lock:
+            hit = self._skills_cache.get(client_id)
+        if hit is not None:
+            return hit
+        jobs = np.flatnonzero(self.ds.client_of_job == client_id)
+        counts: dict[int, int] = defaultdict(int)
+        for j in jobs.tolist():
+            for s in self._job_skills.row(j).tolist():
+                counts[s] += 1
+        top = sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[:k]
+        out = [self.ds.skill_names[s] for s, _ in top]
+        with self._skills_cache_lock:
+            if len(self._skills_cache) > 512:
+                self._skills_cache.clear()
+            self._skills_cache[client_id] = out
+        return out
+
+    def summary(self) -> dict:
+        return self.ds.summary()
+
+    def _title(self, j: int) -> str:
+        jid = int(self.ds.job_ids[j])
+        if jid in self.ds.titles:
+            return self.ds.titles[jid]
+        if self.ds.occ_names:
+            occ = self.ds.occ_names[int(self._occ_of_job[j])] if 0 <= self._occ_of_job[j] < len(self.ds.occ_names) else "Job"
+            return f"{occ} #{jid}"
+        return f"Job #{jid}"
+
+    def _employer(self, j: int) -> str:
+        jid = int(self.ds.job_ids[j])
+        if jid in self.ds.employers:
+            return self.ds.employers[jid]
+        c = int(self.ds.client_of_job[j])
+        if 0 <= c < len(self.ds.clients):
+            return self.ds.clients[c]["name"]
+        return "unknown"
+
+    def recommend(self, user_id: int, k: int) -> dict:
+        if user_id not in self._user_pos:
+            return {"user_id": user_id, "items": []}
+        ui = self._user_pos[user_id]
+        user_skills = self._user_skills.row(ui)
+        scores = np.zeros(self.ds.n_jobs, dtype=np.float64)
+        # cộng điểm cho mọi job chia sẻ skill với user (inverted index skill->job)
+        for s in user_skills.tolist():
+            js = self._skill_jobs.row(s)
+            scores[js] += 1.0
+        # chuẩn hoá theo số skill của job + tín hiệu phổ biến
+        scores = scores / np.sqrt(np.maximum(1.0, self._js_count))
+        pop_max = float(self._popularity.max()) if self._popularity.size else 0.0
+        scores += 0.15 * np.log1p(self._popularity) / max(1.0, math.log1p(pop_max))
+        # Ưu tiên nghề mà user quan tâm (nghề chiếm đa số trong lịch sử ứng tuyển)
+        applied = self._user_jobs.row(ui)
+        if applied.size:
+            occ_hist = self._occ_of_job[applied]
+            if occ_hist.size:
+                vals, counts = np.unique(occ_hist, return_counts=True)
+                scores += 0.05 * (self._occ_of_job == int(vals[counts.argmax()]))
+            scores[applied] = -1.0
+        k = max(1, int(k))
+        top = np.argpartition(-scores, min(k, self.ds.n_jobs - 1))[:k]
+        top = top[np.argsort(-scores[top])]
+        items = []
+        for j in top.tolist():
+            if scores[j] <= 0:
+                continue
+            matched = [self.ds.skill_names[s]
+                       for s in _csr_intersection(self._job_skills.row(j), user_skills)]
+            items.append({
+                "job_id": int(self.ds.job_ids[j]),
+                "title": self._title(j),
+                "score": round(float(scores[j]), 6),
+                "employer": self._employer(j),
+                "matched_skills": matched[:10],
+            })
+        return {"user_id": user_id, "items": items}
+
+    # ---- train runs ----
+    def create_run(self, run_id: str, n_clients: int, rounds: int):
+        with self._lock:
+            self._runs[run_id] = {
+                "run_id": run_id,
+                "started_at": _now().isoformat(),
+                "n_clients": int(n_clients),
+                "rounds": int(rounds),
+                "status": "running",
+                "round": 0,
+                "metrics": [],
+                "latencies": [],
+                "stopped_at_round": 0,
+            }
+
+    def set_run_status(self, run_id: str, status: str, stopped_at_round: int | None = None):
+        with self._lock:
+            r = self._runs.get(run_id)
+            if r:
+                r["status"] = _ok_status(status)
+                if stopped_at_round is not None:
+                    r["stopped_at_round"] = int(stopped_at_round)
+
+    def add_round(self, run_id: str, round_no: int, metrics: dict, latencies: list[dict]):
+        with self._lock:
+            r = self._runs.get(run_id)
+            if not r:
+                return
+            r["round"] = int(round_no)
+            r["metrics"].append({
+                "round": int(round_no),
+                "recall20": float(metrics["recall20"]),
+                "ndcg20": float(metrics["ndcg20"]),
+                "mrr20": float(metrics["mrr20"]),
+                "loss": float(metrics["loss"]),
+            })
+            r["latencies"].extend(latencies)
+
+    def add_latencies(self, run_id: str, latencies: list[dict]):
+        with self._lock:
+            r = self._runs.get(run_id)
+            if r:
+                r["latencies"].extend(latencies)
+
+    def run_status(self, run_id: str):
+        with self._lock:
+            r = self._runs.get(run_id)
+            if not r:
+                return None
+            lat = np.array([x["latency_ms"] for x in r["latencies"]], dtype=np.float64)
+            bytes_total = int(sum(x["bytes_up"] + x["bytes_down"] for x in r["latencies"]))
+            return {
+                "run_id": run_id,
+                "status": _ok_status(r["status"]),
+                "round": int(r["round"]),
+                "total_rounds": int(r["rounds"]),
+                "metrics": list(r["metrics"]),
+                "latency_p50_ms": round(float(np.percentile(lat, 50)), 4) if lat.size else 0.0,
+                "latency_p95_ms": round(float(np.percentile(lat, 95)), 4) if lat.size else 0.0,
+                "bytes_total": bytes_total,
+                "data_source": self.ds.source,
+                "stopped": bool(r["status"] == "stopped"),
+                "stopped_at_round": int(r.get("stopped_at_round", 0) or 0),
+            }
+
+    def runs(self):
+        with self._lock:
+            rows = [
+                {
+                    "run_id": r["run_id"],
+                    "started_at": r["started_at"],
+                    "n_clients": r["n_clients"],
+                    "rounds": r["rounds"],
+                    "status": _ok_status(r["status"]),
+                }
+                for r in self._runs.values()
+            ]
+        rows.sort(key=lambda r: r["started_at"], reverse=True)
+        return rows
+
+
+# =========================================================================
+# PostgreSQL store
+# =========================================================================
+class PgStore:
+    """PostgreSQL thật. Đọc bảng đã nạp bởi load_to_pg.py."""
+
+    kind = "postgres"
+
+    def __init__(self, dsn: str = DEFAULT_DSN):
+        self.dsn = dsn
+        self._pool: list = []
+        self._lock = threading.Semaphore(8)
+        self.has_data = False
+        self.fallback = None
+        self._probe()
+
+    # ---- kết nối ----
+    def _connect(self):
+        import psycopg  # import trễ: --dry-run không cần cài
+        return psycopg.connect(self.dsn, connect_timeout=4)
+
+    def _acquire(self):
+        self._lock.acquire()
+        try:
+            if self._pool:
+                return self._pool.pop()
+            return self._connect()
+        except Exception:
+            self._lock.release()
+            raise
+
+    def _release(self, conn):
+        try:
+            self._pool.append(conn)
+        except Exception:
+            try:
+                conn.close()
+            except Exception:
+                pass
+        finally:
+            self._lock.release()
+
+    def _q(self, sql: str, params=None, fetch: bool = True):
+        conn = self._acquire()
+        try:
+            with conn.cursor() as cur:
+                cur.execute(sql, params or None)
+                rows = cur.fetchall() if fetch else None
+                conn.commit()
+            return rows
+        except Exception:
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+            raise
+        finally:
+            self._release(conn)
+
+    def _probe(self):
+        try:
+            rows = self._q("SELECT count(*) FROM employers")
+            self.has_data = bool(rows and rows[0][0] > 0)
+        except Exception:
+            self.has_data = False
+        if not self.has_data:
+            self.fallback = InMemoryStore(get_dataset(prefer_artifacts=True))
+
+    def db_ok(self) -> bool:
+        try:
+            return bool(self._q("SELECT 1")[0][0] == 1)
+        except Exception:
+            return False
+
+    # ---- chịu lỗi: DB chết giữa chừng -> rơi về in-memory, không trả 500 ----
+    def _degrade(self, exc: Exception):
+        """Chuyển vĩnh viễn sang fallback in-memory khi PostgreSQL không dùng được.
+
+        Đã gặp thật: dừng cluster giữa lúc API đang chạy -> `/api/clients` ném
+        ``psycopg.OperationalError`` và FastAPI trả 500. UI coi 500 là lỗi và
+        hiện dải DEMO dù server còn sống. Nay degrade một lần rồi phục vụ tiếp.
+        """
+        if self.fallback is None:
+            try:
+                self.fallback = InMemoryStore(get_dataset(prefer_artifacts=True))
+            except Exception:
+                from .artifacts import build_demo_dataset
+                self.fallback = InMemoryStore(build_demo_dataset())
+        self.has_data = False
+        self._summary_cache = None
+        print(f"[db] PostgreSQL không dùng được ({type(exc).__name__}: {exc}) "
+              f"-> chuyển sang in-memory ({self.fallback.ds.source})")
+
+    def _safe(self, fn, *args, **kwargs):
+        """Gọi hàm đọc; nếu DB lỗi thì degrade rồi gọi lại trên fallback."""
+        if not self.has_data:
+            return fn(self.fallback, *args, **kwargs)
+        try:
+            return fn(self, *args, **kwargs)
+        except Exception as exc:
+            self._degrade(exc)
+            return fn(self.fallback, *args, **kwargs)
+
+    # ---- đọc ----
+    def clients(self, limit: int, offset: int):
+        def _clients(store, lim, off):
+            if store is self:
+                total = int(self._q("SELECT count(*) FROM employers")[0][0])
+                rows = self._q(
+                    """SELECT client_id, name, n_apps, n_users, n_jobs
+                         FROM employers ORDER BY n_apps DESC, client_id ASC
+                        LIMIT %s OFFSET %s""",
+                    (lim, off),
+                )
+                return total, [
+                    {
+                        "client_id": int(r[0]), "name": r[1] or f"client-{r[0]}",
+                        "n_apps": int(r[2] or 0), "n_users": int(r[3] or 0),
+                        "n_jobs": int(r[4] or 0), "status": client_status(int(r[2] or 0)),
+                    }
+                    for r in rows
+                ]
+            return store.clients(lim, off)
+
+        return self._safe(_clients, limit, offset)
+
+    def client_detail(self, client_id: int):
+        def _detail(store, cid):
+            if store is not self:
+                return store.client_detail(cid)
+            rows = self._q(
+                "SELECT client_id, name, n_apps, n_users, n_jobs FROM employers WHERE client_id=%s",
+                (cid,),
+            )
+            if not rows:
+                return None
+            r = rows[0]
+            skills = self._q(
+                """SELECT js.skill, count(*) AS c
+                     FROM jobs j JOIN job_skills js ON js.job_id = j.job_id
+                    WHERE j.employer = %s
+                    GROUP BY js.skill ORDER BY c DESC, js.skill ASC LIMIT 10""",
+                (r[1],),
+            )
+            return {
+                "client_id": int(r[0]), "name": r[1] or f"client-{r[0]}",
+                "n_apps": int(r[2] or 0), "n_users": int(r[3] or 0), "n_jobs": int(r[4] or 0),
+                "top_skills": [s[0] for s in skills],
+                "status": client_status(int(r[2] or 0)),
+            }
+
+        return self._safe(_detail, client_id)
+
+    def summary(self) -> dict:
+        # Cache: 9 phép count(*) trên bảng 18M dòng (user_skills) mất ~20s mỗi lần,
+        # trong khi dữ liệu chỉ đổi khi chạy lại load_to_pg.py. TTL 300s là đủ.
+        cached = getattr(self, "_summary_cache", None)
+        if self.has_data and cached is not None and (time.time() - cached[0]) < 300:
+            return dict(cached[1])
+        if not self.has_data:
+            return self.fallback.summary()
+        try:
+            out = self._summary_sql()
+        except Exception as exc:
+            self._degrade(exc)
+            return self.fallback.summary()
+        self._summary_cache = (time.time(), dict(out))
+        return out
+
+    def _summary_sql(self) -> dict:
+        one = lambda sql: int(self._q(sql)[0][0] or 0)  # noqa: E731
+        n_users = one("SELECT count(*) FROM users")
+        n_jobs = one("SELECT count(*) FROM jobs")
+        n_skills = one("SELECT count(DISTINCT skill) FROM job_skills")
+        n_occ = one("SELECT count(DISTINCT occupation) FROM jobs WHERE occupation IS NOT NULL")
+        n_uj = one("SELECT count(*) FROM apps")
+        n_js = one("SELECT count(*) FROM job_skills")
+        n_us = one("SELECT count(*) FROM user_skills")
+        n_clients = one("SELECT count(*) FROM employers")
+        # skill-plane có thể có nhiều hơn job_skills (user_skills lấy qua nghề)
+        n_skills = max(n_skills, one("SELECT count(DISTINCT skill) FROM user_skills"))
+        possible = n_users * n_jobs + n_jobs * n_skills + n_users * n_skills
+        sparsity = 100.0 * (1.0 - (n_uj + n_js + n_us) / possible) if possible else 0.0
+        return {
+            "n_users": n_users, "n_jobs": n_jobs, "n_skills": n_skills,
+            "n_occupations": n_occ, "n_edges_user_job": n_uj,
+            "n_edges_job_skill": n_js, "n_edges_user_skill": n_us,
+            "n_clients": n_clients, "sparsity_pct": round(sparsity, 6),
+        }
+
+    def recommend(self, user_id: int, k: int):
+        if not self.has_data:
+            return self.fallback.recommend(user_id, k)
+        try:
+            return self._recommend_sql(user_id, max(1, int(k)))
+        except Exception as exc:
+            self._degrade(exc)
+            return self.fallback.recommend(user_id, k)
+
+    def _recommend_sql(self, user_id: int, k: int):
+        rows = self._q(
+            """
+            -- Tối ưu: gộp theo job_id TRƯỚC khi join jobs.
+            -- Bản cũ join jobs rồi GROUP BY 4 cột -> sắp xếp 26k nhóm, 1.009 ms.
+            -- Bản này gộp trên 2,6M dòng rồi join 200 dòng -> 449 ms.
+            WITH us AS (SELECT DISTINCT skill FROM user_skills WHERE user_id = %(uid)s),
+            cand AS (
+                SELECT js.job_id, count(*) AS overlap
+                  FROM job_skills js
+                  JOIN us USING (skill)
+                 GROUP BY js.job_id
+                 ORDER BY overlap DESC
+                 LIMIT %(lim)s
+            )
+            SELECT c.job_id,
+                   coalesce(j.title, j.occupation, 'Job #' || c.job_id) AS title,
+                   coalesce(j.employer, 'unknown') AS employer,
+                   c.overlap,
+                   (SELECT count(*) FROM job_skills jsx WHERE jsx.job_id = c.job_id) AS n_job_skills,
+                   (SELECT array_agg(js2.skill)
+                      FROM job_skills js2
+                      JOIN us ON us.skill = js2.skill
+                     WHERE js2.job_id = c.job_id) AS matched
+              FROM cand c
+              JOIN jobs j ON j.job_id = c.job_id
+             WHERE NOT EXISTS (SELECT 1 FROM apps a
+                                WHERE a.user_id = %(uid)s AND a.job_id = c.job_id)
+             ORDER BY c.overlap DESC, c.job_id ASC
+             LIMIT %(k)s
+            """,
+            {"uid": user_id, "k": k, "lim": max(k * 10, 200)},
+        )
+        items = []
+        for r in rows:
+            overlap = float(r[3] or 0)
+            denom = math.sqrt(max(1.0, float(r[4] or 1)))
+            items.append({
+                "job_id": int(r[0]),
+                "title": r[1] or f"Job #{r[0]}",
+                "score": round(overlap / denom, 6),
+                "employer": r[2] or "unknown",
+                "matched_skills": [str(s) for s in (r[5] or [])][:10],
+            })
+        if not items:  # user chưa có skill -> gợi ý job phổ biến
+            pop = self._q(
+                """SELECT j.job_id,
+                          coalesce(j.title, j.occupation, 'Job #' || j.job_id),
+                          coalesce(j.employer, 'unknown'), count(*) c
+                     FROM apps a JOIN jobs j ON j.job_id = a.job_id
+                    GROUP BY j.job_id, j.title, j.occupation, j.employer
+                    ORDER BY c DESC LIMIT %s""",
+                (k,),
+            )
+            items = [
+                {"job_id": int(r[0]), "title": r[1] or f"Job #{r[0]}",
+                 "score": 0.0, "employer": r[2] or "unknown", "matched_skills": []}
+                for r in pop
+            ]
+        return {"user_id": user_id, "items": items}
+
+    # ---- train runs ----
+    def create_run(self, run_id: str, n_clients: int, rounds: int):
+        if not self.has_data:
+            return self.fallback.create_run(run_id, n_clients, rounds)
+        try:
+            self._q(
+                """INSERT INTO train_runs(run_id, started_at, n_clients, rounds, status)
+                   VALUES (%s, %s, %s, %s, 'running')""",
+                (uuid.UUID(run_id), _now(), int(n_clients), int(rounds)),
+                fetch=False,
+            )
+        except Exception as exc:
+            self._degrade(exc)
+            self.fallback.create_run(run_id, n_clients, rounds)
+
+    def set_run_status(self, run_id: str, status: str, stopped_at_round: int | None = None):
+        """Cập nhật status. ``stopped_at_round`` chỉ ghi khi dừng giữa chừng.
+
+        Tương thích ngược: DB tạo bằng schema.sql phiên bản cũ (chưa có cột
+        ``stopped_at_round``/``ended_at``) vẫn chạy được — tự rơi về UPDATE đơn giản.
+        """
+        if not self.has_data:
+            return self.fallback.set_run_status(run_id, status, stopped_at_round)
+        status = _ok_status(status)
+        uid = uuid.UUID(run_id)
+        if status == "stopped" and stopped_at_round is None:
+            stopped_at_round = self._last_round(uid)
+        try:
+            self._q(
+                """UPDATE train_runs
+                      SET status=%s,
+                          stopped_at_round=coalesce(%s, stopped_at_round),
+                          ended_at=coalesce(ended_at, now())
+                    WHERE run_id=%s""",
+                (status, stopped_at_round, uid),
+                fetch=False,
+            )
+        except Exception:
+            try:
+                # schema cũ: chỉ có cột status
+                self._q("UPDATE train_runs SET status=%s WHERE run_id=%s",
+                        (status, uid), fetch=False)
+            except Exception as exc:
+                # DB chết: giữ nguyên status trong bộ nhớ, đừng làm run 'failed'
+                self._degrade(exc)
+                if run_id not in getattr(self.fallback, "_runs", {}):
+                    self.fallback.create_run(run_id, 1, 1)
+                self.fallback.set_run_status(run_id, status, stopped_at_round)
+
+    def _last_round(self, uid) -> int:
+        try:
+            rows = self._q("SELECT coalesce(max(round), 0) FROM round_metrics WHERE run_id=%s", (uid,))
+            return int(rows[0][0] or 0)
+        except Exception:
+            return 0
+
+    def add_round(self, run_id: str, round_no: int, metrics: dict, latencies: list[dict]):
+        if not self.has_data:
+            return self.fallback.add_round(run_id, round_no, metrics, latencies)
+        conn = self._acquire()
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """INSERT INTO round_metrics(run_id, round, recall20, ndcg20, mrr20, loss)
+                       VALUES (%s,%s,%s,%s,%s,%s)
+                       ON CONFLICT (run_id, round) DO UPDATE
+                       SET recall20=EXCLUDED.recall20, ndcg20=EXCLUDED.ndcg20,
+                           mrr20=EXCLUDED.mrr20, loss=EXCLUDED.loss""",
+                    (uuid.UUID(run_id), int(round_no), float(metrics["recall20"]),
+                     float(metrics["ndcg20"]), float(metrics["mrr20"]), float(metrics["loss"])),
+                )
+                if latencies:
+                    with cur.copy(
+                        "COPY node_latency(run_id, round, client_id, latency_ms, bytes_up, bytes_down) FROM STDIN"
+                    ) as cp:
+                        for x in latencies:
+                            cp.write_row((uuid.UUID(run_id), int(round_no), int(x["client_id"]),
+                                          float(x["latency_ms"]), int(x["bytes_up"]), int(x["bytes_down"])))
+            conn.commit()
+        except Exception as exc:
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+            self._release(conn)
+            # MẤT DB GIỮA LƯỢT CHẠY: vẫn phải giữ được metric/latency của vòng này
+            self._degrade(exc)
+            # idempotent: KHÔNG tạo lại run đã có trong fallback (sẽ xoá metrics cũ)
+            if run_id not in getattr(self.fallback, "_runs", {}):
+                self.fallback.create_run(run_id, 1, 1)
+            self.fallback.add_round(run_id, round_no, metrics, latencies)
+            return
+        self._release(conn)
+
+    def add_latencies(self, run_id: str, latencies: list[dict]):
+        if not latencies:
+            return
+        if not self.has_data:
+            return self.fallback.add_latencies(run_id, latencies)
+        conn = self._acquire()
+        try:
+            with conn.cursor() as cur:
+                with cur.copy(
+                    "COPY node_latency(run_id, round, client_id, latency_ms, bytes_up, bytes_down) FROM STDIN"
+                ) as cp:
+                    for x in latencies:
+                        cp.write_row((uuid.UUID(run_id), int(x["round"]), int(x["client_id"]),
+                                      float(x["latency_ms"]), int(x["bytes_up"]), int(x["bytes_down"])))
+            conn.commit()
+        except Exception as exc:
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+            self._release(conn)
+            self._degrade(exc)
+            if run_id not in getattr(self.fallback, "_runs", {}):
+                self.fallback.create_run(run_id, 1, 1)
+            self.fallback.add_latencies(run_id, latencies)
+            return
+        self._release(conn)
+
+    def run_status(self, run_id: str):
+        try:
+            uid = uuid.UUID(run_id)
+        except ValueError:
+            return None
+        if not self.has_data:
+            return self.fallback.run_status(run_id)
+        stopped_at_round = 0
+        try:
+            rows = self._q(
+                "SELECT status, n_clients, rounds, stopped_at_round FROM train_runs WHERE run_id=%s", (uid,))
+        except Exception:
+            try:  # schema cũ chưa có cột stopped_at_round
+                rows = self._q("SELECT status, n_clients, rounds, 0 FROM train_runs WHERE run_id=%s", (uid,))
+            except Exception as exc:
+                self._degrade(exc)
+                return self.fallback.run_status(run_id)
+        if not rows:
+            return None
+        status, n_clients, rounds = rows[0][0], rows[0][1], rows[0][2]
+        stopped_at_round = int(rows[0][3] or 0)
+        metrics = self._q(
+            "SELECT round, recall20, ndcg20, mrr20, loss FROM round_metrics WHERE run_id=%s ORDER BY round",
+            (uid,),
+        )
+        lat_row = self._q(
+            """SELECT coalesce(percentile_cont(0.5) WITHIN GROUP (ORDER BY latency_ms), 0),
+                      coalesce(percentile_cont(0.95) WITHIN GROUP (ORDER BY latency_ms), 0),
+                      coalesce(sum(bytes_up + bytes_down), 0)
+                 FROM node_latency WHERE run_id=%s""",
+            (uid,),
+        )[0]
+        last_round = int(metrics[-1][0]) if metrics else 0
+        return {
+            "run_id": run_id,
+            "status": _ok_status(status),
+            "round": last_round,
+            "total_rounds": int(rounds or 0),
+            "metrics": [
+                {"round": int(m[0]), "recall20": float(m[1] or 0), "ndcg20": float(m[2] or 0),
+                 "mrr20": float(m[3] or 0), "loss": float(m[4] or 0)}
+                for m in metrics
+            ],
+            "latency_p50_ms": round(float(lat_row[0]), 4),
+            "latency_p95_ms": round(float(lat_row[1]), 4),
+            "bytes_total": int(lat_row[2] or 0),
+            "data_source": self._source_note(),
+            # --- thêm mới (t7) ---
+            "stopped": _ok_status(status) == "stopped",
+            "stopped_at_round": stopped_at_round or last_round,
+        }
+
+    def runs(self):
+        if not self.has_data:
+            return self.fallback.runs()
+        try:
+            rows = self._q(
+                "SELECT run_id, started_at, n_clients, rounds, status FROM train_runs "
+                "ORDER BY started_at DESC LIMIT 100"
+            )
+        except Exception as exc:
+            self._degrade(exc)
+            return self.fallback.runs()
+        return [
+            {
+                "run_id": str(r[0]),
+                "started_at": r[1].isoformat() if hasattr(r[1], "isoformat") else str(r[1]),
+                "n_clients": int(r[2] or 0), "rounds": int(r[3] or 0),
+                "status": _ok_status(r[4]),
+            }
+            for r in rows
+        ]
+
+    def _source_note(self) -> str:
+        return "postgres" if self.has_data else self.fallback.ds.source
+
+
+# =========================================================================
+def make_store(dry_run: bool = False, dsn: str | None = None):
+    """Chọn backend. dry_run -> in-memory; DB lỗi/rỗng -> in-memory fallback."""
+    if dry_run:
+        ds = get_dataset(prefer_artifacts=True)
+        return InMemoryStore(ds)
+    store = None
+    try:
+        store = PgStore(dsn or DEFAULT_DSN)
+        if store.db_ok():
+            if not store.has_data:
+                print("[db] PostgreSQL kết nối được nhưng bảng rỗng — dùng in-memory fallback.")
+            return store
+        print("[db] PostgreSQL không phản hồi — dùng in-memory.")
+    except Exception as exc:
+        print(f"[db] không kết nối PostgreSQL ({exc}) — dùng in-memory.")
+    ds = get_dataset(prefer_artifacts=True)
+    mem = InMemoryStore(ds)
+    if store is not None:
+        mem.dsn_error = True
+    return mem

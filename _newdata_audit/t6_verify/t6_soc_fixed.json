@@ -1,0 +1,56 @@
+{
+ "P1_skills35__full": {
+  "edges_user_job": 537296,
+  "nodes_user": 197872,
+  "nodes_job": 112553,
+  "nodes_occupation": 780,
+  "edges_job_skill": 27300,
+  "distinct_skill_nodes": 35,
+  "skills_per_job_mean": 35.0,
+  "jobs_per_occupation": 144.3
+ },
+ "P1_skills35__base": {
+  "edges_user_job": 598307,
+  "nodes_user": 207672,
+  "nodes_job": 120175,
+  "nodes_occupation": 683,
+  "edges_job_skill": 23905,
+  "distinct_skill_nodes": 35,
+  "skills_per_job_mean": 35.0,
+  "jobs_per_occupation": 176.0
+ },
+ "P1_technologies__full": {
+  "edges_user_job": 577327,
+  "nodes_user": 204695,
+  "nodes_job": 120675,
+  "nodes_occupation": 814,
+  "edges_job_skill": 30360,
+  "distinct_skill_nodes": 8256,
+  "skills_per_job_mean": 37.3,
+  "jobs_per_occupation": 148.2
+ },
+ "P1_technologies__base": {
+  "edges_user_job": 636896,
+  "nodes_user": 213793,
+  "nodes_job": 127784,
+  "nodes_occupation": 709,
+  "edges_job_skill": 28416,
+  "distinct_skill_nodes": 8316,
+  "skills_per_job_mean": 40.08,
+  "jobs_per_occupation": 180.2
+ },
+ "BUG_P1_skills35": {
+  "nodes_occupation_full_code": 806,
+  "nodes_occupation_base_code": 683,
+  "edges_job_skill_t5_mixed": 28210,
+  "edges_job_skill_correct_base": 23905,
+  "inflation_pct": 18.0
+ },
+ "BUG_P1_technologies": {
+  "nodes_occupation_full_code": 832,
+  "nodes_occupation_base_code": 709,
+  "edges_job_skill_t5_mixed": 47567,
+  "edges_job_skill_correct_base": 28416,
+  "inflation_pct": 67.4
+ }
+}

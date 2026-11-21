@@ -1,0 +1,46 @@
+{
+  "chart_recall_data": {
+    "labels": [
+      1,
+      2,
+      3
+    ],
+    "data": [
+      0.3873,
+      0.4506,
+      0.5018
+    ]
+  },
+  "chart_latency_data": {
+    "labels": [
+      1,
+      2,
+      3
+    ],
+    "p50": [
+      43.5,
+      49.2,
+      49.8
+    ],
+    "p95": [
+      149.84999999999988,
+      170.6999999999999,
+      171.1099999999999
+    ]
+  },
+  "node_cells_200": 200,
+  "node_reported": "200/200",
+  "run_badge": "hoàn tất",
+  "rounded_round": "3 / 3",
+  "log_line_count": 400,
+  "log_ticks": 396,
+  "log_has_round_summary": 2,
+  "node_grid_scrollable": true,
+  "log_scroll": {
+    "sh": 7957,
+    "ch": 300,
+    "st": 7657
+  },
+  "keyboard_select_name": "Công ty CP Bảo hiểm Sao Việt 33",
+  "focus_ring_ok": "TR:true"
+}

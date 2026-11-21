@@ -1,0 +1,151 @@
+{
+ "apps_total_on_jobs_with_apps": 1603078,
+ "axis_definition": "'data-kw' = Title khop regex data/analyst/scientist/BI/database/etl/sql/warehouse/statistic",
+ "data_jobs_join": {
+  "apps_data_matched": 47726,
+  "pct": 2.977,
+  "apps_data_unmatched": 67413,
+  "apps_nondata_matched": 317156,
+  "pct_nondata_matched": 19.784,
+  "apps_nondata_unmatched": 1170783,
+  "total_matched_apps": 364882,
+  "pct_total_matched": 22.761,
+  "share_of_matches_that_are_nondata_pct": 86.92,
+  "top15_matched_titles": [
+   [
+    "administrative assistant",
+    35604
+   ],
+   [
+    "customer service representative",
+    25179
+   ],
+   [
+    "receptionist",
+    16419
+   ],
+   [
+    "executive assistant",
+    9994
+   ],
+   [
+    "customer service",
+    6428
+   ],
+   [
+    "staff accountant",
+    5291
+   ],
+   [
+    "project manager",
+    4985
+   ],
+   [
+    "sales representative",
+    4257
+   ],
+   [
+    "office assistant",
+    4083
+   ],
+   [
+    "data entry clerk",
+    3393
+   ],
+   [
+    "financial analyst",
+    3289
+   ],
+   [
+    "recruiter",
+    3144
+   ],
+   [
+    "operations manager",
+    2958
+   ],
+   [
+    "inside sales representative",
+    2900
+   ],
+   [
+    "business analyst",
+    2858
+   ]
+  ]
+ },
+ "arshkon_join": {
+  "apps_data_matched": 55904,
+  "apps_data_unmatched": 59235,
+  "apps_nondata_matched": 693490,
+  "apps_nondata_unmatched": 794449,
+  "total_matched_apps": 749394,
+  "pct_total_matched": 46.747,
+  "top15_matched_titles": [
+   [
+    "administrative assistant",
+    35604
+   ],
+   [
+    "customer service representative",
+    25179
+   ],
+   [
+    "receptionist",
+    16419
+   ],
+   [
+    "executive assistant",
+    9994
+   ],
+   [
+    "customer service",
+    6428
+   ],
+   [
+    "staff accountant",
+    5291
+   ],
+   [
+    "project manager",
+    4985
+   ],
+   [
+    "sales representative",
+    4257
+   ],
+   [
+    "office assistant",
+    4083
+   ],
+   [
+    "medical assistant",
+    3736
+   ],
+   [
+    "maintenance technician",
+    3584
+   ],
+   [
+    "office manager",
+    3522
+   ],
+   [
+    "admissions representative",
+    3407
+   ],
+   [
+    "data entry clerk",
+    3393
+   ],
+   [
+    "financial analyst",
+    3289
+   ]
+  ]
+ },
+ "interpretation": {
+  "data_jobs": "bo data-only. Match NON-data la TRUNG CHUOI, khong phai cung nghe -> phai loai.",
+  "arshkon": "LinkedIn moi nganh nen match non-data van co the dung nghe."
+ }
+}

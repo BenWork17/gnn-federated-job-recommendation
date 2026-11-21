@@ -1,0 +1,37 @@
+{
+ "file": "E:\\2026\\DUT\\IOT\\Cuoiki\\NewData\\apps.tsv",
+ "rows": 1603111,
+ "distinct_users": 321235,
+ "distinct_jobs": 365668,
+ "splits": {
+  "Train": 1417514,
+  "Test": 185597
+ },
+ "density_pct_active": 0.001365,
+ "apps_per_user": {
+  "min": 1,
+  "median": 2,
+  "p90": 10,
+  "p99": 44,
+  "max": 2473,
+  "mean": 4.9905,
+  "n_ge5": 87760,
+  "n_ge10": 36387,
+  "pct_ge5": 27.32,
+  "pct_ge10": 11.33,
+  "apps_held_by_users_ge5": 1156588
+ },
+ "apps_per_job": {
+  "min": 1,
+  "median": 2,
+  "p90": 10,
+  "p99": 41,
+  "max": 208,
+  "mean": 4.3841,
+  "n_eq1": 158829,
+  "pct_eq1": 43.44,
+  "n_ge5": 83624,
+  "n_ge10": 37538,
+  "pct_ge10": 10.27
+ }
+}

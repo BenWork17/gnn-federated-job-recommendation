@@ -1,0 +1,107 @@
+{
+ "olx": {
+  "kaggle_api_view": {
+   "status": 404,
+   "err": "HTTP 404"
+  },
+  "kaggle_page": {
+   "status": 404,
+   "err": "HTTP 404"
+  },
+  "kaggle_files": {
+   "status": 404,
+   "err": "HTTP 404"
+  }
+ },
+ "zhaopin": {
+  "dataset_page": {
+   "status": 200,
+   "err": null,
+   "n_chars": 4085,
+   "hits": [],
+   "is_spa_shell": true
+  },
+  "api_data": {
+   "status": 200,
+   "err": null,
+   "n_chars": 74379,
+   "kw_hits": [
+    "NC",
+    "协议"
+   ],
+   "hits": [
+    "CCL25-Eval系列评测上线天池！",
+    "CCL25-Eval系列评测上线天池！",
+    "第二十四届中国计算语言学大会（CCL25-Eval）技术评测任务上线天池平台，快来查看系列评测赛事！",
+    "法务协议"
+   ],
+   "is_spa_shell": true
+  },
+  "api_detail": {
+   "status": 200,
+   "err": null,
+   "n_chars": 74379,
+   "kw_hits": [
+    "NC",
+    "协议"
+   ],
+   "hits": [
+    "CCL25-Eval系列评测上线天池！",
+    "CCL25-Eval系列评测上线天池！",
+    "第二十四届中国计算语言学大会（CCL25-Eval）技术评测任务上线天池平台，快来查看系列评测赛事！",
+    "法务协议"
+   ],
+   "is_spa_shell": true
+  }
+ },
+ "djinni": {
+  "lang-uk/recruitment-dataset-job-descriptions-english": {
+   "status": 200,
+   "license": "mit",
+   "license_name": null,
+   "license_link": null,
+   "gated": false,
+   "tags": [
+    "license:mit",
+    "library:datasets"
+   ],
+   "files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "readme_status": 200,
+   "readme_first800": "---\ndataset_info:\n  features:\n  - name: Position\n    dtype: string\n  - name: Long Description\n    dtype: string\n  - name: Company Name\n    dtype: string\n  - name: Exp Years\n    dtype: string\n  - name: Primary Keyword\n    dtype: string\n  - name: English Level\n    dtype: string\n  - name: Published\n    dtype: string\n  - name: Long Description_lang\n    dtype: string\n  - name: id\n    dtype: string\n  - name: __index_level_0__\n    dtype: int64\n  splits:\n  - name: train\n    num_bytes: 281256096\n    num_examples: 141897\n  download_size: 145859589\n  dataset_size: 281256096\nconfigs:\n- config_name: default\n  data_files:\n  - split: train\n    path: data/train-*\nlicense: mit\nlanguage:\n- en\nsize_categories:\n- 100K<n<1M\n---\n\n# Djinni Dataset (English Job Descriptions part)\n\n## Overview\nThe [Djinni Recruitm",
+   "mentions_interaction": true
+  },
+  "lang-uk/recruitment-dataset-candidate-profiles-english": {
+   "status": 200,
+   "license": "mit",
+   "license_name": null,
+   "license_link": null,
+   "gated": false,
+   "tags": [
+    "license:mit",
+    "library:datasets"
+   ],
+   "files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "readme_status": 200,
+   "readme_first800": "---\nlanguage:\n- en\nlicense: mit\nsize_categories:\n- 100K<n<1M\ndataset_info:\n  features:\n  - name: Position\n    dtype: string\n  - name: Moreinfo\n    dtype: string\n  - name: Looking For\n    dtype: string\n  - name: Highlights\n    dtype: string\n  - name: Primary Keyword\n    dtype: string\n  - name: English Level\n    dtype: string\n  - name: Experience Years\n    dtype: float64\n  - name: CV\n    dtype: string\n  - name: CV_lang\n    dtype: string\n  - name: id\n    dtype: string\n  - name: __index_level_0__\n    dtype: int64\n  splits:\n  - name: train\n    num_bytes: 425423208\n    num_examples: 210250\n  download_size: 237415736\n  dataset_size: 425423208\nconfigs:\n- config_name: default\n  data_files:\n  - split: train\n    path: data/train-*\n---\n\n\n# Djinni Dataset (English CVs part)\n\n## Overview\n The [Djinni Re",
+   "mentions_interaction": true
+  }
+ },
+ "hf_search": {
+  "job interaction": [],
+  "recruitment interaction": [],
+  "job click": [],
+  "jobs interactions": [],
+  "job application interaction": [],
+  "job recommendation interaction": [],
+  "advertisement clicks jobs": [],
+  "job clicks": []
+ }
+}
