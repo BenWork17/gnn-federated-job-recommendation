@@ -167,8 +167,7 @@ gnn-federated-job-recommendation/
 ├── app/ & ui/                  # Phiên bản Streamlit legacy & standalone FL Node Console
 ├── tests/                      # Bộ regression tests (pytest)
 ├── DESIGN.md                   # Đặc tả hệ thống thiết kế White + Signal Orange
-├── docker-compose.yml          # Container PostgreSQL 16 (dss-postgres:5433)
-└── README_V3.md                # Nhật ký kỹ thuật & hướng dẫn chi tiết end-to-end V3
+└── docker-compose.yml          # Container PostgreSQL 16 (dss-postgres:5433)
 ```
 
 ---
