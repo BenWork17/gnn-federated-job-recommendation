@@ -349,8 +349,8 @@ def graph_chart(nodes: pd.DataFrame, edges: pd.DataFrame,
             color=alt.Color("kind:N",
                             scale=alt.Scale(
                                 domain=["Người dùng", "Tin tuyển dụng",
-                                        "Kỹ năng", "Ngành"],
-                                range=["#7b241c", "#e8836b", BLUE, GREEN]),
+                                        "Kỹ năng", "Nghề O*NET", "Ngành"],
+                                range=["#7b241c", "#e8836b", BLUE, GREEN, GREEN]),
                             legend=alt.Legend(title="Loại nút", orient="top",
                                               symbolSize=160,
                                               labelFontSize=12,
@@ -400,6 +400,7 @@ _KIND_COLOR_2D = {
     "Người dùng":     "#7b241c",
     "Tin tuyển dụng": "#e8836b",
     "Kỹ năng":        "#0EA5E9",
+    "Nghề O*NET":     "#10B981",
     "Ngành":          "#10B981",
 }
 _EDGE_COLOR_2D = {"Công khai": "#F97316", "Riêng tư": RED}
@@ -1133,7 +1134,7 @@ _HTML_2D = """<!DOCTYPE html>
   <div class="lg-r"><span class="lg-d" style="background:#7b241c"></span>Người dùng</div>
   <div class="lg-r"><span class="lg-d" style="background:#e8836b"></span>Tin tuyển dụng</div>
   <div class="lg-r"><span class="lg-d" style="background:#0EA5E9"></span>Kỹ năng</div>
-  <div class="lg-r"><span class="lg-d" style="background:#10B981"></span>Ngành</div>
+  <div class="lg-r"><span class="lg-d" style="background:#10B981"></span>Nghề O*NET</div>
   <div class="lg-s"></div>
   <div class="lg-t">Loại cạnh</div>
   <div class="lg-r"><span class="lg-l" style="border-top-color:#F97316"></span>Công khai</div>

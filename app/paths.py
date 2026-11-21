@@ -20,6 +20,10 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 PATHS = {
+    "v3": ROOT / "artifacts" / "v3",
+    "v3_metrics": str(ROOT / "results" / "v3" / "notebook_metrics.json"),
+    "v3_figures": ROOT / "results" / "v3" / "figures",
+    # Giữ lại các key cũ để không làm gãy import/test cũ
     "reco": str(ROOT / "results" / "reco_main.json"),
     "figures": ROOT / "results" / "figures",
     "artifacts": ROOT / "artifacts",
@@ -27,16 +31,18 @@ PATHS = {
 }
 
 REQUIRED = {
-    "reco": Path(PATHS["reco"]),
-    "medajob_graph": ROOT / "artifacts" / "medajob" / "graph.npz",
+    "v3_graph": ROOT / "artifacts" / "v3" / "graph.npz",
+    "v3_meta": ROOT / "artifacts" / "v3" / "meta.json",
+    "v3_metrics": ROOT / "results" / "v3" / "notebook_metrics.json",
 }
 
 
 def missing_artifacts() -> list[str]:
     """Liệt kê artifact còn thiếu để hiện hướng dẫn thay vì lỗi khó hiểu."""
     hints = {
-        "reco": "python src/medajob/run_experiments.py",
-        "medajob_graph": "python src/medajob/prepare.py",
+        "v3_graph": "python src/prepare_v3.py",
+        "v3_meta": "python src/prepare_v3.py",
+        "v3_metrics": "jupyter nbconvert --to notebook --execute notebooks/01_gnn_fl.ipynb",
     }
     out = []
     for key, path in REQUIRED.items():

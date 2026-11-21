@@ -28,7 +28,7 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_ARTIFACTS = ROOT / "artifacts" / "v3"
-DEFAULT_DSN = "postgresql://postgres:postgres@127.0.0.1:5432/dss_jobs"
+DEFAULT_DSN = "postgresql://dss:dss_dev_2026@127.0.0.1:5433/dss_jobs"
 
 try:  # dùng lại đúng logic đã kiểm chứng của api/artifacts.py (một nguồn sự thật)
     from .artifacts import load_artifacts

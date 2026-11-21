@@ -32,9 +32,9 @@ for _stream in (sys.stdout, sys.stderr):
     except Exception:
         pass
 
-DEFAULT_DSN = os.environ.get(
-    "DSS_PG_DSN", "postgresql://postgres:postgres@127.0.0.1:5432/dss_jobs"
-)
+DOCKER_DSN = "postgresql://dss:dss_dev_2026@127.0.0.1:5433/dss_jobs"
+NATIVE_DSN = "postgresql://postgres:postgres@127.0.0.1:5432/dss_jobs"
+DEFAULT_DSN = os.environ.get("DSS_PG_DSN", DOCKER_DSN)
 
 
 def _now() -> datetime:
@@ -357,12 +357,31 @@ class PgStore:
         finally:
             self._release(conn)
 
+    def _clear_pool(self):
+        while self._pool:
+            conn = self._pool.pop()
+            try:
+                conn.close()
+            except Exception:
+                pass
+
     def _probe(self):
         try:
             rows = self._q("SELECT count(*) FROM employers")
             self.has_data = bool(rows and rows[0][0] > 0)
         except Exception:
             self.has_data = False
+        if not self.has_data and not os.environ.get("DSS_PG_DSN") and self.dsn == DOCKER_DSN:
+            self._clear_pool()
+            self.dsn = NATIVE_DSN
+            try:
+                rows = self._q("SELECT count(*) FROM employers")
+                self.has_data = bool(rows and rows[0][0] > 0)
+            except Exception:
+                self.has_data = False
+            if not self.has_data:
+                self._clear_pool()
+                self.dsn = DOCKER_DSN
         if not self.has_data:
             self.fallback = InMemoryStore(get_dataset(prefer_artifacts=True))
 
@@ -477,8 +496,9 @@ class PgStore:
         n_js = one("SELECT count(*) FROM job_skills")
         n_us = one("SELECT count(*) FROM user_skills")
         n_clients = one("SELECT count(*) FROM employers")
-        # skill-plane có thể có nhiều hơn job_skills (user_skills lấy qua nghề)
-        n_skills = max(n_skills, one("SELECT count(DISTINCT skill) FROM user_skills"))
+        # Chỉ quét DISTINCT trên user_skills (18M dòng) khi job_skills rỗng
+        if n_skills == 0:
+            n_skills = one("SELECT count(DISTINCT skill) FROM user_skills")
         possible = n_users * n_jobs + n_jobs * n_skills + n_users * n_skills
         sparsity = 100.0 * (1.0 - (n_uj + n_js + n_us) / possible) if possible else 0.0
         return {

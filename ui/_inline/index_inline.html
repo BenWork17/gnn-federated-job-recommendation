@@ -4,10 +4,10 @@
      Sinh bởi: python tools/build_ui_inline.py
      Nguồn: ui/index.html + CSS/JS/font trong ui/ (đã nhúng inline).
      Sửa giao diện ở ui/ rồi chạy lại lệnh trên; file này sẽ bị ghi đè.
-       ui/index.html sha256:3387fdeaa1a5
+       ui/index.html sha256:520d6759d3d8
        ui/assets/app.css sha256:ef769e43ce49
        ui/vendor/chart.umd.min.js sha256:d2af8974e952
-       ui/assets/app.js sha256:84b85298ee75
+       ui/assets/app.js sha256:de188bbe8692
      ============================================================ -->
 <html lang="vi">
 <head>
@@ -1741,7 +1741,7 @@ html.is-embed #ncStayPanel { order: 3; }
               <span>Loss <b id="roLoss">—</b></span>
             </div>
             <div class="nc-sim-note">
-              Đường cong <b>mô phỏng</b> minh hoạ FedAvg; kết quả thật ở trang FL simulation (LightGCN 0,7151).
+              Đường cong <b>mô phỏng</b> minh hoạ quá trình hội tụ theo vòng; kết quả thực nghiệm đầy đủ xem tại mục Federated Learning simulation (Vũ trụ FL: LightGCN 0,7151 · FedAvg 0,3905–0,5756).
             </div>
           </div>
         </section>
@@ -2285,15 +2285,15 @@ function enterLiveMode({ keepRun = false } = {}) {
 
 function buildDemoSummary() {
   renderSummary({
-    n_users: 389708,
-    n_jobs: 1092096,
-    n_skills: 8316,
-    n_occupations: 709,
-    n_edges_user_job: 1753901,
-    n_edges_job_skill: 1317000,
-    n_edges_user_skill: 2480000,
+    n_users: 171807,
+    n_jobs: 84845,
+    n_skills: 7760,
+    n_occupations: 583,
+    n_edges_user_job: 436893,
+    n_edges_job_skill: 2593468,
+    n_edges_user_skill: 18017133,
     n_clients: 9116,
-    sparsity_pct: 0.43,
+    sparsity_pct: 99.872967,
   });
 }
 
@@ -2311,29 +2311,50 @@ function makeRng(seed0) {
 }
 
 function buildDemoClients() {
-  const bases = [
-    'Công ty CP Công nghệ', 'TNHH Thương mại Dịch vụ', 'Công ty TNHH Sản xuất',
-    'Tập đoàn Đầu tư', 'Công ty CP Xây dựng', 'TNHH Logistics', 'Công ty CP Giáo dục',
-    'TNHH Truyền thông', 'Công ty CP Dược phẩm', 'TNHH Cơ khí', 'Công ty CP Bán lẻ',
-    'TNHH Phần mềm', 'Công ty CP Nông nghiệp', 'TNHH Vận tải', 'Công ty CP Bảo hiểm',
-    'TNHH Thép', 'Công ty CP Dệt may', 'TNHH Thực phẩm', 'Công ty CP Năng lượng',
-    'TNHH Bất động sản',
+  const topV3 = [
+    { client_id: 0, name: 'randstad', n_apps: 4745, n_users: 4215, n_jobs: 603, status: 'active' },
+    { client_id: 1, name: 'allmedstaffing.com', n_apps: 1567, n_users: 1437, n_jobs: 219, status: 'active' },
+    { client_id: 2, name: 'webhrdept.com', n_apps: 1531, n_users: 1364, n_jobs: 104, status: 'active' },
+    { client_id: 3, name: 'spherion', n_apps: 1487, n_users: 1412, n_jobs: 161, status: 'active' },
+    { client_id: 4, name: 'select-staffing.com', n_apps: 1477, n_users: 1074, n_jobs: 79, status: 'active' },
+    { client_id: 5, name: 'lcca.com', n_apps: 1451, n_users: 1278, n_jobs: 342, status: 'active' },
+    { client_id: 6, name: 'elitemed.com', n_apps: 1407, n_users: 1213, n_jobs: 283, status: 'active' },
+    { client_id: 7, name: 'greenkeyllc.com', n_apps: 1341, n_users: 777, n_jobs: 68, status: 'active' },
+    { client_id: 8, name: 'selfopportunity.com', n_apps: 1285, n_users: 1196, n_jobs: 199, status: 'active' },
+    { client_id: 9, name: 'unitedhealth group', n_apps: 1248, n_users: 1203, n_jobs: 586, status: 'active' },
+    { client_id: 10, name: 'dr pepper snapple group', n_apps: 1185, n_users: 1166, n_jobs: 317, status: 'active' },
+    { client_id: 11, name: 'volt', n_apps: 1176, n_users: 1058, n_jobs: 217, status: 'active' },
+    { client_id: 12, name: 'expresspros.com', n_apps: 1151, n_users: 1134, n_jobs: 169, status: 'active' },
+    { client_id: 13, name: 'otcmarkets.com', n_apps: 1099, n_users: 951, n_jobs: 272, status: 'active' },
+    { client_id: 14, name: 'elitestaffinginc.com', n_apps: 1080, n_users: 972, n_jobs: 92, status: 'active' },
+    { client_id: 15, name: 'express employment professionals', n_apps: 1044, n_users: 961, n_jobs: 107, status: 'active' },
+    { client_id: 16, name: 'oce.com', n_apps: 1026, n_users: 931, n_jobs: 29, status: 'active' },
+    { client_id: 17, name: 'remingtoncollege.edu', n_apps: 1001, n_users: 874, n_jobs: 68, status: 'active' },
+    { client_id: 18, name: 'ultimatestaffing.com', n_apps: 1000, n_users: 873, n_jobs: 101, status: 'active' },
+    { client_id: 19, name: 'volt workforce solutions', n_apps: 937, n_users: 863, n_jobs: 128, status: 'active' },
+    { client_id: 20, name: 'workway', n_apps: 920, n_users: 720, n_jobs: 109, status: 'active' },
   ];
-  const tails = ['An Phát', 'Minh Long', 'Hoà Bình', 'Thái Dương', 'Đông Á', 'Sao Việt', 'Phú Mỹ', 'Trường Sơn', 'Bình Minh', 'Hồng Hà', 'Nam Việt', 'Tân Tiến', 'Vạn Xuân', 'Kim Ngân', 'Đại Phát'];
+  const bases = [
+    'apex staffing', 'aerotek', 'kelly services', 'manpower', 'adecco',
+    'robert half', 'kforce', 'insight global', 'teksystems', 'modis',
+    'cybercoders', 'judge group', 'lucas group', 'beacon hill', 'atrium',
+    'proclinical', 'medpro', 'careerstaff', 'firstpro', 'staffmark',
+  ];
+  const tails = ['solutions', 'group', 'partners', 'services', 'inc', 'staffing', 'consulting', 'network', 'global', 'corp', 'systems', 'associates', 'enterprises', 'agency', 'team'];
   const rnd = makeRng(20261108);
-  const clients = [];
-  // Cùng quy mô với dữ liệu thật: 9.116 client (employer có >= 10 application).
-  for (let i = 0; i < DEMO_CLIENT_COUNT; i += 1) {
-    const nApps = Math.round(10 + Math.pow(rnd(), 2.6) * 2600);
-    const nJobs = Math.max(1, Math.round(nApps * (0.25 + rnd() * 0.5)));
-    const nUsers = Math.max(1, Math.round(nApps * (0.4 + rnd() * 0.8)));
+  const clients = [...topV3];
+  // Cùng quy mô với dữ liệu thật CareerBuilder V3: 9.116 client (employer có >= 10 application).
+  for (let i = topV3.length; i < DEMO_CLIENT_COUNT; i += 1) {
+    const nApps = Math.round(10 + Math.pow(rnd(), 2.8) * 900);
+    const nJobs = Math.max(1, Math.round(nApps * (0.12 + rnd() * 0.25)));
+    const nUsers = Math.max(1, Math.round(nApps * (0.65 + rnd() * 0.3)));
     clients.push({
-      client_id: 1000 + i,
-      name: `${bases[Math.floor(rnd() * bases.length)]} ${tails[Math.floor(rnd() * tails.length)]}${rnd() > 0.6 ? ' ' + (Math.floor(rnd() * 90) + 10) : ''}`,
+      client_id: i,
+      name: `${bases[Math.floor(rnd() * bases.length)]} ${tails[Math.floor(rnd() * tails.length)]} #${i}`,
       n_apps: nApps,
       n_users: nUsers,
       n_jobs: nJobs,
-      status: rnd() > 0.28 ? 'active' : 'idle',
+      status: nApps >= 50 ? 'active' : 'idle',
     });
   }
   state.clients = clients;
@@ -2371,7 +2392,7 @@ async function loadLiveData() {
 
 async function loadSummary() {
   try {
-    const s = await apiFetch('/api/graph/summary', { timeout: 10000 });
+    const s = await apiFetch('/api/graph/summary', { timeout: 20000 });
     state.summary = s;
     renderSummary(s);
   } catch (err) {

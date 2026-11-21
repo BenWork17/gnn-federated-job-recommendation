@@ -1,15 +1,49 @@
-# Sinh tự động — không commit
-artifacts/
-results/
+# =====================================================================
+# Python & Testing
+# =====================================================================
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+.venv/
+venv/
+*.egg-info/
 .pytest_cache/
 pytest-cache-files-*/
 
-# Dữ liệu tải về (tải lại bằng src/iot/download.py)
-artifacts/iot23/raw/
+# =====================================================================
+# Frontend (React + Vite + TypeScript)
+# =====================================================================
+web/node_modules/
+web/dist/
+web/.vite/
+npm-debug.log*
+yarn-error.log*
 
-# File tạm / rác từ quá trình phát triển
-_tmp/
+# =====================================================================
+# Generated Data, Models & Artifacts (rebuild via pipeline scripts)
+# =====================================================================
+artifacts/
+results/
+chromedriver/
+kaggle_upload/
+_newdata_audit/
+
+# =====================================================================
+# Environment, Logs, Scratch & Agent Temp Files
+# =====================================================================
+.env
+.env.*
+*.log
+*.bak
 *.tmp
 *.part
+_tmp/
+.agent-teams/
+
+# =====================================================================
+# OS & Editor
+# =====================================================================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

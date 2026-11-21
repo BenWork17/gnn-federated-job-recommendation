@@ -22,10 +22,12 @@ from pydantic import BaseModel, Field
 
 try:  # chạy dưới dạng package
     from .artifacts import ARTIFACT_DIR
+    from .dashboard import router as dashboard_router
     from .db import make_store
     from .fl_sim import FLSimulator, TrainConfig
 except ImportError:  # chạy trực tiếp trong thư mục api/
     from artifacts import ARTIFACT_DIR
+    from dashboard import router as dashboard_router
     from db import make_store
     from fl_sim import FLSimulator, TrainConfig
 
@@ -44,6 +46,7 @@ app.add_middleware(
     allow_headers=["*"],
     allow_credentials=False,
 )
+app.include_router(dashboard_router)
 
 
 def _reset_store(dry_run: bool):

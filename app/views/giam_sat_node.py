@@ -29,7 +29,9 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 import sys
+import time
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -178,6 +180,54 @@ def _health(api_base: str) -> dict:
     }
 
 
+def _is_test_env() -> bool:
+    """Phát hiện môi trường pytest / AppTest để không tự bật tiến trình nền khi chạy test."""
+    return (
+        "pytest" in sys.modules
+        or "PYTEST_CURRENT_TEST" in os.environ
+        or "DSH_VIEW" in os.environ
+    )
+
+
+def _is_local_8000(api_base: str) -> bool:
+    return api_base.rstrip("/") in ("http://127.0.0.1:8000", "http://localhost:8000")
+
+
+def _ensure_backend_running(api_base: str, *, force: bool = False) -> bool:
+    """Tự động khởi chạy FastAPI Backend (uvicorn api.main:app) ở chế độ nền nếu chưa chạy."""
+    if not _is_local_8000(api_base):
+        return False
+    if not force and _is_test_env():
+        return False
+    if not force and st.session_state.get("_backend_autostart_tried", False):
+        return False
+    st.session_state["_backend_autostart_tried"] = True
+
+    creationflags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+    try:
+        subprocess.Popen(  # noqa: S603
+            [sys.executable, "-m", "uvicorn", "api.main:app", "--host", "127.0.0.1", "--port", "8000"],
+            cwd=str(ROOT),
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            stdin=subprocess.DEVNULL,
+            creationflags=creationflags,
+        )
+    except Exception as exc:  # noqa: BLE001
+        print(f"[giam_sat_node] không thể tự khởi động uvicorn: {exc}", file=sys.stderr)
+        return False
+
+    deadline = time.time() + 4.0
+    while time.time() < deadline:
+        time.sleep(0.4)
+        payload, err = _probe(f"{api_base}/health", timeout=1.0)
+        if not err and payload:
+            _health.clear()
+            return True
+    _health.clear()
+    return False
+
+
 def _badge(text: str, color: str) -> str:
     return (f"<span style='display:inline-flex;align-items:center;gap:0.4rem;"
             f"background:{color}14;color:{color};border:1px solid {color}55;"
@@ -248,14 +298,25 @@ def _backend_block(health: dict) -> str:
         unsafe_allow_html=True,
     )
     st.warning(
-        "**Chưa kết nối được backend.** Cần chạy 2 lệnh dưới đây, mỗi lệnh một "
-        "terminal riêng:",
+        "**Chưa kết nối được backend.** Bạn có thể bấm nút khởi động tự động ngay bên dưới "
+        "hoặc chạy thủ công trên terminal:",
         icon="⚠️",
     )
+    c_start, c_retry, _ = st.columns([2, 1, 2])
+    with c_start:
+        if st.button("🚀 Khởi động Backend (FastAPI + PostgreSQL)", key="start_backend_btn",
+                     type="primary", use_container_width=True):
+            with st.spinner("Đang khởi động FastAPI + kết nối PostgreSQL (cổng 5433/5432)..."):
+                _ensure_backend_running(API_BASE, force=True)
+            st.session_state["giam_sat_reload"] = \
+                int(st.session_state.get("giam_sat_reload", 0)) + 1
+            _health.clear()
+            st.rerun()
+    with c_retry:
+        if st.button("🩺 Kiểm tra lại", key="retry_down", use_container_width=True):
+            _health.clear()
+            st.rerun()
     _commands_block()
-    if st.button("🩺 Kiểm tra lại", key="retry_down"):
-        _health.clear()
-        st.rerun()
     return state
 
 
@@ -265,8 +326,8 @@ def _backend_block(health: dict) -> str:
 def render() -> None:
     header(
         "Giám sát node Federated Learning",
-        "9.116 nhà tuyển dụng, mỗi nhà một node, dữ liệu không rời máy",
-        kicker="FL Node Console · nhúng từ ui/ (inline CSS/JS)",
+        "9.116 nhà tuyển dụng CareerBuilder + O*NET (V3), mỗi nhà một node, dữ liệu không rời máy",
+        kicker="FL Node Console · nhúng từ ui/ (inline CSS/JS) · PostgreSQL 21M+ dòng",
     )
 
     # --- Giải thích ngắn: gập gọn để bảng điều khiển lên cao hơn -------
@@ -280,16 +341,24 @@ def render() -> None:
         )
 
     metric_row([
-        {"value": "9.116", "label": "Node (nhà tuyển dụng)", "color": ORANGE_DARK},
+        {"value": "9.116", "label": "Node (nhà tuyển dụng)",
+         "help": "Nhà tuyển dụng có từ 10 đơn ứng tuyển trở lên trong CareerBuilder V3",
+         "color": ORANGE_DARK},
         {"value": "264.995", "label": "Nút trong đồ thị",
-         "help": "Người dùng + tin tuyển dụng + kỹ năng + nghề O*NET", "color": INK},
-        {"value": "764.364", "label": "Cạnh user–job", "color": SKY},
+         "help": "171.807 ứng viên · 84.845 tin · 583 nghề O*NET · 7.760 kỹ năng",
+         "color": INK},
+        {"value": "436.893", "label": "Cạnh ứng tuyển user–job",
+         "help": "Tổng 764.364 cạnh đồ thị · PostgreSQL 21M+ dòng",
+         "color": SKY},
     ])
 
     st.divider()
 
-    # --- Khối kiểm tra backend ----------------------------------------
+    # --- Khối kiểm tra backend (tự bật ở nền nếu chưa chạy) -----------
     health = _health(API_BASE)
+    if health["state"] == "down":
+        if _ensure_backend_running(API_BASE):
+            health = _health(API_BASE)
     state = _backend_block(health)
 
     if state != "live":

@@ -1,0 +1,434 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Space Grotesk", system-ui, -apple-system, sans-serif;
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-orange-brand: #FF5A1F;
+  --color-orange-hover: #EA580C;
+  --color-orange-dark: #C2410C;
+  --color-orange-soft: #FFF7ED;
+  --color-orange-border: #FED7AA;
+  --color-ink: #0F172A;
+  --color-ink-muted: #475569;
+  --color-ink-subtle: #64748B;
+  --color-canvas: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-hairline: #E2E8F0;
+}
+
+:root {
+  --orange: #FF5A1F;
+  --orange-hover: #EA580C;
+  --orange-dark: #C2410C;
+  --orange-soft: #FFF7ED;
+  --orange-border: #FED7AA;
+  --orange-rim: #FDBA74;
+
+  --ink: #0F172A;
+  --ink-muted: #475569;
+  --ink-subtle: #64748B;
+
+  --canvas: #F8FAFC;
+  --surface: #FFFFFF;
+  --glass: rgba(255, 255, 255, 0.68);
+  --glass-strong: rgba(255, 255, 255, 0.82);
+  --border: #E2E8F0;
+  --border-glass: rgba(255, 255, 255, 0.92);
+
+  --green: #10B981;
+  --warn: #F59E0B;
+  --red: #EF4444;
+  --sky: #0EA5E9;
+
+  --radius-card: 12px;
+  --radius-control: 8px;
+
+  --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --shadow-glass:
+    0 1px 0 0 rgba(255, 255, 255, 0.92) inset,
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 6px 18px -4px rgba(15, 23, 42, 0.06),
+    0 18px 36px -14px rgba(15, 23, 42, 0.08);
+  --shadow-glass-hover:
+    0 1px 0 0 rgba(255, 255, 255, 0.96) inset,
+    0 2px 6px rgba(255, 90, 31, 0.08),
+    0 12px 26px -6px rgba(15, 23, 42, 0.1),
+    0 24px 44px -16px rgba(255, 90, 31, 0.12);
+}
+
+@property --beam-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes beamSpin {
+  to {
+    --beam-angle: 360deg;
+  }
+}
+
+@keyframes flPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(255, 90, 31, 0.48);
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 0.9;
+    box-shadow: 0 0 0 6px rgba(255, 90, 31, 0);
+  }
+}
+
+@keyframes flPulseGreen {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45);
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 0.9;
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+  }
+}
+
+html,
+body {
+  font-family: var(--font-sans);
+  color: var(--ink);
+  background-color: var(--canvas);
+  min-height: 100%;
+  margin: 0;
+}
+
+/* Blueprint 24px architectural dot-grid over warm paper canvas */
+.blueprint-grid {
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(148, 163, 184, 0.34) 1px, transparent 0),
+    radial-gradient(64rem 42rem at 86% 6%, rgba(255, 90, 31, 0.065), transparent 62%),
+    radial-gradient(52rem 36rem at 12% 94%, rgba(251, 146, 60, 0.055), transparent 60%);
+  background-size: 24px 24px, 100% 100%, 100% 100%;
+  background-position: 0 0, center, center;
+  background-attachment: fixed;
+}
+
+/* Typography utilities */
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-mono-tech {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.kicker-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--orange-dark);
+}
+
+/* Frosted Specular Glass Card */
+.glass-card {
+  position: relative;
+  background: var(--glass);
+  backdrop-filter: blur(18px) saturate(175%);
+  -webkit-backdrop-filter: blur(18px) saturate(175%);
+  border: 1px solid var(--border-glass);
+  outline: 1px solid rgba(226, 232, 240, 0.75);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-glass);
+  transition:
+    transform 260ms var(--ease-spring),
+    border-color 220ms ease,
+    outline-color 220ms ease,
+    box-shadow 260ms var(--ease-spring);
+}
+
+.glass-card-interactive:hover {
+  outline-color: var(--orange-rim);
+  box-shadow: var(--shadow-glass-hover);
+}
+
+.glass-card-sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    360px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 90, 31, 0.08),
+    rgba(255, 255, 255, 0.25) 36%,
+    transparent 70%
+  );
+  transition: opacity 220ms ease;
+}
+
+.glass-card-sheen:hover::after {
+  opacity: 1;
+}
+
+/* Magic UI Border Beam */
+.border-beam {
+  position: relative;
+  border-radius: var(--radius-card);
+  background: rgba(255, 255, 255, 0.76);
+  backdrop-filter: blur(18px) saturate(175%);
+  -webkit-backdrop-filter: blur(18px) saturate(175%);
+  box-shadow: var(--shadow-glass);
+  isolation: isolate;
+}
+
+.border-beam::before {
+  content: "";
+  position: absolute;
+  inset: -1.5px;
+  border-radius: calc(var(--radius-card) + 1.5px);
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--beam-angle),
+    rgba(226, 232, 240, 0.85) 0deg,
+    rgba(226, 232, 240, 0.85) 235deg,
+    #FDBA74 285deg,
+    #FF5A1F 325deg,
+    #FB923C 350deg,
+    rgba(226, 232, 240, 0.85) 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: beamSpin 6s linear infinite;
+  z-index: 1;
+}
+
+/* Tactile 3D Primary Button */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.25;
+  color: #FFFFFF;
+  background: linear-gradient(180deg, #FF5A1F 0%, #EA580C 100%);
+  border: 1px solid #EA580C;
+  border-radius: var(--radius-control);
+  padding: 0.52rem 1rem;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.28) inset,
+    0 2px 6px rgba(234, 88, 12, 0.28),
+    0 6px 14px -4px rgba(255, 90, 31, 0.34);
+  cursor: pointer;
+  transition:
+    transform 160ms var(--ease-spring),
+    box-shadow 180ms ease,
+    filter 180ms ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.34) inset,
+    0 4px 10px rgba(234, 88, 12, 0.34),
+    0 10px 20px -4px rgba(255, 90, 31, 0.38);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(1px) scale(0.985);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.16) inset,
+    0 1px 3px rgba(234, 88, 12, 0.25);
+}
+
+.btn-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Tactile Secondary Button */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.25;
+  color: var(--ink);
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  padding: 0.5rem 0.92rem;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 1px 2px rgba(15, 23, 42, 0.05);
+  cursor: pointer;
+  transition:
+    transform 160ms var(--ease-spring),
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: var(--orange-rim);
+  background: var(--orange-soft);
+  color: var(--orange-dark);
+  box-shadow: 0 3px 10px -2px rgba(255, 90, 31, 0.16);
+}
+
+.btn-secondary:active:not(:disabled) {
+  transform: translateY(1px) scale(0.985);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Crisp Inputs & Selects */
+.input-control {
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  color: var(--ink);
+  font-size: 0.875rem;
+  padding: 0.46rem 0.72rem;
+  outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.input-control:hover {
+  border-color: #CBD5E1;
+}
+
+.input-control:focus {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px rgba(255, 90, 31, 0.14);
+}
+
+/* Custom Range Slider */
+input[type="range"].range-orange {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 999px;
+  background: #E2E8F0;
+  outline: none;
+  cursor: pointer;
+}
+
+input[type="range"].range-orange::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: #FFFFFF;
+  border: 2px solid #FF5A1F;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.18);
+  transition: transform 140ms var(--ease-spring);
+}
+
+input[type="range"].range-orange::-webkit-slider-thumb:hover {
+  transform: scale(1.12);
+}
+
+input[type="range"].range-orange::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: #FFFFFF;
+  border: 2px solid #FF5A1F;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.18);
+}
+
+/* Live Status Dot Pulse */
+.pulse-dot-orange {
+  animation: flPulse 1.8s ease-in-out infinite;
+}
+
+.pulse-dot-green {
+  animation: flPulseGreen 1.8s ease-in-out infinite;
+}
+
+/* Sidebar Frosted Surface */
+.sidebar-glass {
+  background: rgba(255, 255, 255, 0.74);
+  backdrop-filter: blur(18px) saturate(175%);
+  -webkit-backdrop-filter: blur(18px) saturate(175%);
+  border-right: 1px solid rgba(226, 232, 240, 0.85);
+}
+
+.sb-footer {
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 4px 12px -4px rgba(15, 23, 42, 0.06);
+}
+
+/* Custom thin scrollbars */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.45);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 90, 31, 0.55);
+}
+
+/* Accessibility: Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .border-beam::before {
+    animation: none !important;
+  }
+
+  .glass-card-interactive:hover {
+    transform: none !important;
+  }
+}

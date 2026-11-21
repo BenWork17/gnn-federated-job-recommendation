@@ -1,28 +1,18 @@
-"""Trang 2 — Đồ thị việc làm: đồ thị 2D tương tác là hero section.
+"""Trang 2 — Đồ thị việc làm: đồ thị 2D/3D tương tác trên bộ dữ liệu CareerBuilder + O*NET (V3).
 
-BỐ CỤC (viết lại theo 6 yêu cầu của người dùng):
-
+BỐ CỤC:
     [ Tiêu đề: Đồ thị việc làm ]            (KHÔNG còn câu hỏi đầu trang)
-    [ Tìm kiếm ........................ ] [ Loại ▼ ]   |  4 thẻ số liệu nhỏ
-    [ ĐỒ THỊ 2D TƯƠNG TÁC — hero 620px  ]              |  (dọc, bên phải)
-    [                                   ]              |  panel chi tiết
+    [ Tìm kiếm ........................ ] [ Loại ▼ ] [ 2D | 3D ]  |  4 thẻ số liệu nhỏ
+    [ ĐỒ THỊ 2D/3D TƯƠNG TÁC — hero 620px ]                       |  (dọc, bên phải)
+    [                                     ]                       |  panel chi tiết
     [ hai biểu đồ cột phụ + bảng số liệu — trong expander ]
-
-VÌ SAO ĐỔI KHỎI ALTAIR: bản cũ vẽ đồ thị bằng Altair, mà Altair chỉ cho
-pan/zoom qua `.interactive()` — KHÔNG kéo được nút, KHÔNG highlight láng
-giềng, KHÔNG bấm được. Đó đúng là lý do người dùng nói "khó tương tác".
-Nay đồ thị là `force-graph` nhúng trong `components.html` (xem
-`app/components/__init__.py` → `graph_html`): kéo nút, rê làm nổi láng
-giềng, bấm mở bảng chi tiết, cuộn để zoom.
-
-VÌ SAO BỎ HẾT BỘ LỌC: người dùng yêu cầu rõ "xóa phần bộ lọc hiển thị".
-Đồ thị luôn vẽ đủ 4 loại nút và cả hai loại cạnh; việc "làm nổi phần liên
-quan" do tương tác hover/click đảm nhiệm, không cần widget lọc.
 """
 
 from __future__ import annotations
 
+import json
 import unicodedata
+from functools import lru_cache
 
 import numpy as np
 import pandas as pd
@@ -34,160 +24,230 @@ from app.components import (bar_chart, data_note, finding, graph_html,
 from app.components.graph3d import graph_html_3d
 from app.paths import PATHS
 
-# Chiều cao khung đồ thị hero. 620px + hàng tìm kiếm ~72px + tiêu đề ~60px
-# => khối hero chiếm gần trọn màn hình đầu tiên trên laptop 1000px.
 GRAPH_HEIGHT = 620
 
-# Bốn loại nút — trùng mã màu với `_KIND_COLOR_2D` trong components để bảng
-# chi tiết bên phải và nút trong đồ thị cùng một màu.
+# Bốn loại nút của đồ thị V3 (giữ tương thích cả "Nghề O*NET" và "Ngành")
 _KIND_COLOR = {
     "Người dùng": "#7b241c",
     "Tin tuyển dụng": "#e8836b",
     "Kỹ năng": "#0EA5E9",
+    "Nghề O*NET": "#10B981",
     "Ngành": "#10B981",
 }
-_KIND_ORDER = ["Người dùng", "Tin tuyển dụng", "Kỹ năng", "Ngành"]
+_KIND_ORDER = ["Người dùng", "Tin tuyển dụng", "Kỹ năng", "Nghề O*NET"]
 _KIND_ALL = ["Tất cả", *_KIND_ORDER]
 
 
-@st.cache_data(show_spinner="Đang dựng đồ thị…")
-def build_graph_view(dim: int = 2) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Lấy đồ thị con để vẽ. Giữ TẤT CẢ nút ngành/kỹ năng phổ biến và
-    lấy mẫu nút người dùng/tin để hình còn đọc được.
+@lru_cache(maxsize=1)
+def _load_v3_subgraph_base() -> dict:
+    """Lấy mẫu đồ thị con tất định từ `artifacts/v3/graph.npz` (264.995 nút, 764.364 cạnh).
 
-    `dim=2` → DataFrame có x, y (cho đồ thị 2D).
-    `dim=3` → thêm cột z (cho pydeck OrbitView / graph3d).
-    Cùng một tập nút/cạnh và cùng công thức bố cục, nên 2D và 3D không làm
-    đổi nội dung, chỉ đổi cách nhìn. Trang này chỉ dùng `dim=2`; `dim=3`
-    vẫn giữ nguyên chữ ký vì `tests/test_graph_view.py` gọi thẳng."""
+    Thuật toán chọn mẫu tất định (< 0.3s):
+      1. Chọn 30 nút Nghề O*NET (`occ`) có nhiều kết nối `job-occ` và `occ-skill` nhất.
+      2. Chọn 120 nút Kỹ năng (`skill`) phổ biến nhất nối với 30 nghề đó (`edge_type == 2`).
+      3. Chọn đúng 200 nút Tin tuyển dụng (`job`) thuộc 30 nghề trên (`edge_type == 1`),
+         ưu tiên các tin có nhiều lượt ứng tuyển nhất để đảm bảo liên thông.
+      4. Chọn 80 nút Người dùng (`user`) có ứng tuyển vào 200 tin vừa chọn (`edge_type == 0`),
+         sao cho tổng cạnh Riêng tư (`user-job` + `user-occ`) < số cạnh Công khai (`share < 0.5`).
+      5. Gán nhãn thật từ `job_titles.json`, `user_titles.json`, `occ_ids` và `skill_names`.
+    """
+    v3_dir = PATHS["v3"]
+    z = np.load(v3_dir / "graph.npz", allow_pickle=False)
+    nU = int(z["n_users"])         # 171,807
+    nJ = int(z["n_jobs"])          # 84,845
+    nO = int(z["n_occupations"])   # 583
+    nS = int(z["n_skills"])        # 7,760
+    n_nodes = int(z["n_nodes"])    # 264,995
 
-    z = np.load(PATHS["medajob"] / "graph.npz", allow_pickle=False)
-    nU, nJ = int(z["n_users"]), int(z["n_jobs"])
-    nS, nI = int(z["n_skills"]), int(z["n_industries"])
+    off_job = nU
+    off_occ = nU + nJ
+    off_skill = nU + nJ + nO
+
     ei, et = z["edge_index"], z["edge_type"]
 
-    jobs = pd.read_csv(PATHS["medajob"] / "jobs.csv", encoding="utf-8-sig")
-    users = pd.read_csv(PATHS["medajob"] / "users.csv", encoding="utf-8-sig")
+    # 1. Chọn 30 nút Nghề O*NET có cả cạnh job-occ (et==1) và occ-skill (et==2)
+    m1 = et == 1
+    m2 = et == 2
+    occ_job_deg = np.bincount(ei[1][m1], minlength=n_nodes)[off_occ:off_skill]
+    occ_sk_deg = np.bincount(ei[0][m2], minlength=n_nodes)[off_occ:off_skill]
+    valid_occ = np.where((occ_job_deg > 0) & (occ_sk_deg > 0))[0]
+    occ_score = occ_job_deg[valid_occ] + occ_sk_deg[valid_occ] * 5
+    top_occ_local = valid_occ[np.argsort(-occ_score)[:30]]
+    top_occ = {int(off_occ + i) for i in top_occ_local}
+    assert top_occ, "không chọn được nghề O*NET nào"
 
-    rng = np.random.default_rng(42)
-    # Giữ 120 kỹ năng phổ biến nhất (bản đầu 60 -> đồ thị vỡ thành nhiều cụm
-    # rời rạc vì phần lớn tin chỉ nối vào các kỹ năng ngoài mẫu).
-    #
-    # LỖI ĐÃ SỬA (hai lần):
-    # (1) `if s < nS` — `s` là NODE ID TUYỆT ĐỐI (bắt đầu từ off_skill=1084),
-    #     không phải chỉ số trong dải kỹ năng, nên điều kiện luôn sai.
-    # (2) Cộng thêm off_skill vào kết quả argsort — nhưng argsort đã trả về
-    #     index tuyệt đối trên mảng độ dài n_nodes, nên cộng nữa sẽ ra id
-    #     không tồn tại (2168 > 1697).
-    # Cách đúng: argsort trên mảng độ dài n_nodes -> lọc lấy dải skill ->
-    # DÙNG NGUYÊN giá trị đó (không cộng gì).
-    off_skill = nU + nJ
-    skill_deg = np.bincount(ei[1][(et == 0) & (ei[1] >= off_skill)],
-                            minlength=off_skill + nS + nI)
-    order = np.argsort(-skill_deg)
-    top_skills = [int(v) for v in order
-                  if off_skill <= v < off_skill + nS][:120]
-    assert top_skills, "không chọn được kỹ năng nào — kiểm tra lại chỉ số nút"
+    # 2. Chọn 120 nút Kỹ năng phổ biến nhất nối với 30 nghề trên (et==2)
+    m2_occ = m2 & np.isin(ei[0], list(top_occ))
+    sk_deg = np.bincount(ei[1][m2_occ], minlength=n_nodes)[off_skill:n_nodes]
+    top_sk_local = np.argsort(-sk_deg)[:120]
+    top_skills = {int(off_skill + i) for i in top_sk_local if sk_deg[i] > 0}
+    assert top_skills, "không chọn được kỹ năng nào"
 
-    # Chọn tin có NHIỀU kỹ năng nằm trong mẫu nhất, thay vì 200 tin đầu tiên.
-    # Lý do: tin đầu tiên theo id là dữ liệu seed sinh tự động, kỹ năng nghèo
-    # nàn -> nút treo lơ lửng ngoài đồ thị.
-    skill_set = set(top_skills)
-    job_edges: dict[int, int] = {}
-    e0 = (et == 0)
-    for a, b in zip(ei[0][e0], ei[1][e0]):
-        if nU <= a < nU + nJ and b in skill_set:
-            job_edges[int(a)] = job_edges.get(int(a), 0) + 1
-    ranked = sorted(job_edges.items(), key=lambda kv: (-kv[1], kv[0]))
-    n_job_sample = min(200, nJ)
-
-    # LỖI ĐÃ SỬA (cùng gốc với `top_skills` ở trên, bản trước bỏ sót):
-    # `job_edges` được dựng bằng `job_edges[int(a)]` với `a` lấy từ `ei[0]`,
-    # tức a là NODE ID TUYỆT ĐỐI. Nên `j` đã là id tuyệt đối rồi —
-    # bản trước cộng thêm `nU` là cộng hai lần, làm 29/200 "tin" rơi vào
-    # dải kỹ năng (id 1087, 1099, ...) và mất 540 cạnh công khai.
-    job_nodes = [int(j) for j, _ in ranked[:n_job_sample]]
-    assert job_nodes, "không chọn được tin nào — kiểm tra lại chỉ số nút"
-    assert all(nU <= j < nU + nJ for j in job_nodes), \
+    # 3. Chọn đúng 200 nút Tin tuyển dụng nối với 30 nghề trên (et==1)
+    m0 = et == 0
+    job_app_deg = np.bincount(ei[1][m0], minlength=n_nodes)
+    m1_occ = m1 & np.isin(ei[1], list(top_occ))
+    cand_jobs = np.unique(ei[0][m1_occ])
+    cand_order = np.argsort(-job_app_deg[cand_jobs])
+    n_job_sample = min(200, nJ, len(cand_jobs))
+    job_nodes = [int(j) for j in cand_jobs[cand_order[:n_job_sample]]]
+    assert len(job_nodes) == n_job_sample, "không chọn đủ 200 tin tuyển dụng"
+    assert all(off_job <= j < off_occ for j in job_nodes), (
         "job_nodes phải nằm trọn trong dải nút tin tuyển dụng"
+    )
 
-    user_nodes = list(range(0, nU))
-    keep = set(user_nodes) | set(job_nodes) | set(top_skills) | \
-        set(range(nU + nJ + nS, nU + nJ + nS + nI))
+    # 4. Chọn 80 nút Người dùng có ứng tuyển vào 200 tin trên (et==0)
+    m0_job = m0 & np.isin(ei[1], job_nodes)
+    cand_users, user_job_counts = np.unique(ei[0][m0_job], return_counts=True)
+    u_order = np.argsort(-user_job_counts)
+    user_nodes = [int(u) for u in cand_users[u_order[:80]]]
 
-    # lọc cạnh
-    m = np.isin(ei[0], list(keep)) & np.isin(ei[1], list(keep))
+    keep_arr = np.fromiter(
+        set(user_nodes) | set(job_nodes) | top_occ | top_skills,
+        dtype=np.int64,
+    )
+    m = np.isin(ei[0], keep_arr) & np.isin(ei[1], keep_arr)
     s, d, t = ei[0][m], ei[1][m], et[m]
 
-    # bỏ cạnh trùng (đồ thị lưu 2 chiều)
-    pairs = set()
-    es, ed, ek = [], [], []
-    for a, b, typ in zip(s, d, t):
-        key = (min(a, b), max(a, b))
+    # Bỏ cạnh trùng
+    pairs: set[tuple[int, int]] = set()
+    es: list[int] = []
+    ed: list[int] = []
+    ek: list[str] = []
+    for a_val, b_val, typ_val in zip(s.tolist(), d.tolist(), t.tolist()):
+        key = (a_val, b_val) if a_val < b_val else (b_val, a_val)
         if key in pairs:
             continue
         pairs.add(key)
-        es.append(a); ed.append(b)
-        ek.append("Công khai" if typ <= 1 else "Riêng tư")
+        es.append(a_val)
+        ed.append(b_val)
+        # edge_type 1 (job-occ) & 2 (occ-skill) là Công khai; 0 (user-job) & 3 (user-occ) là Riêng tư
+        ek.append("Công khai" if typ_val in (1, 2) else "Riêng tư")
 
     nodes_used = sorted(set(es) | set(ed))
     idx = {n: i for i, n in enumerate(nodes_used)}
-    pos = spring_layout(len(nodes_used),
-                        [idx[a] for a in es], [idx[b] for b in ed],
-                        iterations=70, dim=dim)
 
-    kinds, labels = [], []
+    # Đọc nhãn thật từ job_titles.json và user_titles.json
+    job_titles_path = v3_dir / "job_titles.json"
+    user_titles_path = v3_dir / "user_titles.json"
+    job_meta: dict = {}
+    user_meta: dict = {}
+    if job_titles_path.exists():
+        with open(job_titles_path, encoding="utf-8") as f:
+            job_meta = json.load(f)
+    if user_titles_path.exists():
+        with open(user_titles_path, encoding="utf-8") as f:
+            user_meta = json.load(f)
+
+    user_ids = z["user_ids"]
+    job_ids = z["job_ids"]
+    occ_ids = z["occ_ids"]
+    skill_names = z["skill_names"]
+
+    kinds: list[str] = []
+    labels: list[str] = []
     for n in nodes_used:
-        if n < nU:
+        if n < off_job:
             kinds.append("Người dùng")
-            uid = int(z["user_ids"][n])
-            labels.append(f"Ứng viên {uid}")
-        elif n < nU + nJ:
+            uid = str(user_ids[n])
+            u_info = user_meta.get(uid) or {}
+            u_title = str(u_info.get("title") or "").strip()
+            if u_title:
+                labels.append(f"Ứng viên #{uid} · {u_title[:36]}")
+            else:
+                labels.append(f"Ứng viên #{uid}")
+        elif n < off_occ:
             kinds.append("Tin tuyển dụng")
-            jid = int(z["job_ids"][n - nU])
-            row = jobs[jobs.id == jid]
-            labels.append(str(row.job_title.iloc[0])[:60] if len(row) else f"Tin {jid}")
-        elif n < nU + nJ + nS:
-            kinds.append("Kỹ năng")
-            labels.append(f"Kỹ năng #{n - nU - nJ}")
+            jid = str(job_ids[n - off_job])
+            j_info = job_meta.get(jid) or {}
+            j_title = str(j_info.get("title") or "").strip()
+            j_emp = str(j_info.get("employer") or "").strip()
+            if j_title and j_emp:
+                labels.append(f"{j_title[:42]} ({j_emp[:20]})")
+            elif j_title:
+                labels.append(j_title[:60])
+            else:
+                labels.append(f"Tin #{jid}")
+        elif n < off_skill:
+            kinds.append("Nghề O*NET")
+            occ_code = str(occ_ids[n - off_occ])
+            labels.append(f"Nghề O*NET {occ_code}")
         else:
-            kinds.append("Ngành")
-            labels.append(f"Ngành #{n - nU - nJ - nS}")
+            kinds.append("Kỹ năng")
+            sk_name = str(skill_names[n - off_skill]).strip()
+            labels.append(sk_name[:60] if sk_name else f"Kỹ năng #{n - off_skill}")
 
-    deg = np.zeros(len(nodes_used))
-    for a, b in zip(es, ed):
-        deg[idx[a]] += 1
-        deg[idx[b]] += 1
+    deg = np.zeros(len(nodes_used), dtype=int)
+    src_idx = [idx[a] for a in es]
+    dst_idx = [idx[b] for b in ed]
+    for ia, ib in zip(src_idx, dst_idx):
+        deg[ia] += 1
+        deg[ib] += 1
+
+    return {
+        "n_nodes_used": len(nodes_used),
+        "src_idx": src_idx,
+        "dst_idx": dst_idx,
+        "ek": ek,
+        "kinds": kinds,
+        "labels": labels,
+        "deg": deg,
+    }
+
+
+@lru_cache(maxsize=2)
+def _build_graph_view_cached(dim: int = 2) -> tuple[pd.DataFrame, pd.DataFrame]:
+    base = _load_v3_subgraph_base()
+    pos = spring_layout(
+        base["n_nodes_used"],
+        base["src_idx"],
+        base["dst_idx"],
+        iterations=70,
+        dim=dim,
+    )
+    deg = base["deg"]
+    src_idx = base["src_idx"]
+    dst_idx = base["dst_idx"]
 
     node_df = pd.DataFrame({
-        "x": pos[:, 0], "y": pos[:, 1], "kind": kinds, "label": labels,
+        "x": pos[:, 0],
+        "y": pos[:, 1],
+        "kind": base["kinds"],
+        "label": base["labels"],
         "degree": deg.astype(int),
         "size": np.sqrt(deg + 1),
     })
     edge_df = pd.DataFrame({
-        "x": [pos[idx[a], 0] for a in es],
-        "y": [pos[idx[a], 1] for a in es],
-        "x2": [pos[idx[b], 0] for b in ed],
-        "y2": [pos[idx[b], 1] for b in ed],
-        "edge_kind": ek,
+        "x": [pos[ia, 0] for ia in src_idx],
+        "y": [pos[ia, 1] for ia in src_idx],
+        "x2": [pos[ib, 0] for ib in dst_idx],
+        "y2": [pos[ib, 1] for ib in dst_idx],
+        "edge_kind": base["ek"],
     })
     if dim == 3:
         node_df["z"] = pos[:, 2]
-        edge_df["z"] = [pos[idx[a], 2] for a in es]
-        edge_df["z2"] = [pos[idx[b], 2] for b in ed]
+        edge_df["z"] = [pos[ia, 2] for ia in src_idx]
+        edge_df["z2"] = [pos[ib, 2] for ib in dst_idx]
     return node_df, edge_df
 
 
+@st.cache_data(show_spinner="Đang dựng đồ thị CareerBuilder + O*NET (V3)…")
+def build_graph_view(dim: int = 2) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Lấy đồ thị con để vẽ 2D/3D từ `artifacts/v3/graph.npz`.
+
+    `dim=2` → DataFrame có x, y (cho đồ thị 2D).
+    `dim=3` → thêm cột z (cho đồ thị 3D).
+    Cùng một tập nút/cạnh và cùng công thức bố cục.
+    """
+    node_df, edge_df = _build_graph_view_cached(dim)
+    return node_df.copy(), edge_df.copy()
+
+
 # =====================================================================
-# Tiện ích cho thanh tìm kiếm + bảng chi tiết (thuần Python, không đụng
-# `app/components/__init__.py`)
+# Tiện ích cho thanh tìm kiếm + bảng chi tiết
 # =====================================================================
 def _fold(text: str) -> str:
-    """Bỏ dấu tiếng Việt để gõ "ky nang" vẫn tìm ra "Kỹ năng".
-
-    Người dùng hay gõ không dấu; nếu so khớp thô thì gần như không tìm được
-    gì. `đ` không tách được bằng NFD nên phải thay tay.
-    """
+    """Bỏ dấu tiếng Việt để gõ không dấu vẫn tìm ra nút."""
     s = str(text).lower().replace("đ", "d")
     s = unicodedata.normalize("NFD", s)
     return "".join(ch for ch in s if not unicodedata.combining(ch))
@@ -195,12 +255,7 @@ def _fold(text: str) -> str:
 
 def _index_graph(nodes: pd.DataFrame,
                  edges: pd.DataFrame) -> list[dict[int, set[str]]]:
-    """Danh sách láng giềng của từng nút, nối cạnh qua TOẠ ĐỘ.
-
-    `build_graph_view` không có cột id cho nút; cạnh chỉ có toạ độ hai đầu
-    (`x, y, x2, y2`). Đây đúng là cách `graph_html` nối cạnh, nên bảng chi
-    tiết bên phải và đồ thị trong iframe luôn nói về cùng một cặp nút.
-    """
+    """Danh sách láng giềng của từng nút, nối cạnh qua TOẠ ĐỘ."""
     keyed: dict[tuple[float, float], int] = {}
     for i, (x, y) in enumerate(zip(nodes["x"].to_numpy(),
                                    nodes["y"].to_numpy())):
@@ -277,7 +332,7 @@ def _render_detail(nodes: pd.DataFrame, nbrs, i: int) -> None:
 
 
 def _mini_cards(items: list[dict]) -> None:
-    """4 thẻ số liệu THU NHỎ, xếp dọc (thay cho `metric_row` dải ngang)."""
+    """4 thẻ số liệu THU NHỎ, xếp dọc."""
     html = "".join(
         f"<div class='gx-mini-card {it.get('cls', '')}'>"
         f"<div class='gx-mini-val'>{it['value']}</div>"
@@ -290,61 +345,46 @@ def _mini_cards(items: list[dict]) -> None:
 # Trang
 # =====================================================================
 def render() -> None:
-    # --- a. Tiêu đề gọn, KHÔNG có khối "Câu hỏi của trang này" -----------
-    # Cố ý KHÔNG gọi `header(...)`: hàm đó luôn in khối câu hỏi, mà yêu cầu
-    # của người dùng là bỏ câu hỏi ở trang này. `header()` giữ nguyên hành vi
-    # cho các trang khác (components/__init__.py không bị sửa).
-    st.markdown("<h1 class='gx-title'>Đồ thị việc làm</h1>",
+    st.markdown("<h1 class='gx-title'>Đồ thị việc làm (CareerBuilder + O*NET V3)</h1>",
                 unsafe_allow_html=True)
 
-    meta = load_json(str(PATHS["medajob"] / "meta.json"))
-    g = meta["graph"]
+    meta = load_json(str(PATHS["v3"] / "meta.json"))
+    nodes_meta = meta["nodes"]
+    edges_meta = meta["edges"]
+    by_type = edges_meta["by_type"]
 
-    # Đồ thị luôn đủ 4 loại nút và cả hai loại cạnh — không còn bộ lọc.
+    n_nodes_full = int(nodes_meta["n_nodes"])          # 264,995
+    n_users_full = int(nodes_meta["n_users"])          # 171,807
+    n_jobs_full = int(nodes_meta["n_jobs"])            # 84,845
+    n_occ_full = int(nodes_meta["n_occupations"])      # 583
+    n_skills_full = int(nodes_meta["n_skills"])        # 7,760
+
+    e_user_job = int(by_type["0_user_job"])            # 436,893
+    e_job_occ = int(by_type["1_job_occupation"])       # 26,678
+    e_occ_skill = int(by_type["2_occupation_skill"])   # 25,866
+    e_user_occ = int(by_type["3_user_occupation"])     # 274,927
+
+    public_edges_full = e_job_occ + e_occ_skill        # 52,544
+    private_edges_full = e_user_job + e_user_occ       # 711,820
+
     nodes, edges = build_graph_view(dim=2)
     nodes = nodes.reset_index(drop=True)
     edges = edges.reset_index(drop=True)
     nbrs = _index_graph(nodes, edges)
-    n_kind = nodes["kind"].value_counts().to_dict()
 
     if "gx-sel" not in st.session_state:
         st.session_state["gx-sel"] = None
-    # Chế độ xem: "2D" (force-graph, tương tác mượt) hoặc "3D" (three.js,
-    # xoay/zoom thật). Mặc định 2D vì kéo/hover/click chạy mượt hơn.
-    #
-    # VÌ SAO KHÔI PHỤC 3D: người dùng đã đầu tư `graph3d.py` (529 dòng) và
-    # `3d-force-graph.min.js` (690 KB). Bản thiết kế lại đầu tiên bỏ luôn nút
-    # chuyển vì yêu cầu "xóa bộ lọc hiển thị" — nhưng chế độ xem KHÔNG phải
-    # bộ lọc, và mất 3D là mất một tính năng đã có. Nay giữ cả hai.
     if "gx-dim" not in st.session_state:
         st.session_state["gx-dim"] = "2D"
 
-    # Tỉ lệ 1 : 0.2 là GIÁ TRỊ DỰ PHÒNG. Chiều rộng thật của cột phải do CSS
-    # trong theme.py quy định theo px, thông qua selector
-    # `div[data-testid="stHorizontalBlock"]:has(.st-key-gx-graph-card)`.
-    #
-    # VÌ SAO PHẢI DÙNG CSS THAY TỈ LỆ:
-    # `st.columns` chỉ nhận TỈ LỆ, nên tỉ lệ [4, 1] cho cột phải tới 355px ở
-    # màn 1920px — quá rộng so với yêu cầu "4 thẻ nhỏ nằm bên phải" (người
-    # dùng muốn nó GỌN để nhường chỗ cho đồ thị). Tỉ lệ cố định cũng sai theo
-    # hướng ngược lại khi mở sidebar. `:has()` cho đúng ở mọi bề ngang.
-    #
-    # LỖI ĐÃ GẶP: bọc `st.container(key="gx-hero")` quanh `st.columns` KHÔNG
-    # sinh ra class `.st-key-gx-hero` (đo trong DOM: container chứa columns
-    # render ra `stLayoutWrapper` không mang khoá), nên CSS theo khoá đó
-    # không bao giờ khớp. `:has()` bám vào khối có `.st-key-gx-graph-card` —
-    # khoá này CÓ trong DOM (đã đo).
     c_left, c_right = st.columns([1, 0.2], gap="medium")
 
     # ------------ CỘT TRÁI: tìm kiếm + ĐỒ THỊ HERO ------------------
     with c_left:
-        # Hàng control: tìm kiếm (rộng) + loại nút + chế độ 2D/3D (hẹp).
-        # Chế độ xem nằm CHUNG hàng với tìm kiếm nên không tốn thêm chiều cao.
         c_q, c_kind, c_dim = st.columns([3, 1.1, 0.9], gap="small")
         with c_q:
             q = st.text_input("Tìm trong đồ thị",
-                              placeholder="gõ tên, kỹ năng, ngành… "
-                                          "(không cần dấu)",
+                              placeholder="gõ tên nghề, kỹ năng (Python, SAP, Excel), nhà tuyển dụng…",
                               label_visibility="collapsed",
                               key="gx-q")
         with c_kind:
@@ -357,25 +397,15 @@ def render() -> None:
                            index=0 if st.session_state["gx-dim"] == "2D" else 1)
             st.session_state["gx-dim"] = dim
 
-        # TÍNH KẾT QUẢ TÌM KIẾM TRƯỚC KHI VẼ ĐỒ THỊ — để truyền danh sách
-        # nút khớp vào `graph_html(highlight=...)`. Nếu tính sau thì đồ thị đã
-        # được sinh xong và không tô sáng được gì.
-        # `_search_nodes` trả DataFrame đã sắp theo bậc; lấy chỉ số dòng.
         _hits = _search_nodes(nodes, q, kind_filter)
         _hit_positions = [int(i) for i in _hits.index] if len(_hits) else []
 
         with st.container(key="gx-graph-card"):
             if st.session_state["gx-dim"] == "3D":
-                # 3D: dùng graph3d.py có sẵn (three.js, xoay/zoom thật).
-                # Bố cục 3 chiều tính riêng, cùng tập nút/cạnh với 2D.
                 nodes3, edges3 = build_graph_view(dim=3)
                 nodes3 = nodes3.reset_index(drop=True)
                 edges3 = edges3.reset_index(drop=True)
 
-                # TÔ SÁNG cho 3D — phải tính LẠI vị trí vì `nodes3` là
-                # DataFrame khác (bố cục 3 chiều), thứ tự dòng có thể khác
-                # `nodes` của 2D. Ghép theo `label` thay vì dùng
-                # `_hit_positions` của 2D — nếu dùng thẳng sẽ tô sáng SAI nút.
                 _hl3: list[int] = []
                 if len(_hits):
                     _hit_labels = set(_hits["label"].astype(str))
@@ -389,17 +419,6 @@ def render() -> None:
                                       highlight=_hl3),
                         height=GRAPH_HEIGHT + 4, scrolling=False)
             else:
-                # Truyền danh sách nút khớp tìm kiếm để TÔ SÁNG trên đồ thị.
-                # `nodes` đã `reset_index(drop=True)` nên vị trí trùng với chỉ
-                # số dòng — đúng thứ `graph_html` cần.
-                #
-                # VÌ SAO CẦN `key`: `components.html` không nhận tham số key,
-                # nên Streamlit so sánh HTML để quyết định có render lại iframe
-                # hay không. Xoá từ khoá làm HTML gần giống bản trước (khác mỗi
-                # `var arr = [...]`), và Streamlit có thể bỏ qua thay đổi →
-                # đồ thị giữ nguyên trạng thái tô sáng cũ.
-                # Bọc trong `st.container` có key phụ thuộc vào từ khoá để ép
-                # dựng lại khối mỗi khi kết quả tìm kiếm đổi.
                 _hl_sig = "none" if not _hit_positions else f"{len(_hit_positions)}-{_hit_positions[0]}"
                 with st.container(key=f"gx-graph-2d-{_hl_sig}"):
                     components.html(
@@ -411,16 +430,18 @@ def render() -> None:
     # ---------- CỘT PHẢI: 4 thẻ nhỏ + tìm kiếm + chi tiết -----------
     with c_right:
         _mini_cards([
-            {"value": f"{g['nodes']:,}", "label": "Nút (đồ thị đầy đủ)"},
-            {"value": f"{g['public_edges']:,}",
-             "label": "Cạnh công khai — máy chủ thấy", "cls": "is-public"},
-            {"value": f"{g['private_edges']:,}",
-             "label": "Cạnh riêng tư — chỉ ở khách hàng",
+            {"value": f"{n_nodes_full:,}", "label": "Nút (đồ thị đầy đủ)"},
+            {"value": f"{public_edges_full:,}",
+             "label": f"Cạnh công khai — máy chủ thấy ({e_job_occ:,} tin–nghề + {e_occ_skill:,} nghề–kỹ năng)",
+             "cls": "is-public"},
+            {"value": f"{private_edges_full:,}",
+             "label": f"Cạnh riêng tư — chỉ ở khách hàng ({e_user_job:,} ứng tuyển + {e_user_occ:,} hồ sơ nghề)",
              "cls": "is-private"},
-            {"value": f"{g['industries']}", "label": "Nút ngành"},
+            {"value": f"{n_occ_full:,}",
+             "label": f"Nút nghề O*NET ({n_skills_full:,} kỹ năng)"},
         ])
 
-        hits = _hits   # đã tính ở trên, trước khi vẽ đồ thị (để tô sáng)
+        hits = _hits
         if q.strip():
             st.markdown("<div class='gx-side-title'>Kết quả tìm kiếm</div>",
                         unsafe_allow_html=True)
@@ -459,73 +480,61 @@ def render() -> None:
 
     # ---------------- Dưới hero: phát hiện + phần phụ trong expander -----
     finding(
-        "Ranh giới rất rõ: máy chủ chỉ thấy cấu trúc nghề nghiệp",
-        f"{g['public_edges']:,} cạnh công khai (tin – kỹ năng – ngành) nằm trên máy chủ; "
-        f"toàn bộ {g['private_edges']:,} cạnh riêng tư của người dùng chỉ ở lại khách hàng.",
+        "Ranh giới bảo mật rõ ràng: máy chủ chỉ giữ khung xương Nghề O*NET – Kỹ năng",
+        f"<b>{public_edges_full:,} cạnh công khai</b> (<b>{e_job_occ:,}</b> cạnh tin–nghề O*NET + "
+        f"<b>{e_occ_skill:,}</b> cạnh nghề O*NET–kỹ năng công nghệ) nằm trên máy chủ làm cầu nối truyền thông tin; "
+        f"toàn bộ <b>{private_edges_full:,} cạnh riêng tư</b> (<b>{e_user_job:,}</b> lượt ứng tuyển user–job + "
+        f"<b>{e_user_occ:,}</b> hồ sơ lịch sử nghề user–occupation) giữ tuyệt đối tại <b>9.116</b> silo nhà tuyển dụng.",
         "good",
     )
 
     with st.expander("Cách đọc đồ thị", expanded=False):
         st.caption(
-            "Đồ thị phía trên là **đồ thị con** để vẽ được: giữ toàn bộ ứng "
-            "viên, 200 tin có nhiều kỹ năng phổ biến nhất và 120 kỹ năng phổ "
-            "biến nhất. Chọn tin theo độ phổ biến (không phải theo id) để đồ "
-            "thị liên thông thay vì vỡ thành nhiều cụm rời rạc."
+            f"Đồ thị đầy đủ có **{n_nodes_full:,} nút** và **{int(edges_meta['n_edges_stored']):,} cạnh**. "
+            "Khung tương tác phía trên hiển thị **đồ thị con đại diện (430 nút)**: giữ 30 nghề O*NET trung tâm, "
+            "120 kỹ năng công nghệ phổ biến nhất, 200 tin tuyển dụng tiêu biểu có gắn mã nghề O*NET và 80 ứng viên "
+            "nộp đơn liên thông giữa các tin đó để vẽ 2D/3D mượt mà mà vẫn giữ nguyên cấu trúc liên kết thật."
         )
 
-    with st.expander("Cấu trúc đồ thị theo loại nút và phân bố ngành",
+    with st.expander("Cấu trúc đồ thị theo loại nút và phân bố nhà tuyển dụng / nghề O*NET",
                      expanded=False):
-        # Lưới 2 CỘT TỰ CO dùng `theme.grid(2, ...)` — hàm này trả về
-        # container có khoá, CSS ở theme.py biến `.st-key-lx-grid-2-*` thành
-        # grid `minmax(420px, 1fr)`; dưới 900px tự về 1 cột.
-        #
-        # LỖI ĐÃ ĐO VÀ SỬA: `render_chart` phát ra BA khối markdown riêng
-        # (`<div class=hx-chart>`, biểu đồ, `</div>`). Nếu gọi thẳng trong
-        # lưới, grid nhận 6 con thay vì 2 -> auto-fit chia 3 cột, biểu đồ rơi
-        # vào cột GIỮA. Cách sửa: mỗi biểu đồ bọc trong `st.container()`.
         with theme.grid(2, "chart-phu"):
             with st.container():
-                df = pd.DataFrame({
-                    "loại": ["Người dùng", "Tin tuyển dụng", "Kỹ năng",
-                             "Ngành"],
-                    "số_nút": [meta["clean"]["users"], meta["clean"]["jobs"],
-                               meta["clean"]["skills"],
-                               meta["clean"]["industries"]],
+                df_nodes = pd.DataFrame({
+                    "loại": ["Người dùng", "Tin tuyển dụng", "Kỹ năng", "Nghề O*NET"],
+                    "số_nút": [n_users_full, n_jobs_full, n_skills_full, n_occ_full],
                 })
-                # Biểu đồ số nút chênh nhau ~100 lần (10 vs 1.014). Thang log
-                # làm `mark_bar` cột cao đúng 0px (xem chú thích trong
-                # `bar_chart`), nên vẽ thang tuyến tính, giá trị thật vẫn
-                # hiện trên đầu cột.
-                render_chart(bar_chart(df, "loại", "số_nút",
-                                       title="Số nút theo loại "
-                                             "(giá trị thật trên đầu cột)",
+                render_chart(bar_chart(df_nodes, "loại", "số_nút",
+                                       title="Số nút theo 4 loại thực thể (264.995 nút)",
                                        height=280, value_fmt=",.0f"),
                              delay_ms=60)
 
             with st.container():
-                ind = pd.DataFrame([
-                    {"ngành": k, "số_tin": v}
-                    for k, v in sorted(meta["graph"]["industry_counts"].items(),
-                                       key=lambda x: -x[1])
+                top_emps = meta["employer_extraction"]["top20_employers_by_apps"][:12]
+                df_emps = pd.DataFrame([
+                    {"nhà_tuyển_dụng": str(name), "số_đơn": int(cnt)}
+                    for name, cnt in top_emps
                 ])
-                render_chart(bar_chart(ind, "số_tin", "ngành",
-                                       horizontal=True, title="Phân bố ngành",
+                render_chart(bar_chart(df_emps, "số_đơn", "nhà_tuyển_dụng",
+                                       horizontal=True,
+                                       title="Top 12 Nhà tuyển dụng (Node FL) có nhiều lượt ứng tuyển nhất",
                                        height=280, value_fmt=",.0f"),
                              delay_ms=120)
 
         st.markdown("**Bảng số liệu của hai biểu đồ trên**")
         t1, t2 = st.columns(2, gap="medium")
         with t1:
-            st.markdown("**Số nút theo loại**")
-            st.dataframe(df, hide_index=True, width="stretch")
+            st.markdown("**Số nút theo loại thực thể**")
+            st.dataframe(df_nodes, hide_index=True, width="stretch")
         with t2:
-            st.markdown("**Số tin theo ngành**")
-            st.dataframe(ind, hide_index=True, width="stretch")
+            st.markdown("**Top 12 Nhà tuyển dụng (Node FL) theo lượt ứng tuyển**")
+            st.dataframe(df_emps, hide_index=True, width="stretch")
 
         data_note(
-            f"Ngành được suy ra từ tiêu đề tin bằng từ điển khoá; "
-            f"{meta['graph']['industry_counts'].get('Khác', 0):,} tin "
-            "rơi vào «Khác» vì tiêu đề không khớp từ khoá nào."
+            f"Chuẩn hóa nghề theo O*NET-SOC 6 ký tự (soc[:7], {n_occ_full} nghề); "
+            f"kỹ năng trích từ O*NET Technology Skills.txt ({n_skills_full:,} kỹ năng). "
+            f"{edges_meta['n_jobs_with_occupation_edge']:,}/{n_jobs_full:,} tin ({edges_meta['pct_jobs_with_occupation_edge']}%) "
+            "ánh xạ được trực tiếp vào mã nghề O*NET."
         )
 
 

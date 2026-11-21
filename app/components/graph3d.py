@@ -58,6 +58,7 @@ _KIND_COLOR = {
     "Người dùng":     "#7b241c",
     "Tin tuyển dụng": "#e8836b",
     "Kỹ năng":        "#0EA5E9",
+    "Nghề O*NET":     "#10B981",
     "Ngành":          "#10B981",
 }
 _EDGE_COLOR = {"Công khai": "#F97316", "Riêng tư": "#EF4444"}
@@ -313,7 +314,7 @@ _JS_APP = r"""
       if (s.r < 1e-6) s.r = 1;
     }
     ALLN.forEach(function (n) {
-      var s = stat[n.kind], c = centers[n.kind];
+      var s = stat[n.kind], c = centers[n.kind] || (n.kind === 'Nghề O*NET' ? centers['Ngành'] : null);
       var o = ORIG[n.id];
       if (!s || !c) { out[n.id] = o; return; }
       var sc = SPREAD / s.r;
@@ -488,8 +489,10 @@ _JS_APP = r"""
     if (!box) return;
     var html = '<div class="lg-title">Loại nút</div>';
     Object.keys(KC).forEach(function (k) {
+      if (k === 'Ngành' && KC['Nghề O*NET']) return;
+      var label = (k === 'Nghề O*NET') ? 'Nghề O*NET (Ngành)' : k;
       html += '<div class="lg-row"><span class="lg-dot" style="background:'
-            + KC[k] + '"></span>' + k + '</div>';
+            + KC[k] + '"></span>' + label + '</div>';
     });
     html += '<div class="lg-sep"></div><div class="lg-title">Loại cạnh</div>';
     html += '<div class="lg-row"><span class="lg-line" style="border-top-color:'

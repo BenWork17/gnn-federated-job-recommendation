@@ -28,7 +28,7 @@ from app.paths import missing_artifacts, run_all_command  # noqa: E402
 from app.components.theme import inject_theme  # noqa: E402
 
 st.set_page_config(
-    page_title="GNN + Federated Learning · Demo",
+    page_title="GNN + Federated Learning · CareerBuilder + O*NET (V3)",
     page_icon="🕸️",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -43,20 +43,19 @@ missing = missing_artifacts()
 if missing:
     st.error(
         "### Chưa có kết quả để hiển thị\n\n"
-        "App này đọc số liệu từ `results/*.json` và `artifacts/`, do pipeline "
-        "sinh ra. Hiện còn thiếu:\n\n"
+        "App này đọc số liệu từ `results/v3/notebook_metrics.json` và `artifacts/v3/`, "
+        "do pipeline CareerBuilder + O*NET (V3) sinh ra. Hiện còn thiếu:\n\n"
         + "\n".join(f"- {m}" for m in missing)
         + f"\n\n**Cách nhanh nhất** — chạy một lệnh:\n\n```powershell\n"
-        f"{run_all_command()}\n```\n\n"
-        "Lần đầu cần dữ liệu MEDAJob trong thư mục Lab03 của môn học."
+        f"{run_all_command()}\n```"
     )
     st.stop()
 
 from app.views import (do_thi_viec_lam, fl_sim, giam_sat_node,  # noqa: E402
-                       goi_y, ket_luan, tong_quan)
+                       ket_luan, tong_quan)
 
 # ---------------------------------------------------------------------
-# Điều hướng
+# Điều hướng (5 mục đồng nhất trên bộ dữ liệu CareerBuilder + O*NET V3)
 # ---------------------------------------------------------------------
 PAGES = [
     st.Page(tong_quan.render, title="Tổng quan", icon=None,
@@ -65,8 +64,6 @@ PAGES = [
             url_path="do-thi"),
     st.Page(fl_sim.render, title="Federated Learning simulation", icon=None,
             url_path="lien-bang"),
-    st.Page(goi_y.render, title="Gợi ý cho ứng viên", icon=None,
-            url_path="goi-y"),
     st.Page(giam_sat_node.render, title="Giám sát node FL", icon=None,
             url_path="giam-sat-node", default=False),
     st.Page(ket_luan.render, title="Kết luận & hạn chế", icon=None,
@@ -87,7 +84,7 @@ with st.sidebar:
             Nguyễn Văn Chương · 102220267
           </div>
           <div class="sb-footer-badge">
-            MEDAJob · CareerBuilder 9.116 nodes
+            CareerBuilder + O*NET · 9.116 nodes · 264.995 nút
           </div>
         </div>
         """,
