@@ -39,6 +39,7 @@ _newdata_audit/
 *.part
 _tmp/
 .agent-teams/
+maubaocao/
 
 # =====================================================================
 # OS & Editor

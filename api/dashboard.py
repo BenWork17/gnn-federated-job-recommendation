@@ -13,16 +13,27 @@ from __future__ import annotations
 
 import json
 import math
+import sys
 import unicodedata
 from functools import lru_cache
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 import numpy as np
 from fastapi import APIRouter, Query
 
 # ------------------------------------------------------------------ paths
 ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from app.components.v3_graph import (  # noqa: E402
+    _select_render_budget,
+    extract_ego_subgraph,
+    extract_silo_subgraph,
+    load_v3_index,
+    search_all_nodes,
+)
 V3_DIR = ROOT / "artifacts" / "v3"
 V3_METRICS_PATH = ROOT / "results" / "v3" / "notebook_metrics.json"
 
@@ -644,45 +655,318 @@ async def dashboard_overview():
     }
 
 
+_V3_KIND_TO_API = {
+    "Người dùng": "user",
+    "Tin tuyển dụng": "job",
+    "Nghề O*NET": "occupation",
+    "Kỹ năng": "skill",
+}
+_API_KIND_TO_V3 = {
+    "user": "Người dùng",
+    "job": "Tin tuyển dụng",
+    "occupation": "Nghề O*NET",
+    "skill": "Kỹ năng",
+    "": "Tất cả",
+}
+
+
+def _convert_v3_subgraph_to_3d_payload(
+    sub: dict[str, Any],
+    limit: int,
+) -> dict[str, Any]:
+    """Chuyển subgraph từ `extract_silo_subgraph` / `extract_ego_subgraph` sang payload 3D."""
+    meta = _load_v3_meta()
+    raw_nodes: list[dict[str, Any]] = list(sub.get("nodes") or ())
+    raw_edges: list[tuple[int, int, int, str]] = list(sub.get("edges") or ())
+
+    kept_nodes, kept_edges = _select_render_budget(sub, raw_nodes, raw_edges, limit)
+    if kept_edges and len(kept_nodes) > 1:
+        connected_nids = {int(e[0]) for e in kept_edges} | {int(e[1]) for e in kept_edges}
+        center_keep = sub.get("center_nid")
+        if center_keep is not None:
+            connected_nids.add(int(center_keep))
+        kept_nodes = [n for n in kept_nodes if int(n["nid"]) in connected_nids]
+    id_to_pos = {int(n["nid"]): idx for idx, n in enumerate(kept_nodes)}
+
+    deg = np.zeros(len(kept_nodes), dtype=np.int64)
+    edge_pairs_idx: list[tuple[int, int]] = []
+    edges_out: list[dict[str, Any]] = []
+    n_pub_sub = 0
+    n_priv_sub = 0
+
+    for a_val, b_val, typ_val, _ in kept_edges:
+        ia = id_to_pos.get(int(a_val))
+        ib = id_to_pos.get(int(b_val))
+        if ia is None or ib is None or ia == ib:
+            continue
+        deg[ia] += 1
+        deg[ib] += 1
+        edge_pairs_idx.append((ia, ib))
+        et_name, et_label, is_pub = _EDGE_TYPE_META.get(
+            int(typ_val), ("other", "Công khai", True)
+        )
+        if is_pub:
+            n_pub_sub += 1
+        else:
+            n_priv_sub += 1
+        edges_out.append(
+            {
+                "source": str(a_val),
+                "target": str(b_val),
+                "edge_type": et_name,
+                "edge_label": et_label,
+                "is_public": is_pub,
+            }
+        )
+
+    nodes_meta: list[dict[str, Any]] = []
+    kind_counts = {"user": 0, "job": 0, "occupation": 0, "skill": 0}
+    for idx_i, nd in enumerate(kept_nodes):
+        api_kind = _V3_KIND_TO_API.get(str(nd["kind"]), "job")
+        kind_counts[api_kind] += 1
+        nodes_meta.append(
+            {
+                "id": str(nd["nid"]),
+                "kind": api_kind,
+                "kind_label": _KIND_META[api_kind],
+                "label": str(nd["label"]),
+                "degree": int(deg[idx_i]),
+                "global_degree": int(nd.get("meta", {}).get("global_degree", nd["degree"])),
+            }
+        )
+
+    coords = _compute_3d_v3_layout(nodes_meta, edge_pairs_idx)
+    nodes_out = [
+        {
+            **nm,
+            "x": round(float(coords[idx_i, 0]), 4),
+            "y": round(float(coords[idx_i, 1]), 4),
+            "z": round(float(coords[idx_i, 2]), 4),
+        }
+        for idx_i, nm in enumerate(nodes_meta)
+    ]
+
+    nodes_info = meta["nodes"]
+    edges_info = meta["edges"]
+    by_type = edges_info["by_type"]
+    e_user_job = int(by_type["0_user_job"])
+    e_job_occ = int(by_type["1_job_occupation"])
+    e_occ_skill = int(by_type["2_occupation_skill"])
+    e_user_occ = int(by_type["3_user_occupation"])
+
+    summary = {
+        "total_nodes": int(nodes_info["n_nodes"]),
+        "total_edges": int(edges_info["n_edges_stored"]),
+        "public_edges": e_job_occ + e_occ_skill,
+        "private_edges": e_user_job + e_user_occ,
+        "n_users": int(nodes_info["n_users"]),
+        "n_jobs": int(nodes_info["n_jobs"]),
+        "n_occupations": int(nodes_info["n_occupations"]),
+        "n_skills": int(nodes_info["n_skills"]),
+        "e_user_job": e_user_job,
+        "e_job_occ": e_job_occ,
+        "e_occ_skill": e_occ_skill,
+        "e_user_occ": e_user_occ,
+        "sampled_nodes": len(nodes_out),
+        "sampled_edges": len(edges_out),
+        "sampled_public_edges": n_pub_sub,
+        "sampled_private_edges": n_priv_sub,
+        "kind_counts": kind_counts,
+    }
+    return {"summary": summary, "nodes": nodes_out, "edges": edges_out}
+
+
 @router.get("/graph")
 async def dashboard_graph(
-    limit: int = Query(default=430, ge=80, le=900),
+    limit: int = Query(default=430, ge=50, le=1500),
     q: str = Query(default=""),
     kind: str = Query(default=""),
+    mode: str = Query(default="silo"),
+    client_id: int = Query(default=0, ge=0),
+    center_id: Optional[int] = Query(default=None),
+    hops: int = Query(default=1, ge=1, le=2),
+    extra_ids: str = Query(default=""),
+    silo_q: str = Query(default=""),
 ):
-    """Đồ thị con 3D CareerBuilder + O*NET (V3) kèm tìm kiếm không dấu."""
-    base = _build_v3_graph_payload(limit)
-    nodes = base["nodes"]
-    edges = base["edges"]
-
+    """Đồ thị tương tác V3: hỗ trợ chế độ Silo Nhà tuyển dụng (9.116 silo) & Tìm kiếm toàn bộ 264.995 nút + Ego-graph."""
+    idx = load_v3_index()
     term = _fold(q).strip()
     kind_norm = _normalize_kind(kind)
+    v3_kind_filter = _API_KIND_TO_V3.get(kind_norm, "Tất cả")
 
-    hits: list[dict[str, Any]] = []
-    if term or kind_norm:
-        for nd in nodes:
-            if kind_norm and nd["kind"] != kind_norm:
-                continue
-            if term and term not in _fold(nd["label"]):
-                continue
-            hits.append(
-                {
-                    "id": nd["id"],
-                    "kind": nd["kind"],
-                    "kind_label": nd["kind_label"],
-                    "label": nd["label"],
-                    "degree": nd["degree"],
-                }
-            )
-        hits.sort(key=lambda h: (-int(h["degree"]), int(h["id"])))
+    # Danh sách nhà tuyển dụng khớp silo_q (trong tổng số 9.116 silo)
+    silo_term = _fold(silo_q).strip()
+    silos_out: list[dict[str, Any]] = []
+    for c, cname_f in zip(idx.clients, idx.client_names_folded):
+        cid_val = int(c["client_id"])
+        if silo_term and silo_term not in cname_f and silo_term not in str(cid_val):
+            continue
+        silos_out.append(
+            {
+                "client_id": cid_val,
+                "name": str(c["employer_name"]),
+                "n_apps": int(c["n_apps"]),
+                "n_jobs": int(c["n_jobs"]),
+                "n_users": int(c["n_users"]),
+            }
+        )
+        if len(silos_out) >= 80:
+            break
+
+    # Đảm bảo client_id đang chọn luôn nằm trong danh sách trả về
+    valid_cid = client_id if client_id in idx.client_by_id else 0
+    if not any(s["client_id"] == valid_cid for s in silos_out):
+        c_sel = idx.client_by_id[valid_cid]
+        silos_out.insert(
+            0,
+            {
+                "client_id": int(c_sel["client_id"]),
+                "name": str(c_sel["employer_name"]),
+                "n_apps": int(c_sel["n_apps"]),
+                "n_jobs": int(c_sel["n_jobs"]),
+                "n_users": int(c_sel["n_users"]),
+            },
+        )
+
+    mode_norm = mode.strip().lower()
+    silo_info: Optional[dict[str, Any]] = None
+    ego_info: Optional[dict[str, Any]] = None
+
+    if mode_norm == "ego":
+        # Tìm kiếm trực tiếp trên toàn bộ 264.995 nút
+        global_hits_raw = (
+            search_all_nodes(idx, q, kind_filter=v3_kind_filter, limit=40)
+            if term
+            else []
+        )
+        resolved_center = center_id
+        if resolved_center is None or not (0 <= int(resolved_center) < idx.n_nodes):
+            if global_hits_raw:
+                resolved_center = int(global_hits_raw[0]["nid"])
+            else:
+                # Mặc định chọn nút kỹ năng Python hoặc nghề O*NET đầu tiên
+                resolved_center = int(idx.skill_to_node.get("python", idx.off_occ))
+
+        parsed_extras: list[int] = []
+        if extra_ids.strip():
+            for part in extra_ids.split(","):
+                part_s = part.strip()
+                if part_s.isdigit():
+                    parsed_extras.append(int(part_s))
+
+        sub = extract_ego_subgraph(
+            idx,
+            int(resolved_center),
+            hops=hops,
+            extra_nids=parsed_extras,
+            max_nodes=limit,
+        )
+        base = _convert_v3_subgraph_to_3d_payload(sub, limit)
+        st_ego = sub["stats"]
+        c_api_kind = _V3_KIND_TO_API.get(str(st_ego["center_kind"]), "skill")
+        ego_info = {
+            "center_id": str(st_ego["center_nid"]),
+            "center_label": str(st_ego["center_label"]),
+            "center_kind": c_api_kind,
+            "center_kind_label": _KIND_META[c_api_kind],
+            "hops": int(st_ego["hops"]),
+            "extra_ids": [str(x) for x in sub.get("extra_nids", [])],
+            "total_unfiltered_nodes": int(st_ego["total_unfiltered_nodes"]),
+            "truncated": bool(st_ego["truncated"]),
+            "n_jobs": int(st_ego["n_jobs"]),
+            "n_users": int(st_ego["n_users"]),
+            "n_occs": int(st_ego["n_occs"]),
+            "n_skills": int(st_ego["n_skills"]),
+        }
+
+        hits = [
+            {
+                "id": str(h["nid"]),
+                "kind": _V3_KIND_TO_API.get(str(h["kind"]), "job"),
+                "kind_label": _KIND_META[_V3_KIND_TO_API.get(str(h["kind"]), "job")],
+                "label": str(h["label"]),
+                "degree": int(h["degree"]),
+            }
+            for h in global_hits_raw
+        ]
+    elif mode_norm == "sample":
+        base = _build_v3_graph_payload(min(limit, 900))
+        hits = []
+        if term or kind_norm:
+            for nd in base["nodes"]:
+                if kind_norm and nd["kind"] != kind_norm:
+                    continue
+                if term and term not in _fold(nd["label"]):
+                    continue
+                hits.append(
+                    {
+                        "id": nd["id"],
+                        "kind": nd["kind"],
+                        "kind_label": nd["kind_label"],
+                        "label": nd["label"],
+                        "degree": nd["degree"],
+                    }
+                )
+            hits.sort(key=lambda h: (-int(h["degree"]), int(h["id"])))
+    else:
+        # Chế độ mặc định: Silo Nhà tuyển dụng (9.116 silo từ clients.json)
+        sub = extract_silo_subgraph(idx, valid_cid)
+        base = _convert_v3_subgraph_to_3d_payload(sub, limit)
+        st_silo = sub["stats"]
+        c_obj = st_silo["client"]
+        silo_info = {
+            "client_id": int(valid_cid),
+            "name": str(c_obj["employer_name"]),
+            "n_jobs": int(st_silo["n_jobs"]),
+            "n_users": int(st_silo["n_users"]),
+            "n_occs": int(st_silo["n_occs"]),
+            "n_skills": int(st_silo["n_skills"]),
+            "n_nodes": int(st_silo["n_nodes"]),
+            "n_edges": int(st_silo["n_edges"]),
+            "n_public": int(st_silo["n_public"]),
+            "n_private": int(st_silo["n_private"]),
+            "n_apps": int(st_silo["n_apps"]),
+            "truncated": len(base["nodes"]) < int(st_silo["n_nodes"]),
+        }
+
+        hits = []
+        if term or kind_norm:
+            for nd in base["nodes"]:
+                if kind_norm and nd["kind"] != kind_norm:
+                    continue
+                if term and term not in _fold(nd["label"]):
+                    continue
+                hits.append(
+                    {
+                        "id": nd["id"],
+                        "kind": nd["kind"],
+                        "kind_label": nd["kind_label"],
+                        "label": nd["label"],
+                        "degree": nd["degree"],
+                    }
+                )
+            hits.sort(key=lambda h: (-int(h["degree"]), int(h["id"])))
 
     return {
         "summary": base["summary"],
-        "nodes": nodes,
-        "edges": edges,
+        "nodes": base["nodes"],
+        "edges": base["edges"],
         "hits": hits,
         "hit_ids": [h["id"] for h in hits],
-        "query": {"limit": limit, "q": q, "kind": kind_norm},
+        "mode": "ego" if mode_norm == "ego" else ("sample" if mode_norm == "sample" else "silo"),
+        "total_silos": len(idx.clients),
+        "silos": silos_out,
+        "silo_info": silo_info,
+        "ego_info": ego_info,
+        "query": {
+            "limit": limit,
+            "q": q,
+            "kind": kind_norm,
+            "mode": mode_norm,
+            "client_id": valid_cid,
+            "center_id": center_id,
+            "hops": hops,
+        },
     }
 
 

@@ -531,6 +531,45 @@ div[data-testid="stVerticalBlock"][class*="st-key-lx-grid-3"] > * {
 @media (min-width: 1200px) {
     [data-testid="stSidebar"][aria-expanded="true"] { min-width: 290px !important; }
 }
+/* Luôn hiển thị nút đóng/mở sidebar gốc của Streamlit (mặc định chỉ hiện khi hover) */
+[data-testid="stSidebarCollapseButton"],
+[data-testid="stExpandSidebarButton"],
+[data-testid="collapsedControl"] {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+[data-testid="stSidebarCollapseButton"] button,
+[data-testid="stExpandSidebarButton"] button,
+[data-testid="collapsedControl"] button {
+    background: #FFFFFF !important;
+    border: 1px solid #FED7AA !important;
+    border-radius: 8px !important;
+    color: #C2410C !important;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08) !important;
+    transition: background 0.15s ease, transform 0.15s ease !important;
+}
+[data-testid="stSidebarCollapseButton"] button:hover,
+[data-testid="stExpandSidebarButton"] button:hover,
+[data-testid="collapsedControl"] button:hover {
+    background: #FFF7ED !important;
+    border-color: #FF5A1F !important;
+    transform: scale(1.05);
+}
+/* Nút Thu nhỏ / Mở rộng thanh taskbar bên trái (chế độ Mini Icon-Rail) */
+div[class*="st-key-sb-toggle-wrap"] button {
+    background: #FFF7ED !important;
+    border: 1px solid #FED7AA !important;
+    color: #C2410C !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    padding: 0.35rem 0.65rem !important;
+    min-height: 2.1rem !important;
+    border-radius: 8px !important;
+}
+div[class*="st-key-sb-toggle-wrap"] button:hover {
+    background: #FFEDD5 !important;
+    border-color: #FF5A1F !important;
+}
 [data-testid="stSidebarNav"]::before {
     content: "ĐIỀU HƯỚNG";
     font-size: 11px;

@@ -58,8 +58,12 @@ function getLinkEndpointId(v: any): string {
 
 interface FGNode extends GraphNode3D {
   color: string;
+  vx?: number;
+  vy?: number;
+  vz?: number;
   fx?: number;
   fy?: number;
+  fz?: number;
 }
 
 interface FGLink {
@@ -80,6 +84,7 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
   showPrivate,
   highlightIds,
   selectedNodeId,
+  focusSeq = 0,
   messagePassingActive = false,
   hop1Ids,
   hop2Ids,
@@ -88,6 +93,8 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const graphRef = useRef<any>(null);
+  const fgNodesRef = useRef<Map<string, FGNode>>(new Map());
+  const userMovedRef = useRef<boolean>(false);
   const [libError, setLibError] = useState<string | null>(null);
   const [hoveredInfo, setHoveredInfo] = useState<{ node: GraphNode3D } | null>(null);
 
@@ -103,6 +110,48 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
   const nodeByIdRef = useRef<Map<string, GraphNode3D>>(new Map());
   const onSelectRef = useRef(onSelectNode);
   onSelectRef.current = onSelectNode;
+
+  // Helper to smoothly pan/zoom camera to a specific node in both 2D and 3D
+  const focusCameraOnNode = (nodeId: string, durationMs = 520) => {
+    const g = graphRef.current;
+    const target = fgNodesRef.current.get(nodeId);
+    if (!g || !target) return;
+    if (!Number.isFinite(target.x) || !Number.isFinite(target.y)) return;
+
+    try {
+      if (mode === '2d') {
+        if (typeof g.centerAt === 'function') {
+          g.centerAt(target.x, target.y, durationMs);
+        }
+        if (typeof g.zoom === 'function') {
+          const curZoom = g.zoom() || 1;
+          if (curZoom < 2.8) {
+            g.zoom(2.8, durationMs);
+          }
+        }
+      } else {
+        if (typeof g.cameraPosition === 'function') {
+          const nx = target.x || 0;
+          const ny = target.y || 0;
+          const nz = target.z || 0;
+          const dist = 75;
+          const mag = Math.hypot(nx, ny, nz) || 1;
+          const ratio = (mag + dist) / mag;
+          g.cameraPosition(
+            {
+              x: nx * ratio,
+              y: ny * ratio,
+              z: mag < 1e-3 ? dist : nz * ratio,
+            },
+            { x: nx, y: ny, z: nz },
+            durationMs,
+          );
+        }
+      }
+    } catch {
+      // ignore if graph is unmounting
+    }
+  };
 
   // Compute filtered edges and adjacency map
   const filteredEdges = useMemo(() => {
@@ -151,8 +200,9 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
     highlightFocusSetRef.current = hlFocus;
   }, [nodes, filteredEdges, highlightIds]);
 
-  // Sync external selectedNodeId & 2-Hop Message Passing sets into refs
+  // Sync external selectedNodeId & 2-Hop Message Passing sets into refs + fly camera to selected node
   useEffect(() => {
+    const prevSelected = selectedIdRef.current;
     selectedIdRef.current = selectedNodeId ?? null;
     mpActiveRef.current = Boolean(messagePassingActive && selectedNodeId);
     hop1SetRef.current = new Set(hop1Ids ?? []);
@@ -167,10 +217,13 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
         g.nodeColor(g.nodeColor());
         g.linkColor(g.linkColor());
       }
+      if (selectedNodeId && (selectedNodeId !== prevSelected || focusSeq > 0)) {
+        focusCameraOnNode(selectedNodeId, 520);
+      }
     } catch {
       // ignore if tearing down
     }
-  }, [selectedNodeId, highlightIds, messagePassingActive, hop1Ids, hop2Ids, mode]);
+  }, [selectedNodeId, focusSeq, highlightIds, messagePassingActive, hop1Ids, hop2Ids, mode]);
 
   // Mount & configure ForceGraph (2D) or ForceGraph3D (3D)
   useEffect(() => {
@@ -182,7 +235,7 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
 
     const radiusFor = (n: { degree: number }) => {
       const ratio = Math.sqrt(Math.max(1, n.degree)) / Math.sqrt(Math.max(1, maxDegRef.current));
-      return 3.4 + ratio * 7.8;
+      return 2.3 + ratio * 4.8;
     };
 
     const getFocusId = () => hoveredIdRef.current || selectedIdRef.current;
@@ -242,10 +295,18 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
 
         host.innerHTML = '';
 
+        // Scale initial backend coordinates [-11.5, 11.5] to a compact initial layout radius
         const fgNodes: FGNode[] = nodes.map((n) => ({
           ...n,
+          x: (n.x || 0) * 8,
+          y: (n.y || 0) * 8,
+          z: (n.z || 0) * 8,
           color: KIND_COLOR[n.kind] || '#64748B',
         }));
+        const fgMap = new Map<string, FGNode>();
+        for (const fn of fgNodes) fgMap.set(fn.id, fn);
+        fgNodesRef.current = fgMap;
+
         const fgLinks: FGLink[] = filteredEdges.map((e) => ({
           source: e.source,
           target: e.target,
@@ -256,10 +317,10 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
           width: e.is_public ? 1.0 : 1.15,
         }));
 
-        let userMoved = false;
+        userMovedRef.current = false;
         let firstFitDone = false;
         const markMoved = () => {
-          userMoved = true;
+          userMovedRef.current = true;
         };
         host.addEventListener('pointerdown', markMoved, { passive: true });
         host.addEventListener('wheel', markMoved, { passive: true });
@@ -288,19 +349,19 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
               if (isHl) {
                 ctx.globalAlpha = 0.9;
                 ctx.beginPath();
-                ctx.arc(node.x, node.y, r + 5 / scale, 0, 2 * Math.PI, false);
+                ctx.arc(node.x, node.y, r + 4.5 / scale, 0, 2 * Math.PI, false);
                 ctx.fillStyle = 'rgba(255, 214, 10, 0.55)';
                 ctx.fill();
               } else if (isMpHop1) {
                 ctx.globalAlpha = 0.32;
                 ctx.beginPath();
-                ctx.arc(node.x, node.y, r + 5.5 / scale, 0, 2 * Math.PI, false);
+                ctx.arc(node.x, node.y, r + 5 / scale, 0, 2 * Math.PI, false);
                 ctx.fillStyle = '#EF4444';
                 ctx.fill();
               } else if (isMpHop2) {
                 ctx.globalAlpha = 0.28;
                 ctx.beginPath();
-                ctx.arc(node.x, node.y, r + 4.5 / scale, 0, 2 * Math.PI, false);
+                ctx.arc(node.x, node.y, r + 4 / scale, 0, 2 * Math.PI, false);
                 ctx.fillStyle = '#FF5A1F';
                 ctx.fill();
               }
@@ -312,51 +373,61 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
               ctx.fill();
 
               if (isHl) {
-                ctx.lineWidth = 2.4 / scale;
+                ctx.lineWidth = 2.2 / scale;
                 ctx.strokeStyle = '#b8860b';
                 ctx.stroke();
               } else if (isMpHop1) {
-                ctx.lineWidth = 2.0 / scale;
+                ctx.lineWidth = 1.9 / scale;
                 ctx.strokeStyle = '#EF4444';
                 ctx.stroke();
               } else if (isMpHop2) {
-                ctx.lineWidth = 1.8 / scale;
+                ctx.lineWidth = 1.7 / scale;
                 ctx.strokeStyle = '#FF5A1F';
                 ctx.stroke();
               } else if (!dim) {
-                ctx.lineWidth = 1.2 / scale;
+                ctx.lineWidth = 1.1 / scale;
                 ctx.strokeStyle = '#ffffff';
                 ctx.stroke();
               }
 
               if (node.id === selectedIdRef.current) {
                 ctx.beginPath();
-                ctx.arc(node.x, node.y, r + 3.5 / scale, 0, 2 * Math.PI, false);
+                ctx.arc(node.x, node.y, r + 3.2 / scale, 0, 2 * Math.PI, false);
                 ctx.lineWidth = 2.0 / scale;
                 ctx.strokeStyle = isMpOn ? '#FF5A1F' : '#0F172A';
                 ctx.stroke();
               }
 
+              const isSelectedOrHovered =
+                node.id === selectedIdRef.current || node.id === hoveredIdRef.current;
               const showLabel =
                 !dim &&
-                (node.id === selectedIdRef.current ||
-                  node.id === hoveredIdRef.current ||
-                  (f && isNeighborOrSelf(f, node.id) && scale > 1.05) ||
-                  (isHl && scale > 0.7) ||
-                  scale > 1.65);
+                (isSelectedOrHovered ||
+                  (f && isNeighborOrSelf(f, node.id) && scale > 0.95) ||
+                  (isHl && scale > 0.75) ||
+                  scale > 2.25);
 
               if (showLabel) {
-                const fs = Math.max(6, 11 / scale);
+                // Khi phóng to (scale lớn), nút to ra nhưng chữ thu nhỏ nhẹ trên màn hình (8.5px - 10.5px)
+                // và tuyệt đối không bị chặn sàn world-unit làm chữ phình to đè lên nút.
+                const baseScreenPx = isSelectedOrHovered ? 11.0 : 9.6;
+                const zoomShrink = Math.max(0.76, 1.04 - Math.log2(Math.max(1, scale)) * 0.08);
+                const screenPx = Math.max(8.0, baseScreenPx * zoomShrink);
+                const fs = screenPx / scale;
+
                 let lab = String(node.label || '');
-                if (lab.length > 28) lab = `${lab.slice(0, 27)}…`;
-                ctx.font = `600 ${fs}px "Plus Jakarta Sans", system-ui, sans-serif`;
+                const maxLen = scale > 3.5 ? 36 : 26;
+                if (lab.length > maxLen) lab = `${lab.slice(0, maxLen - 1)}…`;
+
+                ctx.font = `${isSelectedOrHovered ? 700 : 600} ${fs}px "Plus Jakarta Sans", system-ui, sans-serif`;
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'middle';
-                ctx.lineWidth = 3 / scale;
-                ctx.strokeStyle = 'rgba(255,255,255,0.94)';
-                ctx.strokeText(lab, node.x + r + 4 / scale, node.y);
-                ctx.fillStyle = '#0F172A';
-                ctx.fillText(lab, node.x + r + 4 / scale, node.y);
+                ctx.lineWidth = 2.6 / scale;
+                ctx.strokeStyle = 'rgba(255,255,255,0.92)';
+                const pad = r + 3.2 / scale;
+                ctx.strokeText(lab, node.x + pad, node.y);
+                ctx.fillStyle = isSelectedOrHovered ? '#C2410C' : '#0F172A';
+                ctx.fillText(lab, node.x + pad, node.y);
               }
               ctx.globalAlpha = 1;
             })
@@ -416,10 +487,10 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
               );
               return hop === 1 ? '#EF4444' : '#FF5A1F';
             })
-            .d3AlphaDecay(0.026)
-            .d3VelocityDecay(0.32)
-            .warmupTicks(45)
-            .cooldownTicks(260)
+            .d3AlphaDecay(0.032)
+            .d3VelocityDecay(0.36)
+            .warmupTicks(55)
+            .cooldownTicks(200)
             .onNodeHover((n: FGNode | null) => {
               hoveredIdRef.current = n ? n.id : null;
               host.style.cursor = n ? 'pointer' : 'grab';
@@ -428,7 +499,6 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
             .onNodeClick((n: FGNode) => {
               const now = Date.now();
               if (lastClick.id === n.id && now - lastClick.t < 380) {
-                // Double click unpins the node
                 n.fx = undefined;
                 n.fy = undefined;
                 lastClick = { id: null, t: 0 };
@@ -438,8 +508,7 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
               selectedIdRef.current = n.id;
               const orig = nodeByIdRef.current.get(n.id) ?? n;
               onSelectRef.current?.(orig);
-              Graph.centerAt(n.x, n.y, 450);
-              if (Graph.zoom() < 1.8) Graph.zoom(1.8, 450);
+              focusCameraOnNode(n.id, 480);
             })
             .onNodeDragEnd((n: FGNode) => {
               n.fx = n.x;
@@ -450,16 +519,50 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
               onSelectRef.current?.(null);
             })
             .onEngineStop(() => {
-              if (!firstFitDone && !userMoved) {
+              if (!firstFitDone && !userMovedRef.current) {
                 firstFitDone = true;
                 try {
-                  Graph.zoomToFit(450, 38);
+                  if (selectedIdRef.current && fgNodesRef.current.has(selectedIdRef.current)) {
+                    focusCameraOnNode(selectedIdRef.current, 450);
+                  } else {
+                    Graph.zoomToFit(450, 36);
+                  }
                 } catch {
                   // ignore
                 }
               }
             })
             .graphData({ nodes: fgNodes, links: fgLinks });
+
+          // Điều chỉnh lực D3 để các cụm phụ không bị bắn ra góc xa và cạnh không bị kéo giãn quá dài
+          try {
+            const chargeForce = Graph.d3Force('charge');
+            if (chargeForce) {
+              if (typeof chargeForce.strength === 'function') chargeForce.strength(-22);
+              if (typeof chargeForce.distanceMax === 'function') chargeForce.distanceMax(115);
+            }
+            const linkForce = Graph.d3Force('link');
+            if (linkForce && typeof linkForce.distance === 'function') {
+              linkForce.distance(20);
+            }
+            // Lực gom tâm mềm: giữ các cụm rời/nhánh lẻ nằm gọn quanh khối chính
+            Graph.d3Force(' radialPull', (alpha: number) => {
+              const k = alpha * 0.16;
+              for (const n of fgNodes) {
+                const x = n.x || 0;
+                const y = n.y || 0;
+                const dist = Math.hypot(x, y);
+                const extra = dist > 140 ? 1.8 : 1.0;
+                n.vx = (n.vx || 0) - x * k * extra;
+                n.vy = (n.vy || 0) - y * k * extra;
+              }
+            });
+            if (typeof Graph.d3ReheatSimulation === 'function') {
+              Graph.d3ReheatSimulation();
+            }
+          } catch {
+            // ignore
+          }
 
           graphRef.current = Graph;
 
@@ -478,9 +581,13 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
           ro.observe(host);
 
           fitTimer = window.setTimeout(() => {
-            if (!disposed && !userMoved) {
+            if (!disposed && !userMovedRef.current) {
               try {
-                Graph.zoomToFit(450, 38);
+                if (selectedIdRef.current && fgNodesRef.current.has(selectedIdRef.current)) {
+                  focusCameraOnNode(selectedIdRef.current, 450);
+                } else {
+                  Graph.zoomToFit(450, 36);
+                }
               } catch {
                 // ignore
               }
@@ -488,11 +595,32 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
           }, 520);
         } else {
           // Classic 3d-force-graph (Three.js/WebGL)
+          // Lưu ý: KHÔNG gọi d3Force() hay d3ReheatSimulation() trên 3d-force-graph
+          // vì bundle 3d-force-graph sẽ bật engineRunning trước khi t.layout khởi tạo -> TypeError reading 'tick'.
+          // Đồng thời đặt width/height trước khi nạp graphData().
+          const initW = Math.max(300, host.clientWidth || 720);
+          const initH = Math.max(380, host.clientHeight || 540);
+
+          const fgNodes3D: FGNode[] = nodes.map((n) => ({
+            ...n,
+            x: (n.x || 0) * 14,
+            y: (n.y || 0) * 14,
+            z: (n.z || 0) * 14,
+            color: KIND_COLOR[n.kind] || '#64748B',
+          }));
+          const fgMap3D = new Map<string, FGNode>();
+          for (const fn of fgNodes3D) fgMap3D.set(fn.id, fn);
+          fgNodesRef.current = fgMap3D;
+
           const Graph3D = window.ForceGraph3D!()(host)
+            .width(initW)
+            .height(initH)
             .backgroundColor('#ffffff')
+            .showNavInfo(false)
             .nodeId('id')
             .nodeLabel((n: FGNode) => `${KIND_LABEL[n.kind]} · ${n.label} (bậc ${n.degree})`)
-            .nodeVal((n: FGNode) => Math.max(1.5, Math.sqrt(Math.max(1, n.degree)) * 2.2))
+            .nodeRelSize(3.0)
+            .nodeVal((n: FGNode) => Math.max(0.8, Math.sqrt(Math.max(1, n.degree)) * 1.15))
             .nodeResolution(12)
             .nodeOpacity(0.95)
             .nodeColor((n: FGNode) => {
@@ -550,9 +678,9 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
               );
               return hop === 1 ? 3 : hop === 2 ? 2 : 0;
             })
-            .linkDirectionalParticleWidth(2.4)
+            .linkDirectionalParticleWidth(2.2)
             .linkDirectionalParticleSpeed(0.008)
-            .cooldownTicks(180)
+            .cooldownTicks(45)
             .onNodeHover((n: FGNode | null) => {
               hoveredIdRef.current = n ? n.id : null;
               host.style.cursor = n ? 'pointer' : 'grab';
@@ -574,18 +702,23 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
               } catch {
                 // ignore
               }
+              focusCameraOnNode(n.id, 600);
             })
             .onEngineStop(() => {
-              if (!firstFitDone && !userMoved) {
+              if (!firstFitDone && !userMovedRef.current) {
                 firstFitDone = true;
                 try {
-                  Graph3D.zoomToFit(500, 45);
+                  if (selectedIdRef.current && fgNodesRef.current.has(selectedIdRef.current)) {
+                    focusCameraOnNode(selectedIdRef.current, 550);
+                  } else {
+                    Graph3D.zoomToFit(500, 40);
+                  }
                 } catch {
                   // ignore
                 }
               }
             })
-            .graphData({ nodes: fgNodes, links: fgLinks });
+            .graphData({ nodes: fgNodes3D, links: fgLinks });
 
           graphRef.current = Graph3D;
 
@@ -604,9 +737,13 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
           ro.observe(host);
 
           fitTimer = window.setTimeout(() => {
-            if (!disposed && !userMoved) {
+            if (!disposed && !userMovedRef.current) {
               try {
-                Graph3D.zoomToFit(500, 45);
+                if (selectedIdRef.current && fgNodesRef.current.has(selectedIdRef.current)) {
+                  focusCameraOnNode(selectedIdRef.current, 550);
+                } else {
+                  Graph3D.zoomToFit(500, 40);
+                }
               } catch {
                 // ignore
               }

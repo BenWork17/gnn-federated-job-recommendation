@@ -71,6 +71,7 @@ const DEFENSE_STEPS: DefenseStep[] = [
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -87,30 +88,47 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     navigate(DEFENSE_STEPS[clamped].to);
   };
 
-  const renderSidebarContent = (onNavigate?: () => void) => (
-    <div className="flex h-full flex-col justify-between p-4">
+  const renderSidebarContent = (onNavigate?: () => void, collapsed = false) => (
+    <div className={`flex h-full flex-col justify-between ${collapsed ? 'p-2.5' : 'p-4'}`}>
       <div>
         {/* Brand Header */}
-        <div className="flex items-center justify-between px-2 pb-4 mb-3 border-b border-slate-200/80">
+        <div
+          className={`flex items-center ${
+            collapsed ? 'flex-col gap-2 pb-3' : 'justify-between px-2 pb-4'
+          } mb-3 border-b border-slate-200/80`}
+        >
           <div className="flex items-center gap-2.5">
-            <div className="relative flex h-9 w-9 items-center justify-center rounded-[10px] bg-gradient-to-b from-[#FF5A1F] to-[#EA580C] text-white shadow-[0_2px_8px_rgba(255,90,31,0.32)]">
+            <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-b from-[#FF5A1F] to-[#EA580C] text-white shadow-[0_2px_8px_rgba(255,90,31,0.32)]">
               <Network size={18} strokeWidth={2} />
             </div>
-            <div>
-              <div className="font-display text-[1.02rem] font-bold tracking-[-0.025em] text-[#0F172A] leading-tight">
-                FedGraph
+            {!collapsed && (
+              <div>
+                <div className="font-display text-[1.02rem] font-bold tracking-[-0.025em] text-[#0F172A] leading-tight">
+                  FedGraph
+                </div>
+                <div className="font-mono-tech text-[0.65rem] font-semibold uppercase tracking-[0.08em] text-[#C2410C]">
+                  GNN · FL Job Reco
+                </div>
               </div>
-              <div className="font-mono-tech text-[0.65rem] font-semibold uppercase tracking-[0.08em] text-[#C2410C]">
-                GNN · FL Job Reco
-              </div>
-            </div>
+            )}
           </div>
+          {!onNavigate && (
+            <button
+              type="button"
+              onClick={() => setSidebarCollapsed((v) => !v)}
+              title={collapsed ? 'Mở rộng thanh taskbar bên trái' : 'Thu nhỏ thanh taskbar bên trái'}
+              aria-label={collapsed ? 'Mở rộng thanh taskbar bên trái' : 'Thu nhỏ thanh taskbar bên trái'}
+              className="hidden md:inline-flex items-center justify-center rounded-lg border border-orange-200/90 bg-[#FFF7ED]/90 p-1.5 text-[#C2410C] hover:border-[#FF5A1F] hover:bg-orange-100/80 transition-all cursor-pointer"
+            >
+              {collapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}
+            </button>
+          )}
           {onNavigate && (
             <button
               type="button"
               onClick={onNavigate}
               aria-label="Đóng menu"
-              className="lg:hidden rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900 cursor-pointer"
+              className="md:hidden rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900 cursor-pointer"
             >
               <X size={18} />
             </button>
@@ -132,7 +150,10 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 to={item.to}
                 end={item.to === '/'}
                 onClick={onNavigate}
-                className={`group relative flex items-center gap-3 rounded-[9px] px-3 py-2.5 text-[0.88rem] font-medium transition-colors ${
+                title={collapsed ? item.label : undefined}
+                className={`group relative flex items-center ${
+                  collapsed ? 'justify-center px-2 py-2.5' : 'gap-3 px-3 py-2.5'
+                } rounded-[9px] text-[0.88rem] font-medium transition-colors ${
                   isActive
                     ? 'text-[#C2410C] font-semibold'
                     : 'text-[#475569] hover:bg-[#FFF7ED]/75 hover:text-[#0F172A]'
@@ -154,22 +175,50 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                       : 'text-[#64748B] group-hover:text-[#0F172A]'
                   }`}
                 />
-                <span className="relative z-10 truncate">{item.label}</span>
+                {!collapsed && <span className="relative z-10 truncate">{item.label}</span>}
               </NavLink>
             );
           })}
         </nav>
       </div>
 
-      {/* Presentation Mode Trigger + Framed Academic Footer */}
-      <div className="space-y-2.5 mt-4">
+      {/* Sidebar Collapse Button + Presentation Mode Trigger + Framed Academic Footer */}
+      <div className="space-y-2 mt-4">
+        {!onNavigate && (
+          <button
+            type="button"
+            onClick={() => setSidebarCollapsed((v) => !v)}
+            title={collapsed ? 'Mở rộng thanh bên' : 'Thu nhỏ thanh bên'}
+            className={`hidden md:flex w-full items-center ${
+              collapsed ? 'justify-center px-2 py-2' : 'justify-between gap-2 px-3 py-2'
+            } rounded-[10px] border border-orange-200/90 bg-[#FFF7ED]/85 text-xs font-semibold text-[#C2410C] hover:border-[#FF5A1F] hover:bg-orange-100/70 transition-all cursor-pointer`}
+          >
+            {collapsed ? (
+              <ChevronRight size={15} />
+            ) : (
+              <>
+                <span className="inline-flex items-center gap-1.5">
+                  <ChevronLeft size={14} />
+                  <span>Thu nhỏ thanh bên</span>
+                </span>
+                <span className="font-mono-tech text-[10px] rounded px-1.5 py-0.5 bg-white/80 text-[#C2410C] border border-orange-200">
+                  «
+                </span>
+              </>
+            )}
+          </button>
+        )}
+
         <button
           type="button"
           onClick={() => {
             setGuideOpen((v) => !v);
             onNavigate?.();
           }}
-          className={`w-full flex items-center justify-between gap-2 rounded-[10px] border px-3 py-2 text-xs font-semibold transition-all cursor-pointer ${
+          title={collapsed ? 'Chế độ Thuyết trình (5 bước)' : undefined}
+          className={`w-full flex items-center ${
+            collapsed ? 'justify-center px-2 py-2' : 'justify-between gap-2 px-3 py-2'
+          } rounded-[10px] border text-xs font-semibold transition-all cursor-pointer ${
             guideOpen
               ? 'border-[#FF5A1F] bg-[#FFF7ED] text-[#C2410C] shadow-xs'
               : 'border-slate-200/90 bg-white/80 text-slate-700 hover:border-orange-300 hover:bg-[#FFF7ED]/70 hover:text-[#C2410C]'
@@ -177,30 +226,34 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         >
           <span className="inline-flex items-center gap-2">
             <Presentation size={14} className={guideOpen ? 'text-[#FF5A1F]' : 'text-slate-500'} />
-            <span>Chế độ Thuyết trình</span>
+            {!collapsed && <span>Chế độ Thuyết trình</span>}
           </span>
-          <span
-            className={`font-mono-tech text-[10px] rounded-full px-1.5 py-0.5 ${
-              guideOpen ? 'bg-[#FF5A1F] text-white' : 'bg-slate-100 text-slate-500'
-            }`}
-          >
-            {guideOpen ? 'ON' : '5 bước'}
-          </span>
+          {!collapsed && (
+            <span
+              className={`font-mono-tech text-[10px] rounded-full px-1.5 py-0.5 ${
+                guideOpen ? 'bg-[#FF5A1F] text-white' : 'bg-slate-100 text-slate-500'
+              }`}
+            >
+              {guideOpen ? 'ON' : '5 bước'}
+            </span>
+          )}
         </button>
 
-        <div className="sb-footer p-3.5">
-          <div className="font-mono-tech text-[0.66rem] font-bold uppercase tracking-[0.08em] text-[#C2410C] mb-1.5">
-            Đồ án cuối kỳ — DSS
+        {!collapsed && (
+          <div className="sb-footer p-3.5">
+            <div className="font-mono-tech text-[0.66rem] font-bold uppercase tracking-[0.08em] text-[#C2410C] mb-1.5">
+              Đồ án cuối kỳ — DSS
+            </div>
+            <div className="space-y-0.5 text-[0.79rem] font-medium text-[#0F172A]">
+              <div>Phan Gia Bảo · <span className="font-mono-tech text-[0.74rem] text-[#475569]">102220265</span></div>
+              <div>Nguyễn Văn Chương · <span className="font-mono-tech text-[0.74rem] text-[#475569]">102220267</span></div>
+            </div>
+            <div className="mt-2 pt-2 border-t border-slate-200/80 font-mono-tech text-[0.66rem] text-[#64748B] space-y-0.5">
+              <div className="font-semibold text-[#0F172A]">CareerBuilder + O*NET (V3)</div>
+              <div>9.116 nodes · 264.995 nút · 764.364 cạnh</div>
+            </div>
           </div>
-          <div className="space-y-0.5 text-[0.79rem] font-medium text-[#0F172A]">
-            <div>Phan Gia Bảo · <span className="font-mono-tech text-[0.74rem] text-[#475569]">102220265</span></div>
-            <div>Nguyễn Văn Chương · <span className="font-mono-tech text-[0.74rem] text-[#475569]">102220267</span></div>
-          </div>
-          <div className="mt-2 pt-2 border-t border-slate-200/80 font-mono-tech text-[0.66rem] text-[#64748B] space-y-0.5">
-            <div className="font-semibold text-[#0F172A]">CareerBuilder + O*NET (V3)</div>
-            <div>9.116 nodes · 264.995 nút · 764.364 cạnh</div>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
@@ -212,12 +265,16 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
       <div className="relative z-10 flex min-h-screen">
         {/* Desktop Sidebar */}
-        <aside className="hidden lg:block w-[264px] shrink-0 sticky top-0 h-screen sidebar-glass z-20">
-          {renderSidebarContent()}
+        <aside
+          className={`hidden md:block ${
+            sidebarCollapsed ? 'w-[72px]' : 'w-[264px]'
+          } shrink-0 sticky top-0 h-screen sidebar-glass z-20 transition-[width] duration-200 ease-out`}
+        >
+          {renderSidebarContent(undefined, sidebarCollapsed)}
         </aside>
 
         {/* Mobile Top Bar */}
-        <div className="lg:hidden fixed top-0 inset-x-0 h-14 z-30 flex items-center justify-between px-4 sidebar-glass border-b border-slate-200/80">
+        <div className="md:hidden fixed top-0 inset-x-0 h-14 z-30 flex items-center justify-between px-4 sidebar-glass border-b border-slate-200/80">
           <div className="flex items-center gap-2">
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-b from-[#FF5A1F] to-[#EA580C] text-white">
               <Network size={15} strokeWidth={2} />
@@ -261,7 +318,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         </AnimatePresence>
 
         {/* Main Content Viewport */}
-        <main className={`flex-1 min-w-0 pt-18 lg:pt-7 px-4 sm:px-6 lg:px-9 ${guideOpen ? 'pb-32' : 'pb-12'}`}>
+        <main className={`flex-1 min-w-0 pt-18 md:pt-7 px-4 sm:px-6 lg:px-9 ${guideOpen ? 'pb-32' : 'pb-12'}`}>
           <div className="mx-auto max-w-[1360px]">{children}</div>
         </main>
       </div>

@@ -104,11 +104,16 @@ def _payload(nodes: pd.DataFrame, edges: pd.DataFrame) -> dict:
     Toạ độ đưa vào bằng `x/y/z` (không phải `fx/fy/fz`): `fx/fy/fz` là ghim
     cứng, sẽ làm lực đẩy 3D vô hiệu và đồ thị đặc lại rất khó đọc.
     """
+    use_id = ("node_id" in nodes.columns) and ({"source", "target"} <= set(edges.columns))
     scale = 220.0
     ns = []
+    ids = set()
+    keyed = {}
     for r in nodes.itertuples(index=False):
+        nid = str(r.node_id) if use_id else f"{r.label}|{r.x:.5f}|{r.y:.5f}"
+        ids.add(nid)
         ns.append({
-            "id": f"{r.label}|{r.x:.5f}|{r.y:.5f}",
+            "id": nid,
             "name": str(r.label),
             "kind": str(r.kind),
             "deg": int(r.degree),
@@ -116,21 +121,28 @@ def _payload(nodes: pd.DataFrame, edges: pd.DataFrame) -> dict:
             "y": (float(r.y) - 0.5) * scale,
             "z": (float(r.z) - 0.5) * scale,
         })
-
-    keyed = {}
-    for r in nodes.itertuples(index=False):
-        keyed[(round(float(r.x), 5), round(float(r.y), 5))] = \
-            f"{r.label}|{r.x:.5f}|{r.y:.5f}"
+        if not use_id:
+            keyed[(round(float(r.x), 5), round(float(r.y), 5))] = nid
 
     links = []
-    for r in edges.itertuples(index=False):
-        a = keyed.get((round(float(r.x), 5), round(float(r.y), 5)))
-        b = keyed.get((round(float(r.x2), 5), round(float(r.y2), 5)))
-        if a and b:
-            # source/target là CHUỖI ID, không phải object — tránh phụ thuộc
-            # vào việc thư viện đã thay object vào chưa
-            links.append({"source": a, "target": b,
-                          "kind": str(r.edge_kind)})
+    if use_id:
+        has_edge_kind = "edge_kind" in edges.columns
+        for r in edges.itertuples(index=False):
+            a, b = str(r.source), str(r.target)
+            if a in ids and b in ids and a != b:
+                ek = str(r.edge_kind if has_edge_kind else getattr(r, "kind", "Công khai"))
+                # source/target là CHUỖI ID, không phải object — tránh phụ thuộc
+                # vào việc thư viện đã thay object vào chưa
+                links.append({"source": a, "target": b, "kind": ek})
+    else:
+        for r in edges.itertuples(index=False):
+            a = keyed.get((round(float(r.x), 5), round(float(r.y), 5)))
+            b = keyed.get((round(float(r.x2), 5), round(float(r.y2), 5)))
+            if a and b:
+                # source/target là CHUỖI ID, không phải object — tránh phụ thuộc
+                # vào việc thư viện đã thay object vào chưa
+                links.append({"source": a, "target": b,
+                              "kind": str(r.edge_kind)})
     return {"nodes": ns, "links": links}
 
 
@@ -158,7 +170,7 @@ _JS_APP = r"""
   }
 
   var ALLN = DATA.nodes, ALLL = DATA.links;
-  var ORIG = {}, MAXDEG = 1;
+  var ORIG = {}, MAXDEG = 0;
   var byId = {};
   ALLN.forEach(function (n) {
     ORIG[n.id] = { x: n.x, y: n.y, z: n.z };
@@ -167,7 +179,7 @@ _JS_APP = r"""
   });
 
   var mode = 'force';
-  var minDeg = 1;
+  var minDeg = 0;
   var focusOn = true;
   var hovered = null, pinned = null, focusSet = null, adj = null;
   var ready = false;
@@ -430,9 +442,13 @@ _JS_APP = r"""
   });
 
   var slider = document.getElementById('degs');
-  slider.max = Math.min(20, MAXDEG);
+  slider.min = 0;
+  slider.max = Math.max(1, Math.min(20, MAXDEG));
+  slider.value = minDeg;
+  document.getElementById('degv').textContent = minDeg;
   slider.addEventListener('input', function () {
-    minDeg = parseInt(slider.value, 10) || 1;
+    var parsed = parseInt(slider.value, 10);
+    minDeg = isNaN(parsed) ? 0 : parsed;
     document.getElementById('degv').textContent = minDeg;
     try { render(); }
     catch (e) { fail('Lọc theo bậc thất bại: ' + e.message); }
@@ -640,8 +656,8 @@ def graph_html_3d(
   </div>
   <div class="row">
     <span class="lab">Bậc ≥</span>
-    <input type="range" id="degs" min="1" max="10" value="1">
-    <span id="degv" class="muted">1</span>
+    <input type="range" id="degs" min="0" max="10" value="0">
+    <span id="degv" class="muted">0</span>
     <span id="degcount" class="muted"></span>
   </div>
   <div class="row">

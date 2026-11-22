@@ -72,7 +72,83 @@ PAGES = [
 
 nav = st.navigation(PAGES, position="sidebar")
 
+if "sb_mini" not in st.session_state:
+    st.session_state["sb_mini"] = False
+
 with st.sidebar:
+    _is_mini = bool(st.session_state.get("sb_mini", False))
+    with st.container(key="sb-toggle-wrap"):
+        _lbl = "»" if _is_mini else "« Thu nhỏ thanh bên"
+        _hlp = (
+            "Mở rộng thanh taskbar bên trái"
+            if _is_mini
+            else "Thu nhỏ thanh taskbar bên trái thành thanh icon gọn"
+        )
+        if st.button(_lbl, key="sb-mini-toggle-btn", help=_hlp, width="stretch"):
+            st.session_state["sb_mini"] = not _is_mini
+            st.rerun()
+
+    if st.session_state.get("sb_mini", False):
+        st.markdown(
+            """
+            <style>
+            section[data-testid="stSidebar"][aria-expanded="true"],
+            [data-testid="stSidebar"][aria-expanded="true"] {
+                width: 68px !important;
+                min-width: 68px !important;
+                max-width: 68px !important;
+                flex: 0 0 68px !important;
+                transition: width 0.2s ease, min-width 0.2s ease;
+            }
+            [data-testid="stSidebar"][aria-expanded="true"] > div,
+            [data-testid="stSidebarContent"] {
+                width: 68px !important;
+                min-width: 68px !important;
+                max-width: 68px !important;
+                overflow-x: hidden !important;
+            }
+            [data-testid="stSidebarHeader"] {
+                padding: 0.35rem 0.25rem !important;
+                justify-content: center !important;
+            }
+            [data-testid="stSidebarNav"]::before {
+                display: none !important;
+            }
+            [data-testid="stSidebarNavItems"] {
+                padding: 0 !important;
+            }
+            [data-testid="stSidebarNavLink"] {
+                justify-content: center !important;
+                padding: 0.55rem 0 !important;
+                margin: 4px 0.35rem !important;
+            }
+            [data-testid="stSidebarNavItems"] li a::before {
+                margin-right: 0 !important;
+                width: 20px !important;
+                height: 20px !important;
+                flex: 0 0 20px !important;
+            }
+            [data-testid="stSidebarNavLink"] span {
+                display: none !important;
+            }
+            [data-testid="stSidebarUserContent"] {
+                padding-left: 0.35rem !important;
+                padding-right: 0.35rem !important;
+            }
+            div[class*="st-key-sb-toggle-wrap"] button {
+                padding: 0.3rem 0 !important;
+                min-width: 0 !important;
+                font-size: 1rem !important;
+                justify-content: center !important;
+            }
+            .sb-footer {
+                display: none !important;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
+
     st.markdown(
         """
         <div class="sb-footer">

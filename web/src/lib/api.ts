@@ -195,6 +195,7 @@ export interface OverviewResponse {
 
 export interface GraphNodeRich extends GraphNode3D {
   kind_label: string;
+  global_degree?: number;
 }
 
 export interface GraphEdgeRich extends GraphEdge3D {
@@ -207,6 +208,36 @@ export interface GraphHit {
   kind_label: string;
   label: string;
   degree: number;
+}
+
+export interface GraphSiloInfo {
+  client_id: number;
+  name: string;
+  n_jobs: number;
+  n_users: number;
+  n_occs: number;
+  n_skills: number;
+  n_nodes: number;
+  n_edges: number;
+  n_public: number;
+  n_private: number;
+  n_apps: number;
+  truncated: boolean;
+}
+
+export interface GraphEgoInfo {
+  center_id: string;
+  center_label: string;
+  center_kind: 'user' | 'job' | 'occupation' | 'skill';
+  center_kind_label: string;
+  hops: number;
+  extra_ids: string[];
+  total_unfiltered_nodes: number;
+  truncated: boolean;
+  n_jobs: number;
+  n_users: number;
+  n_occs: number;
+  n_skills: number;
 }
 
 export interface GraphResponse {
@@ -233,7 +264,20 @@ export interface GraphResponse {
   edges: GraphEdgeRich[];
   hits: GraphHit[];
   hit_ids: string[];
-  query: { limit: number; q: string; kind: string };
+  mode?: 'silo' | 'ego' | 'sample';
+  total_silos?: number;
+  silos?: V3Employer[];
+  silo_info?: GraphSiloInfo | null;
+  ego_info?: GraphEgoInfo | null;
+  query: {
+    limit: number;
+    q: string;
+    kind: string;
+    mode?: string;
+    client_id?: number;
+    center_id?: number | null;
+    hops?: number;
+  };
 }
 
 export interface FlScenarioMetric {
@@ -373,11 +417,31 @@ export const api = {
 
   overview: () => fetchJson<OverviewResponse>('/api/dashboard/overview'),
 
-  graph: async (params?: { limit?: number; q?: string; kind?: string }): Promise<GraphResponse> => {
+  graph: async (params?: {
+    limit?: number;
+    q?: string;
+    kind?: string;
+    mode?: 'silo' | 'ego' | 'sample';
+    client_id?: number;
+    center_id?: string | number | null;
+    hops?: 1 | 2;
+    extra_ids?: string[];
+    silo_q?: string;
+  }): Promise<GraphResponse> => {
     const qs = new URLSearchParams();
     if (params?.limit) qs.set('limit', String(params.limit));
     if (params?.q) qs.set('q', params.q);
     if (params?.kind && params.kind !== 'all') qs.set('kind', params.kind);
+    if (params?.mode) qs.set('mode', params.mode);
+    if (params?.client_id !== undefined) qs.set('client_id', String(params.client_id));
+    if (params?.center_id !== undefined && params?.center_id !== null && params?.center_id !== '') {
+      qs.set('center_id', String(params.center_id));
+    }
+    if (params?.hops) qs.set('hops', String(params.hops));
+    if (params?.extra_ids && params.extra_ids.length > 0) {
+      qs.set('extra_ids', params.extra_ids.join(','));
+    }
+    if (params?.silo_q) qs.set('silo_q', params.silo_q);
     const suffix = qs.toString() ? `?${qs.toString()}` : '';
     const raw = await fetchJson<
       Omit<GraphResponse, 'nodes' | 'edges' | 'hits' | 'hit_ids'> & {

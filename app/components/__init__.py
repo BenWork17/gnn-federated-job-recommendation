@@ -431,11 +431,12 @@ def _graph_payload_2d(nodes: pd.DataFrame, edges: pd.DataFrame) -> dict:
     hàm này không phụ thuộc cứng vào một nguồn dữ liệu.
     """
     has_xy = {"x", "y"} <= set(nodes.columns)
+    use_id = ("node_id" in nodes.columns) and ({"source", "target"} <= set(edges.columns))
 
     ns: list[dict] = []
     keyed: dict[tuple[float, float], str] = {}
     for i, row in enumerate(nodes.to_dict("records")):
-        nid = f"n{i}"
+        nid = str(row["node_id"]) if use_id else f"n{i}"
         ns.append({
             "id": nid,
             "label": str(row.get("label", nid)),
@@ -452,8 +453,8 @@ def _graph_payload_2d(nodes: pd.DataFrame, edges: pd.DataFrame) -> dict:
         for row in edges.to_dict("records"):
             a, b = str(row["source"]), str(row["target"])
             if a in ids and b in ids and a != b:
-                links.append({"source": a, "target": b,
-                              "kind": str(row.get("kind", "Công khai"))})
+                kind = str(row.get("edge_kind", row.get("kind", "Công khai")))
+                links.append({"source": a, "target": b, "kind": kind})
     elif has_xy:
         for row in edges.to_dict("records"):
             a = keyed.get((round(float(row["x"]), 6),
