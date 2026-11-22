@@ -394,6 +394,27 @@ input[type="range"].range-orange::-moz-range-thumb {
     0 4px 12px -4px rgba(15, 23, 42, 0.06);
 }
 
+/* 3d-force-graph / force-graph tooltip override: force crisp black text on white background */
+.scene-tooltip,
+.float-tooltip-kap,
+.graph-tooltip {
+  color: #0F172A !important;
+  background: rgba(255, 255, 255, 0.97) !important;
+  border: 1px solid #CBD5E1 !important;
+  border-radius: 8px !important;
+  padding: 5px 9px !important;
+  font-family: var(--font-sans) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 1.35 !important;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.14) !important;
+  pointer-events: none !important;
+}
+
+.scene-nav-info {
+  color: #0F172A !important;
+}
+
 /* Custom thin scrollbars */
 ::-webkit-scrollbar {
   width: 7px;

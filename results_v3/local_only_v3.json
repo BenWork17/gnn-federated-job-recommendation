@@ -1,0 +1,112 @@
+{
+  "experiment": "Local-only LightGCN vs FedAvg (20N Fixed FL Catalog)",
+  "generated_at": "2026-11-22T04:08:43Z",
+  "environment": {
+    "device": "cpu",
+    "python": "3.13.0",
+    "numpy": "2.4.2",
+    "torch": "2.10.0+cpu"
+  },
+  "config": {
+    "n_clients": 20,
+    "n_catalog": 4511,
+    "n_eval_users": 800,
+    "dim": 32,
+    "layers": 2,
+    "lr": 0.05,
+    "reg": 1e-05,
+    "local_epochs": 1,
+    "rounds": 4,
+    "total_local_steps_per_client": 80,
+    "seed": 42,
+    "n_boot": 1000
+  },
+  "silo_cross_client_stats": {
+    "eval_users_with_ge1_train_edge_in_20N": 458,
+    "eval_users_with_test_positive_in_seen_client": 248,
+    "pct_eval_users_cross_silo_only": 69.0,
+    "avg_seen_clients_per_eval_user_in_20N": 0.839
+  },
+  "evaluation_rules": {
+    "local_only_strict_silo": "Primary Local-only rule (no FedAvg aggregation, no global graph propagation). Each of the 20 clients trains its own local subgraph E_c independently for 4 rounds x 20 Adam steps = 80 steps (continuing locally without server averaging) and produces local propagated embeddings out_c = propagate(E_c, adj_c, L=2). For eval user u and catalog job j owned by client c = client_of_job[j], score(u, j) = out_c[u] @ out_c[j] if u appears in client c's local subgraph, and -1e9 if client c has never observed u (cannot transfer preferences across silos without FL aggregation).",
+    "local_only_stitched_eval_upper_bound": "Sensitivity check (no FedAvg during training, post-hoc stitched eval only). Uses the exact same independently trained E_c matrices, stitches client embeddings by averaging nodes across clients that observed them, and runs full_forward once on ADJ_FULL at evaluation time. Included to isolate training-time aggregation vs eval-time cross-silo propagation."
+  },
+  "results": {
+    "local_only_strict_silo": {
+      "recall@10": 0.2307,
+      "recall@20": 0.246,
+      "ndcg@20": 0.1876,
+      "mrr@20": 0.1765,
+      "coverage@10": 0.0652,
+      "recall@10_ci95": [
+        0.2019,
+        0.2581
+      ],
+      "recall@20_ci95": [
+        0.216,
+        0.274
+      ],
+      "ndcg@20_ci95": [
+        0.1644,
+        0.2111
+      ],
+      "mrr@20_ci95": [
+        0.153,
+        0.2003
+      ],
+      "train_seconds": 86.72,
+      "mean_final_loss": 0.000464,
+      "latency_p50_ms": 321.12
+    },
+    "local_only_stitched_upper_bound": {
+      "recall@10": 0.3637,
+      "recall@20": 0.3939,
+      "ndcg@20": 0.284,
+      "mrr@20": 0.259,
+      "coverage@10": 0.0924,
+      "recall@10_ci95": [
+        0.3309,
+        0.3983
+      ],
+      "recall@20_ci95": [
+        0.3615,
+        0.4298
+      ],
+      "ndcg@20_ci95": [
+        0.2564,
+        0.3131
+      ],
+      "mrr@20_ci95": [
+        0.2314,
+        0.2877
+      ],
+      "train_seconds": 86.72
+    },
+    "fedavg_20n_repro": {
+      "recall@10": 0.4445,
+      "recall@20": 0.4833,
+      "ndcg@20": 0.3469,
+      "mrr@20": 0.315,
+      "coverage@10": 0.0794,
+      "recall@10_ci95": [
+        0.4105,
+        0.4783
+      ],
+      "recall@20_ci95": [
+        0.4505,
+        0.5175
+      ],
+      "ndcg@20_ci95": [
+        0.319,
+        0.3755
+      ],
+      "mrr@20_ci95": [
+        0.2859,
+        0.3458
+      ],
+      "train_seconds": 32.86,
+      "latency_p50_ms": 353.96
+    }
+  },
+  "total_script_seconds": 124.47
+}

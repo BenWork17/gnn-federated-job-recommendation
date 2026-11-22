@@ -517,7 +517,7 @@ export const JobGraphPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setSelectedNodeId(null)}
-                    className="text-xs font-semibold text-[#64748B] hover:text-[#0F172A] cursor-pointer"
+                    className="text-xs font-bold text-black hover:text-[#C2410C] cursor-pointer"
                   >
                     Bỏ chọn
                   </button>
@@ -537,7 +537,7 @@ export const JobGraphPage: React.FC = () => {
                       />
                       {selectedNode.kind_label}
                     </span>
-                    <h3 className="font-display text-lg font-bold text-[#0F172A] mt-2 leading-snug">
+                    <h3 className="font-display text-lg font-bold text-black mt-2 leading-snug">
                       {selectedNode.label}
                     </h3>
                   </div>
@@ -556,7 +556,7 @@ export const JobGraphPage: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => handleSetEgoCenter(selectedNode.id)}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:border-orange-300 hover:text-[#C2410C] cursor-pointer"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-bold text-black hover:border-orange-300 hover:text-[#C2410C] cursor-pointer"
                       >
                         <Target size={13} />
                         <span>Đặt làm tâm Ego-graph</span>
@@ -565,25 +565,25 @@ export const JobGraphPage: React.FC = () => {
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">
-                    <div className="rounded-lg bg-white/85 border border-slate-200/80 p-2.5">
-                      <div className="font-mono-tech text-[0.65rem] text-[#64748B] uppercase">
+                    <div className="rounded-lg bg-white/95 border border-slate-300 p-2.5">
+                      <div className="font-mono-tech text-[0.65rem] font-bold text-black uppercase">
                         Bậc đang vẽ / Toàn V3
                       </div>
-                      <div className="font-display text-base font-bold tabular-nums">
+                      <div className="font-display text-base font-bold text-black tabular-nums">
                         {selectedNode.degree}
                         {selectedNode.global_degree !== undefined && (
-                          <span className="text-xs font-normal text-slate-500">
+                          <span className="text-xs font-semibold text-black">
                             {' '}
                             / {selectedNode.global_degree.toLocaleString('vi-VN')}
                           </span>
                         )}
                       </div>
                     </div>
-                    <div className="rounded-lg bg-white/85 border border-slate-200/80 p-2.5">
-                      <div className="font-mono-tech text-[0.65rem] text-[#64748B] uppercase">
+                    <div className="rounded-lg bg-white/95 border border-slate-300 p-2.5">
+                      <div className="font-mono-tech text-[0.65rem] font-bold text-black uppercase">
                         Phạm vi lưu trữ
                       </div>
-                      <div className="text-xs font-bold mt-1 text-[#0F172A]">
+                      <div className="text-xs font-bold mt-1 text-black">
                         {selectedNode.kind === 'user' ? 'Riêng tư (Client)' : 'Công khai (Server)'}
                       </div>
                     </div>
@@ -644,7 +644,7 @@ export const JobGraphPage: React.FC = () => {
                   </div>
 
                   <div>
-                    <div className="font-mono-tech text-[0.68rem] uppercase text-[#64748B] font-semibold mb-1.5">
+                    <div className="font-mono-tech text-[0.68rem] uppercase text-black font-bold mb-1.5">
                       Láng giềng trực tiếp ({neighbors.length})
                     </div>
                     <div className="space-y-1.5 max-h-[210px] overflow-y-auto pr-1">
@@ -653,7 +653,7 @@ export const JobGraphPage: React.FC = () => {
                           key={`${node.id}-${edgeLabel}`}
                           type="button"
                           onClick={() => selectAndFocusNode(node.id)}
-                          className="w-full flex items-center justify-between gap-2 rounded-lg border border-slate-200/80 bg-white/80 hover:border-[#FDBA74] px-2.5 py-1.5 text-left transition-colors cursor-pointer"
+                          className="w-full flex items-center justify-between gap-2 rounded-lg border border-slate-300 bg-white/95 hover:border-[#FDBA74] px-2.5 py-1.5 text-left transition-colors cursor-pointer"
                         >
                           <div className="min-w-0 flex items-center gap-2">
                             <span
@@ -661,7 +661,7 @@ export const JobGraphPage: React.FC = () => {
                                 KIND_BADGE_COLOR[node.kind].dot
                               }`}
                             />
-                            <span className="text-xs font-medium text-[#0F172A] truncate">
+                            <span className="text-xs font-semibold text-black truncate">
                               {node.label}
                             </span>
                           </div>

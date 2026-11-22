@@ -618,7 +618,10 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
             .backgroundColor('#ffffff')
             .showNavInfo(false)
             .nodeId('id')
-            .nodeLabel((n: FGNode) => `${KIND_LABEL[n.kind]} · ${n.label} (bậc ${n.degree})`)
+            .nodeLabel(
+              (n: FGNode) =>
+                `<div style="color:#000000;background:#ffffff;border:1px solid #94a3b8;border-radius:7px;padding:4px 8px;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:12px;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,0.14);line-height:1.35">${KIND_LABEL[n.kind]} · ${n.label} (bậc ${n.degree})</div>`,
+            )
             .nodeRelSize(3.0)
             .nodeVal((n: FGNode) => Math.max(0.8, Math.sqrt(Math.max(1, n.degree)) * 1.15))
             .nodeResolution(12)
@@ -811,6 +814,13 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
     }
   };
 
+  const activeBadgeNode = useMemo(
+    () =>
+      hoveredInfo?.node ??
+      (selectedNodeId ? nodes.find((n) => n.id === selectedNodeId) ?? null : null),
+    [hoveredInfo, selectedNodeId, nodes],
+  );
+
   return (
     <div
       className={`relative w-full h-full bg-white overflow-hidden rounded-[12px] ${className}`}
@@ -824,7 +834,7 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
           <button
             type="button"
             onClick={handleClearFocus}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white/92 px-2.5 py-1.5 text-xs font-semibold text-slate-700 shadow-sm backdrop-blur-md hover:border-orange-300 hover:text-[#C2410C] cursor-pointer"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white/96 px-2.5 py-1.5 text-xs font-bold text-black shadow-sm backdrop-blur-md hover:border-orange-400 hover:text-[#C2410C] cursor-pointer"
           >
             <RotateCcw size={13} />
             <span>Bỏ chọn</span>
@@ -833,38 +843,38 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
         <button
           type="button"
           onClick={handleFitView}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white/92 px-2.5 py-1.5 text-xs font-semibold text-slate-700 shadow-sm backdrop-blur-md hover:border-orange-300 hover:text-[#C2410C] cursor-pointer"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white/96 px-2.5 py-1.5 text-xs font-bold text-black shadow-sm backdrop-blur-md hover:border-orange-400 hover:text-[#C2410C] cursor-pointer"
         >
           <Maximize2 size={13} />
           <span>Vừa khung</span>
         </button>
       </div>
 
-      {/* Hover quick badge (top-left) */}
-      {hoveredInfo && (
-        <div className="pointer-events-none absolute top-3 left-3 z-10 max-w-[300px] rounded-xl border border-slate-200 bg-white/94 px-3 py-2 shadow-md backdrop-blur-md">
-          <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500">
+      {/* Hover / Selected quick badge (top-left) — crisp black text on white */}
+      {activeBadgeNode && (
+        <div className="pointer-events-none absolute top-3 left-3 z-10 max-w-[340px] rounded-xl border border-slate-300 bg-white/98 px-3 py-2 shadow-md backdrop-blur-md">
+          <div className="flex items-center gap-1.5 text-[11px] font-bold text-black">
             <span
-              className="h-2 w-2 rounded-full shrink-0"
-              style={{ background: KIND_COLOR[hoveredInfo.node.kind] }}
+              className="h-2.5 w-2.5 rounded-full shrink-0"
+              style={{ background: KIND_COLOR[activeBadgeNode.kind] }}
             />
-            <span>{KIND_LABEL[hoveredInfo.node.kind]}</span>
-            <span className="ml-auto font-mono text-[10px] text-slate-400">
-              bậc {hoveredInfo.node.degree}
+            <span>{KIND_LABEL[activeBadgeNode.kind]}</span>
+            <span className="ml-auto font-mono text-[10.5px] font-bold text-black">
+              bậc {activeBadgeNode.degree}
             </span>
           </div>
-          <div className="text-xs font-semibold text-slate-900 truncate mt-0.5">
-            {hoveredInfo.node.label}
+          <div className="text-xs font-bold text-black truncate mt-0.5">
+            {activeBadgeNode.label}
           </div>
         </div>
       )}
 
       {/* Classic clean floating legend (bottom-left) */}
-      <div className="pointer-events-none absolute bottom-3 left-3 z-10 rounded-xl border border-slate-200/90 bg-white/92 px-3 py-2.5 text-[11.5px] text-slate-700 shadow-sm backdrop-blur-md">
-        <div className="font-semibold text-slate-900 mb-1.5">Loại nút</div>
+      <div className="pointer-events-none absolute bottom-3 left-3 z-10 rounded-xl border border-slate-300 bg-white/96 px-3 py-2.5 text-[11.5px] font-medium text-black shadow-sm backdrop-blur-md">
+        <div className="font-bold text-black mb-1.5">Loại nút</div>
         <div className="space-y-1">
           {(['user', 'job', 'skill', 'occupation'] as const).map((k) => (
-            <div key={k} className="flex items-center gap-2">
+            <div key={k} className="flex items-center gap-2 text-black">
               <span
                 className="h-2.5 w-2.5 rounded-full ring-1 ring-white shadow-xs"
                 style={{ background: KIND_COLOR[k] }}
@@ -873,13 +883,13 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
             </div>
           ))}
         </div>
-        <div className="font-semibold text-slate-900 mt-2.5 mb-1">Loại cạnh</div>
+        <div className="font-bold text-black mt-2.5 mb-1">Loại cạnh</div>
         <div className="space-y-1">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 text-black">
             <span className="h-[2.5px] w-3.5 rounded-full bg-[#F97316]" />
             <span>Công khai</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 text-black">
             <span className="h-[2.5px] w-3.5 rounded-full bg-[#EF4444]" />
             <span>Riêng tư</span>
           </div>
@@ -887,7 +897,7 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
       </div>
 
       {/* Minimal interaction hint (bottom-right) */}
-      <div className="pointer-events-none absolute bottom-3 right-3 z-10 hidden sm:block rounded-full border border-slate-200/80 bg-white/88 px-3 py-1 text-[11px] text-slate-500 backdrop-blur-md">
+      <div className="pointer-events-none absolute bottom-3 right-3 z-10 hidden sm:block rounded-full border border-slate-300 bg-white/95 px-3 py-1 text-[11px] font-semibold text-black backdrop-blur-md">
         {mode === '2d'
           ? 'Kéo nút để dời · thả ra để ghim · bấm đúp để bỏ ghim · cuộn để zoom'
           : 'Kéo để xoay 3D · cuộn để zoom · bấm nút để soi liên kết'}
