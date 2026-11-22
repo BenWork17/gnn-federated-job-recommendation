@@ -10,9 +10,6 @@
   <img src="https://img.shields.io/badge/ML-PyTorch%20%C2%B7%20LightGCN%20%C2%B7%20FedAvg%20%2F%20FedProx-EA580C?style=flat-square" alt="PyTorch GNN + FL" />
 </p>
 
-> **Đồ án cuối kỳ môn Hệ hỗ trợ quyết định (DSS)** — Đại học Bách khoa, Đại học Đà Nẵng (DUT)
-> **Nhóm thực hiện:** Phan Gia Bảo (`102220265`) · Nguyễn Văn Chương (`102220267`)
-
 Hệ thống gợi ý việc làm bảo vệ quyền riêng tư kết hợp **Heterogeneous Graph Neural Networks (LightGCN / GraphSAGE / GAT)** và **Cross-Silo Federated Learning (FedAvg / FedProx)** trên quy mô thực tế **CareerBuilder + O\*NET (V3)** gồm **9.116 nhà tuyển dụng (FL silos)**, **264.995 nút** và **764.364 cạnh** — đi kèm ứng dụng web full-stack **React + Three.js + FastAPI + PostgreSQL**.
 
 ---

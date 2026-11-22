@@ -80,6 +80,9 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
   showPrivate,
   highlightIds,
   selectedNodeId,
+  messagePassingActive = false,
+  hop1Ids,
+  hop2Ids,
   onSelectNode,
   className = '',
 }) => {
@@ -91,6 +94,9 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
   // Refs synced with latest React props so callbacks & canvas paint always read fresh state
   const hoveredIdRef = useRef<string | null>(null);
   const selectedIdRef = useRef<string | null>(selectedNodeId ?? null);
+  const mpActiveRef = useRef<boolean>(messagePassingActive);
+  const hop1SetRef = useRef<Set<string>>(new Set(hop1Ids ?? []));
+  const hop2SetRef = useRef<Set<string>>(new Set(hop2Ids ?? []));
   const highlightSetRef = useRef<Set<string>>(new Set());
   const highlightFocusSetRef = useRef<Set<string>>(new Set());
   const adjRef = useRef<Map<string, Set<string>>>(new Map());
@@ -145,20 +151,26 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
     highlightFocusSetRef.current = hlFocus;
   }, [nodes, filteredEdges, highlightIds]);
 
-  // Sync external selectedNodeId into ref and re-render graph
+  // Sync external selectedNodeId & 2-Hop Message Passing sets into refs
   useEffect(() => {
     selectedIdRef.current = selectedNodeId ?? null;
+    mpActiveRef.current = Boolean(messagePassingActive && selectedNodeId);
+    hop1SetRef.current = new Set(hop1Ids ?? []);
+    hop2SetRef.current = new Set(hop2Ids ?? []);
     const g = graphRef.current;
     if (!g) return;
-    if (mode === '3d') {
-      try {
+    try {
+      if (typeof g.linkDirectionalParticles === 'function') {
+        g.linkDirectionalParticles(g.linkDirectionalParticles());
+      }
+      if (mode === '3d') {
         g.nodeColor(g.nodeColor());
         g.linkColor(g.linkColor());
-      } catch {
-        // ignore if tearing down
       }
+    } catch {
+      // ignore if tearing down
     }
-  }, [selectedNodeId, highlightIds, mode]);
+  }, [selectedNodeId, highlightIds, messagePassingActive, hop1Ids, hop2Ids, mode]);
 
   // Mount & configure ForceGraph (2D) or ForceGraph3D (3D)
   useEffect(() => {
@@ -178,7 +190,34 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
     const isNeighborOrSelf = (focusId: string, nodeId: string) =>
       focusId === nodeId || Boolean(adjRef.current.get(focusId)?.has(nodeId));
 
+    const isInMessagePassing = (nodeId: string) => {
+      if (!mpActiveRef.current || !selectedIdRef.current) return false;
+      return (
+        nodeId === selectedIdRef.current ||
+        hop1SetRef.current.has(nodeId) ||
+        hop2SetRef.current.has(nodeId)
+      );
+    };
+
+    const getMessagePassingEdgeHop = (s: string, t: string): 0 | 1 | 2 => {
+      if (!mpActiveRef.current || !selectedIdRef.current) return 0;
+      const sel = selectedIdRef.current;
+      if ((s === sel && hop1SetRef.current.has(t)) || (t === sel && hop1SetRef.current.has(s))) {
+        return 1;
+      }
+      if (
+        (hop1SetRef.current.has(s) && hop2SetRef.current.has(t)) ||
+        (hop1SetRef.current.has(t) && hop2SetRef.current.has(s))
+      ) {
+        return 2;
+      }
+      return 0;
+    };
+
     const nodeAlpha = (nodeId: string) => {
+      if (mpActiveRef.current && selectedIdRef.current) {
+        return isInMessagePassing(nodeId) ? 1 : 0.06;
+      }
       const f = getFocusId();
       if (f) return isNeighborOrSelf(f, nodeId) ? 1 : 0.1;
       const hl = highlightSetRef.current;
@@ -242,11 +281,27 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
               const f = getFocusId();
               const isHl = highlightSetRef.current.size > 0 && !f && highlightSetRef.current.has(node.id);
 
+              const isMpOn = mpActiveRef.current && Boolean(selectedIdRef.current);
+              const isMpHop1 = isMpOn && hop1SetRef.current.has(node.id);
+              const isMpHop2 = isMpOn && hop2SetRef.current.has(node.id);
+
               if (isHl) {
                 ctx.globalAlpha = 0.9;
                 ctx.beginPath();
                 ctx.arc(node.x, node.y, r + 5 / scale, 0, 2 * Math.PI, false);
                 ctx.fillStyle = 'rgba(255, 214, 10, 0.55)';
+                ctx.fill();
+              } else if (isMpHop1) {
+                ctx.globalAlpha = 0.32;
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, r + 5.5 / scale, 0, 2 * Math.PI, false);
+                ctx.fillStyle = '#EF4444';
+                ctx.fill();
+              } else if (isMpHop2) {
+                ctx.globalAlpha = 0.28;
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, r + 4.5 / scale, 0, 2 * Math.PI, false);
+                ctx.fillStyle = '#FF5A1F';
                 ctx.fill();
               }
 
@@ -260,6 +315,14 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
                 ctx.lineWidth = 2.4 / scale;
                 ctx.strokeStyle = '#b8860b';
                 ctx.stroke();
+              } else if (isMpHop1) {
+                ctx.lineWidth = 2.0 / scale;
+                ctx.strokeStyle = '#EF4444';
+                ctx.stroke();
+              } else if (isMpHop2) {
+                ctx.lineWidth = 1.8 / scale;
+                ctx.strokeStyle = '#FF5A1F';
+                ctx.stroke();
               } else if (!dim) {
                 ctx.lineWidth = 1.2 / scale;
                 ctx.strokeStyle = '#ffffff';
@@ -268,9 +331,9 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
 
               if (node.id === selectedIdRef.current) {
                 ctx.beginPath();
-                ctx.arc(node.x, node.y, r + 3 / scale, 0, 2 * Math.PI, false);
-                ctx.lineWidth = 1.7 / scale;
-                ctx.strokeStyle = '#0F172A';
+                ctx.arc(node.x, node.y, r + 3.5 / scale, 0, 2 * Math.PI, false);
+                ctx.lineWidth = 2.0 / scale;
+                ctx.strokeStyle = isMpOn ? '#FF5A1F' : '#0F172A';
                 ctx.stroke();
               }
 
@@ -305,9 +368,15 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
             })
             .nodeLabel(() => '')
             .linkColor((l: FGLink) => {
-              const f = getFocusId();
               const s = getLinkEndpointId(l.source);
               const t = getLinkEndpointId(l.target);
+              if (mpActiveRef.current && selectedIdRef.current) {
+                const hop = getMessagePassingEdgeHop(s, t);
+                if (hop === 1) return hexToRgba(l.is_public ? '#FF5A1F' : '#EF4444', 0.92);
+                if (hop === 2) return hexToRgba('#FF5A1F', 0.72);
+                return hexToRgba(l.color, 0.03);
+              }
+              const f = getFocusId();
               if (f) {
                 return s === f || t === f ? hexToRgba(l.color, 0.85) : hexToRgba(l.color, 0.06);
               }
@@ -318,11 +387,34 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
               return hexToRgba(l.color, l.alpha);
             })
             .linkWidth((l: FGLink) => {
-              const f = getFocusId();
               const s = getLinkEndpointId(l.source);
               const t = getLinkEndpointId(l.target);
+              if (mpActiveRef.current && selectedIdRef.current) {
+                const hop = getMessagePassingEdgeHop(s, t);
+                if (hop === 1) return 2.4;
+                if (hop === 2) return 1.65;
+                return 0.35;
+              }
+              const f = getFocusId();
               if (f) return s === f || t === f ? 1.8 : 0.5;
               return l.width;
+            })
+            .linkDirectionalParticles((l: FGLink) => {
+              if (!mpActiveRef.current || !selectedIdRef.current) return 0;
+              const hop = getMessagePassingEdgeHop(
+                getLinkEndpointId(l.source),
+                getLinkEndpointId(l.target),
+              );
+              return hop === 1 ? 3 : hop === 2 ? 2 : 0;
+            })
+            .linkDirectionalParticleWidth(3.2)
+            .linkDirectionalParticleSpeed(0.008)
+            .linkDirectionalParticleColor((l: FGLink) => {
+              const hop = getMessagePassingEdgeHop(
+                getLinkEndpointId(l.source),
+                getLinkEndpointId(l.target),
+              );
+              return hop === 1 ? '#EF4444' : '#FF5A1F';
             })
             .d3AlphaDecay(0.026)
             .d3VelocityDecay(0.32)
@@ -404,6 +496,12 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
             .nodeResolution(12)
             .nodeOpacity(0.95)
             .nodeColor((n: FGNode) => {
+              if (mpActiveRef.current && selectedIdRef.current) {
+                if (n.id === selectedIdRef.current) return '#0F172A';
+                if (hop1SetRef.current.has(n.id)) return '#EF4444';
+                if (hop2SetRef.current.has(n.id)) return '#FF5A1F';
+                return '#e8ecf1';
+              }
               const f = getFocusId();
               if (f && !isNeighborOrSelf(f, n.id)) return '#e8ecf1';
               if (highlightSetRef.current.size > 0 && !f) {
@@ -413,9 +511,15 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
               return n.color;
             })
             .linkColor((l: FGLink) => {
-              const f = getFocusId();
               const s = getLinkEndpointId(l.source);
               const t = getLinkEndpointId(l.target);
+              if (mpActiveRef.current && selectedIdRef.current) {
+                const hop = getMessagePassingEdgeHop(s, t);
+                if (hop === 1) return '#EF4444';
+                if (hop === 2) return '#FF5A1F';
+                return '#f2f5f8';
+              }
+              const f = getFocusId();
               if (f && s !== f && t !== f) return '#f2f5f8';
               if (highlightSetRef.current.size > 0 && !f) {
                 if (!(highlightFocusSetRef.current.has(s) && highlightFocusSetRef.current.has(t))) {
@@ -426,12 +530,28 @@ export const JobGraphExplorer3D: React.FC<JobGraphExplorer3DProps> = ({
             })
             .linkOpacity(0.5)
             .linkWidth((l: FGLink) => {
-              const f = getFocusId();
               const s = getLinkEndpointId(l.source);
               const t = getLinkEndpointId(l.target);
+              if (mpActiveRef.current && selectedIdRef.current) {
+                const hop = getMessagePassingEdgeHop(s, t);
+                if (hop === 1) return 2.2;
+                if (hop === 2) return 1.5;
+                return 0.3;
+              }
+              const f = getFocusId();
               if (f && (s === f || t === f)) return 1.8;
               return 0.8;
             })
+            .linkDirectionalParticles((l: FGLink) => {
+              if (!mpActiveRef.current || !selectedIdRef.current) return 0;
+              const hop = getMessagePassingEdgeHop(
+                getLinkEndpointId(l.source),
+                getLinkEndpointId(l.target),
+              );
+              return hop === 1 ? 3 : hop === 2 ? 2 : 0;
+            })
+            .linkDirectionalParticleWidth(2.4)
+            .linkDirectionalParticleSpeed(0.008)
             .cooldownTicks(180)
             .onNodeHover((n: FGNode | null) => {
               hoveredIdRef.current = n ? n.id : null;

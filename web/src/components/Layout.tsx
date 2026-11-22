@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutGrid,
@@ -9,6 +9,9 @@ import {
   ClipboardCheck,
   Menu,
   X,
+  Presentation,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { WarmSilkAurora } from './three';
 
@@ -26,9 +29,63 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/ket-luan', label: 'Kết luận & hạn chế', icon: ClipboardCheck },
 ];
 
+interface DefenseStep {
+  to: string;
+  title: string;
+  point: string;
+}
+
+const DEFENSE_STEPS: DefenseStep[] = [
+  {
+    to: '/',
+    title: 'Kiến trúc tổng thể & Kết quả chính',
+    point:
+      'Trình bày bài toán gợi ý việc làm bảo vệ quyền riêng tư: tách 52.544 Public Edges và 711.820 Private Edges trên 9.116 employer silos (0 B raw data rời máy).',
+  },
+  {
+    to: '/do-thi',
+    title: 'Đồ thị Heterogeneous & LightGCN 2-Hop',
+    point:
+      'Chọn 1 nút việc làm/kỹ năng rồi bấm "Minh họa 2-Hop" để giải thích cách LightGCN lan truyền tín hiệu qua Public Graph Backbone (O*NET) mà không cần lộ dữ liệu riêng.',
+  },
+  {
+    to: '/lien-bang',
+    title: 'Ablation Study & Phân tích hội tụ FL',
+    point:
+      'So sánh Centralized vs Federated (FedAvg / FedProx), đánh giá Privacy-Utility Trade-off và phân bố Non-IID giữa 9.116 doanh nghiệp.',
+  },
+  {
+    to: '/giam-sat-node',
+    title: 'Thực nghiệm Live: Dropout, Straggler & Fairness',
+    point:
+      'Chạy nhanh Preset 1 → Preset 2/3 để so sánh A/B trực tiếp, và click điểm trên Scatter Non-IID để đối chiếu Client Drift với 3D Topology.',
+  },
+  {
+    to: '/ket-luan',
+    title: 'Tổng kết đóng góp & Hướng phát triển',
+    point:
+      'Chốt lại giá trị nghiên cứu của hệ thống (FL Catalog, 0 B Data Leakage) cùng các hạn chế về DP-SGD, Secure Aggregation và kế hoạch mở rộng.',
+  },
+];
+
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const currentStepIdx = Math.max(
+    0,
+    DEFENSE_STEPS.findIndex((s) =>
+      s.to === '/' ? location.pathname === '/' : location.pathname.startsWith(s.to),
+    ),
+  );
+  const currentStep = DEFENSE_STEPS[currentStepIdx];
+
+  const goToStep = (idx: number) => {
+    const clamped = Math.max(0, Math.min(DEFENSE_STEPS.length - 1, idx));
+    navigate(DEFENSE_STEPS[clamped].to);
+  };
 
   const renderSidebarContent = (onNavigate?: () => void) => (
     <div className="flex h-full flex-col justify-between p-4">
@@ -104,18 +161,45 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         </nav>
       </div>
 
-      {/* Framed Academic Footer */}
-      <div className="sb-footer p-3.5 mt-4">
-        <div className="font-mono-tech text-[0.66rem] font-bold uppercase tracking-[0.08em] text-[#C2410C] mb-1.5">
-          Đồ án cuối kỳ — DSS
-        </div>
-        <div className="space-y-0.5 text-[0.79rem] font-medium text-[#0F172A]">
-          <div>Phan Gia Bảo · <span className="font-mono-tech text-[0.74rem] text-[#475569]">102220265</span></div>
-          <div>Nguyễn Văn Chương · <span className="font-mono-tech text-[0.74rem] text-[#475569]">102220267</span></div>
-        </div>
-        <div className="mt-2 pt-2 border-t border-slate-200/80 font-mono-tech text-[0.66rem] text-[#64748B] space-y-0.5">
-          <div className="font-semibold text-[#0F172A]">CareerBuilder + O*NET (V3)</div>
-          <div>9.116 nodes · 264.995 nút · 764.364 cạnh</div>
+      {/* Presentation Mode Trigger + Framed Academic Footer */}
+      <div className="space-y-2.5 mt-4">
+        <button
+          type="button"
+          onClick={() => {
+            setGuideOpen((v) => !v);
+            onNavigate?.();
+          }}
+          className={`w-full flex items-center justify-between gap-2 rounded-[10px] border px-3 py-2 text-xs font-semibold transition-all cursor-pointer ${
+            guideOpen
+              ? 'border-[#FF5A1F] bg-[#FFF7ED] text-[#C2410C] shadow-xs'
+              : 'border-slate-200/90 bg-white/80 text-slate-700 hover:border-orange-300 hover:bg-[#FFF7ED]/70 hover:text-[#C2410C]'
+          }`}
+        >
+          <span className="inline-flex items-center gap-2">
+            <Presentation size={14} className={guideOpen ? 'text-[#FF5A1F]' : 'text-slate-500'} />
+            <span>Chế độ Thuyết trình</span>
+          </span>
+          <span
+            className={`font-mono-tech text-[10px] rounded-full px-1.5 py-0.5 ${
+              guideOpen ? 'bg-[#FF5A1F] text-white' : 'bg-slate-100 text-slate-500'
+            }`}
+          >
+            {guideOpen ? 'ON' : '5 bước'}
+          </span>
+        </button>
+
+        <div className="sb-footer p-3.5">
+          <div className="font-mono-tech text-[0.66rem] font-bold uppercase tracking-[0.08em] text-[#C2410C] mb-1.5">
+            Đồ án cuối kỳ — DSS
+          </div>
+          <div className="space-y-0.5 text-[0.79rem] font-medium text-[#0F172A]">
+            <div>Phan Gia Bảo · <span className="font-mono-tech text-[0.74rem] text-[#475569]">102220265</span></div>
+            <div>Nguyễn Văn Chương · <span className="font-mono-tech text-[0.74rem] text-[#475569]">102220267</span></div>
+          </div>
+          <div className="mt-2 pt-2 border-t border-slate-200/80 font-mono-tech text-[0.66rem] text-[#64748B] space-y-0.5">
+            <div className="font-semibold text-[#0F172A]">CareerBuilder + O*NET (V3)</div>
+            <div>9.116 nodes · 264.995 nút · 764.364 cạnh</div>
+          </div>
         </div>
       </div>
     </div>
@@ -177,10 +261,82 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         </AnimatePresence>
 
         {/* Main Content Viewport */}
-        <main className="flex-1 min-w-0 pt-18 lg:pt-7 pb-12 px-4 sm:px-6 lg:px-9">
+        <main className={`flex-1 min-w-0 pt-18 lg:pt-7 px-4 sm:px-6 lg:px-9 ${guideOpen ? 'pb-32' : 'pb-12'}`}>
           <div className="mx-auto max-w-[1360px]">{children}</div>
         </main>
       </div>
+
+      {/* Floating 5-Step Guided Defense Presentation Bar */}
+      <AnimatePresence>
+        {guideOpen && currentStep && (
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.22, ease: 'easeOut' }}
+            className="fixed bottom-4 left-1/2 -translate-x-1/2 lg:left-[calc(50%+132px)] z-40 w-[min(94vw,760px)] rounded-2xl border border-orange-200/90 bg-white/92 p-3.5 shadow-[0_14px_38px_-10px_rgba(15,23,42,0.22)] backdrop-blur-xl"
+          >
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className="min-w-0 flex-1 space-y-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-[#FF5A1F] px-2.5 py-0.5 font-mono-tech text-[10px] font-bold uppercase tracking-wider text-white">
+                    <Presentation size={11} />
+                    Bước {currentStepIdx + 1}/{DEFENSE_STEPS.length}
+                  </span>
+                  <span className="font-display text-sm font-bold text-[#0F172A]">
+                    {currentStep.title}
+                  </span>
+                  <div className="flex items-center gap-1 ml-1">
+                    {DEFENSE_STEPS.map((st, idx) => (
+                      <button
+                        key={st.to}
+                        type="button"
+                        onClick={() => goToStep(idx)}
+                        aria-label={`Đi tới bước ${idx + 1}: ${st.title}`}
+                        className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                          idx === currentStepIdx
+                            ? 'w-5 bg-[#FF5A1F]'
+                            : 'w-1.5 bg-slate-300 hover:bg-orange-300'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <p className="text-xs leading-relaxed text-[#475569]">{currentStep.point}</p>
+              </div>
+
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button
+                  type="button"
+                  disabled={currentStepIdx === 0}
+                  onClick={() => goToStep(currentStepIdx - 1)}
+                  className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:border-orange-300 hover:text-[#C2410C] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  <ChevronLeft size={13} />
+                  <span>Trước</span>
+                </button>
+                <button
+                  type="button"
+                  disabled={currentStepIdx === DEFENSE_STEPS.length - 1}
+                  onClick={() => goToStep(currentStepIdx + 1)}
+                  className="inline-flex items-center gap-1 rounded-lg bg-[#FF5A1F] px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-[#EA580C] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  <span>Tiếp theo</span>
+                  <ChevronRight size={13} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setGuideOpen(false)}
+                  aria-label="Đóng chế độ thuyết trình"
+                  className="rounded-lg border border-slate-200 bg-white p-1.5 text-slate-500 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 cursor-pointer"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

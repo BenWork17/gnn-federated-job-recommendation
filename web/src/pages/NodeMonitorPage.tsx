@@ -12,6 +12,8 @@ import {
   Pin,
   Trash2,
   GitCompareArrows,
+  Sparkles,
+  Scale,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -24,6 +26,10 @@ import {
   AreaChart,
   Area,
   Legend,
+  ScatterChart,
+  Scatter,
+  ZAxis,
+  Cell,
 } from 'recharts';
 import {
   api,
@@ -51,6 +57,70 @@ const COMPRESSION_META: Record<
   fp32: { label: 'FP32 (100%)', ratio: 1.0, recallPenalty: 0.0 },
   fp16: { label: 'FP16 (50%)', ratio: 0.5, recallPenalty: 0.004 },
   top20: { label: 'Top-20% (20%)', ratio: 0.2, recallPenalty: 0.015 },
+};
+
+interface ExperimentPreset {
+  id: string;
+  label: string;
+  hint: string;
+  nClients: number;
+  rounds: number;
+  algorithm: 'fedavg' | 'fedprox';
+  dropoutPct: 0 | 15 | 30;
+  stragglerPolicy: StragglerPolicy;
+  compression: CompressionMode;
+}
+
+const EXPERIMENT_PRESETS: ExperimentPreset[] = [
+  {
+    id: 'baseline',
+    label: 'Preset 1 · Baseline FedAvg',
+    hint: '100 clients · 8 vòng · 0% dropout · Sync · FP32',
+    nClients: 100,
+    rounds: 8,
+    algorithm: 'fedavg',
+    dropoutPct: 0,
+    stragglerPolicy: 'sync',
+    compression: 'fp32',
+  },
+  {
+    id: 'stress',
+    label: 'Preset 2 · Stress 30% Drop + Deadline',
+    hint: '100 clients · 8 vòng · FedProx · 30% dropout · cắt 65ms',
+    nClients: 100,
+    rounds: 8,
+    algorithm: 'fedprox',
+    dropoutPct: 30,
+    stragglerPolicy: 'deadline65',
+    compression: 'fp32',
+  },
+  {
+    id: 'compress',
+    label: 'Preset 3 · Nén 80% băng thông (Top-20%)',
+    hint: '100 clients · 8 vòng · FedProx · 15% dropout · Top-20% ΔW',
+    nClients: 100,
+    rounds: 8,
+    algorithm: 'fedprox',
+    dropoutPct: 15,
+    stragglerPolicy: 'deadline65',
+    compression: 'top20',
+  },
+];
+
+type ClientTier = 'large' | 'medium' | 'small' | 'offline';
+
+const SCATTER_TIER_COLOR: Record<ClientTier, string> = {
+  large: '#0F172A',
+  medium: '#FF5A1F',
+  small: '#0EA5E9',
+  offline: '#94A3B8',
+};
+
+const SCATTER_TIER_LABEL: Record<ClientTier, string> = {
+  large: 'Top 10% Large',
+  medium: 'Medium',
+  small: 'Long-Tail Small',
+  offline: 'Offline (Dropout)',
 };
 
 interface NodeCellState {
@@ -206,6 +276,7 @@ export const NodeMonitorPage: React.FC = () => {
   const [nodeView, setNodeView] = useState<'3d' | 'grid'>('3d');
   const [cellFilter, setCellFilter] = useState<'all' | 'active' | 'slow'>('all');
   const [xAxisMode, setXAxisMode] = useState<'round' | 'mb'>('round');
+  const [scatterY, setScatterY] = useState<'drift' | 'latency'>('drift');
 
   const [nodes, setNodes] = useState<NodeCellState[]>(() => makeFallbackNodes(100, 'fedavg'));
   const [selectedClientId, setSelectedClientId] = useState<number | null>(1001);
@@ -955,6 +1026,64 @@ export const NodeMonitorPage: React.FC = () => {
     return out;
   }, [roundPoints, baselineRun, xAxisMode]);
 
+  const applyPreset = (preset: ExperimentPreset) => {
+    if (running) return;
+    setNClients(preset.nClients);
+    setRounds(preset.rounds);
+    setAlgorithm(preset.algorithm);
+    setDropoutPct(preset.dropoutPct);
+    setStragglerPolicy(preset.stragglerPolicy);
+    setCompression(preset.compression);
+    appendLog('SYS', `Áp dụng kịch bản nhanh: ${preset.label} (${preset.hint}).`);
+  };
+
+  // Non-IID Fairness & Drift Scatter data (coordinated brushing with 3D Topology & Node Inspector)
+  const { scatterData, fairnessStats } = useMemo(() => {
+    const sortedApps = [...nodes].map((n) => n.nApps).sort((a, b) => a - b);
+    const p90 = sortedApps[Math.floor(sortedApps.length * 0.9)] ?? 100;
+    const p50 = sortedApps[Math.floor(sortedApps.length * 0.5)] ?? 20;
+
+    const pts = nodes.map((n) => {
+      const tier: ClientTier = n.isDropped
+        ? 'offline'
+        : n.nApps >= p90
+          ? 'large'
+          : n.nApps >= p50
+            ? 'medium'
+            : 'small';
+      return {
+        clientId: n.clientId,
+        name: n.name,
+        nApps: n.nApps,
+        logApps: Number(Math.log10(Math.max(1, n.nApps)).toFixed(2)),
+        yVal: scatterY === 'drift' ? n.drift : (n.latencyMs ?? 0),
+        drift: n.drift,
+        latencyMs: n.latencyMs,
+        weightSharePct: n.weightSharePct,
+        tier,
+        zSize: Math.max(36, Math.min(180, Math.round(n.weightSharePct * 42 + 44))),
+      };
+    });
+
+    const largeActive = pts.filter((p) => p.tier === 'large');
+    const smallActive = pts.filter((p) => p.tier === 'small');
+    const avgLargeDrift = largeActive.length
+      ? largeActive.reduce((s, p) => s + p.drift, 0) / largeActive.length
+      : 0;
+    const avgSmallDrift = smallActive.length
+      ? smallActive.reduce((s, p) => s + p.drift, 0) / smallActive.length
+      : 0;
+
+    return {
+      scatterData: pts,
+      fairnessStats: {
+        avgLargeDrift: Number(avgLargeDrift.toFixed(3)),
+        avgSmallDrift: Number(avgSmallDrift.toFixed(3)),
+        gap: Number(Math.abs(avgSmallDrift - avgLargeDrift).toFixed(3)),
+      },
+    };
+  }, [nodes, scatterY]);
+
   const formattedBytes =
     totalBytes >= 1024 * 1024
       ? `${(totalBytes / (1024 * 1024)).toFixed(2)} MB`
@@ -996,6 +1125,38 @@ export const NodeMonitorPage: React.FC = () => {
 
       {/* Compact Research Experiment Control Bar */}
       <GlassCard padding="sm" className="space-y-2.5">
+        {/* 1-Click Experiment Presets Strip */}
+        <div className="flex flex-wrap items-center gap-1.5 pb-2 border-b border-slate-200/75">
+          <span className="inline-flex items-center gap-1 font-mono-tech text-[10px] font-bold uppercase tracking-wider text-[#C2410C] mr-1">
+            <Sparkles size={11} />
+            Kịch bản mẫu:
+          </span>
+          {EXPERIMENT_PRESETS.map((preset) => {
+            const isMatched =
+              nClients === preset.nClients &&
+              rounds === preset.rounds &&
+              algorithm === preset.algorithm &&
+              dropoutPct === preset.dropoutPct &&
+              stragglerPolicy === preset.stragglerPolicy &&
+              compression === preset.compression;
+            return (
+              <button
+                key={preset.id}
+                type="button"
+                disabled={running}
+                onClick={() => applyPreset(preset)}
+                title={preset.hint}
+                className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-all cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed ${
+                  isMatched
+                    ? 'border-[#FF5A1F] bg-[#FFF7ED] text-[#C2410C] shadow-2xs'
+                    : 'border-slate-200 bg-white/85 text-slate-600 hover:border-orange-300 hover:text-[#0F172A]'
+                }`}
+              >
+                {preset.label}
+              </button>
+            );
+          })}
+        </div>
         <div className="flex flex-wrap items-center justify-between gap-2.5">
           <div className="flex flex-wrap items-center gap-2.5">
             <label className="flex items-center gap-1.5 text-xs font-semibold text-[#475569]">
@@ -1604,6 +1765,155 @@ export const NodeMonitorPage: React.FC = () => {
           </div>
         </GlassCard>
       </div>
+
+      {/* Non-IID Client Fairness & Drift Scatter Plot (Coordinated Brushing) */}
+      <GlassCard padding="md">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+          <div>
+            <div className="kicker-label flex items-center gap-1.5">
+              <Scale size={12} className="text-[#FF5A1F]" />
+              Non-IID Fairness &amp; Coordinated Brushing
+            </div>
+            <h3 className="font-display text-base font-bold text-[#0F172A]">
+              Phân bố Quy mô dữ liệu vs{' '}
+              {scatterY === 'drift' ? 'Client Drift' : 'Latency (ms)'} giữa {nodes.length} Employer Nodes
+            </h3>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2.5">
+            <div className="flex flex-wrap items-center gap-2 font-mono-tech text-[11px]">
+              <span className="rounded-lg border border-slate-200 bg-white/85 px-2.5 py-1 text-slate-700">
+                Top 10% Large Drift:{' '}
+                <strong className="text-[#0F172A]">{fairnessStats.avgLargeDrift.toFixed(3)}</strong>
+              </span>
+              <span className="rounded-lg border border-sky-200 bg-sky-50/80 px-2.5 py-1 text-sky-900">
+                Long-Tail Drift:{' '}
+                <strong className="text-sky-700">{fairnessStats.avgSmallDrift.toFixed(3)}</strong>
+              </span>
+              <span className="rounded-lg border border-orange-200 bg-[#FFF7ED] px-2.5 py-1 text-[#C2410C]">
+                Fairness Gap: <strong>Δ {fairnessStats.gap.toFixed(3)}</strong>
+              </span>
+            </div>
+
+            <SegmentedTabs
+              layoutId="scatter-y-axis"
+              size="sm"
+              value={scatterY}
+              onChange={setScatterY}
+              options={[
+                { id: 'drift', label: 'Client Drift' },
+                { id: 'latency', label: 'Latency (ms)' },
+              ]}
+            />
+          </div>
+        </div>
+
+        <div className="h-[260px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <ScatterChart margin={{ top: 10, right: 20, bottom: 14, left: -4 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+              <XAxis
+                type="number"
+                dataKey="logApps"
+                name="log10(nApps)"
+                domain={['dataMin - 0.1', 'dataMax + 0.1']}
+                tickFormatter={(v: number) => Number(v).toFixed(2)}
+                tick={{ fontSize: 11, fill: '#64748B' }}
+                stroke="#CBD5E1"
+                label={{
+                  value: 'Quy mô dữ liệu local: log₁₀(nApps)',
+                  position: 'insideBottom',
+                  offset: -8,
+                  style: { fontSize: 11, fill: '#64748B', fontWeight: 600 },
+                }}
+              />
+              <YAxis
+                type="number"
+                dataKey="yVal"
+                name={scatterY === 'drift' ? 'Client Drift' : 'Latency (ms)'}
+                domain={scatterY === 'drift' ? [0, 'dataMax + 0.12'] : ['auto', 'auto']}
+                tickFormatter={(v: number) =>
+                  scatterY === 'drift' ? Number(v).toFixed(2) : `${Math.round(v)}`
+                }
+                tick={{ fontSize: 11, fill: '#64748B' }}
+                stroke="#CBD5E1"
+              />
+              <ZAxis type="number" dataKey="zSize" range={[40, 210]} />
+              <Tooltip
+                cursor={{ strokeDasharray: '3 3', stroke: '#FF5A1F' }}
+                content={({ active, payload }) => {
+                  if (!active || !payload?.length) return null;
+                  const pt = payload[0].payload as (typeof scatterData)[number];
+                  return (
+                    <div className="rounded-xl border border-slate-200 bg-white/95 p-2.5 shadow-lg backdrop-blur-md text-xs space-y-1">
+                      <div className="font-display font-bold text-[#0F172A]">{pt.name}</div>
+                      <div className="font-mono-tech text-[10px] text-slate-500">
+                        {SCATTER_TIER_LABEL[pt.tier]} · client_id={pt.clientId}
+                      </div>
+                      <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 pt-1 border-t border-slate-100 font-mono-tech text-[11px]">
+                        <span className="text-slate-500">nApps:</span>
+                        <span className="font-semibold text-slate-900">{pt.nApps}</span>
+                        <span className="text-slate-500">Trọng số p_k:</span>
+                        <span className="font-semibold text-slate-900">{pt.weightSharePct}%</span>
+                        <span className="text-slate-500">Client Drift:</span>
+                        <span className="font-semibold text-[#C2410C]">{pt.drift.toFixed(3)}</span>
+                        <span className="text-slate-500">Latency:</span>
+                        <span className="font-semibold text-slate-900">
+                          {pt.latencyMs !== null ? `${pt.latencyMs} ms` : 'IDLE'}
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-[#C2410C] pt-0.5">
+                        Click để soi node trên 3D Topology
+                      </div>
+                    </div>
+                  );
+                }}
+              />
+              <Scatter
+                name="Employer Clients"
+                data={scatterData}
+                isAnimationActive={false}
+                onClick={(entry) => {
+                  if (entry && typeof entry.clientId === 'number') {
+                    setSelectedClientId(entry.clientId);
+                  }
+                }}
+                style={{ cursor: 'pointer' }}
+              >
+                {scatterData.map((entry) => {
+                  const isSel = selectedNode?.clientId === entry.clientId;
+                  return (
+                    <Cell
+                      key={entry.clientId}
+                      fill={SCATTER_TIER_COLOR[entry.tier]}
+                      fillOpacity={entry.tier === 'offline' ? 0.4 : isSel ? 1 : 0.78}
+                      stroke={isSel ? '#0F172A' : '#ffffff'}
+                      strokeWidth={isSel ? 2.6 : 1}
+                    />
+                  );
+                })}
+              </Scatter>
+            </ScatterChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 text-[11.5px] text-[#475569]">
+          <div className="flex flex-wrap items-center gap-3.5">
+            {(['large', 'medium', 'small', 'offline'] as const).map((tier) => (
+              <span key={tier} className="inline-flex items-center gap-1.5">
+                <span
+                  className="h-2.5 w-2.5 rounded-full"
+                  style={{ background: SCATTER_TIER_COLOR[tier] }}
+                />
+                <span>{SCATTER_TIER_LABEL[tier]}</span>
+              </span>
+            ))}
+          </div>
+          <span className="font-mono-tech text-[11px] text-[#64748B]">
+            Click vào bất kỳ điểm nào để đồng bộ chọn trên 3D Topology &amp; Node Inspector
+          </span>
+        </div>
+      </GlassCard>
     </div>
   );
 };

@@ -31,6 +31,9 @@ export interface JobGraphExplorer3DProps {
   showPrivate: boolean;
   highlightIds?: string[];
   selectedNodeId?: string | null;
+  messagePassingActive?: boolean;
+  hop1Ids?: string[];
+  hop2Ids?: string[];
   onSelectNode?: (node: GraphNode3D | null) => void;
   className?: string;
 }

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Search, Eye, Lock, Globe, X, Sparkles } from 'lucide-react';
+import { Search, Eye, Lock, Globe, X, Sparkles, GitBranch } from 'lucide-react';
 import { api, type GraphNodeRich, type GraphResponse } from '../lib/api';
 import { JobGraphExplorer3D } from '../components/three';
 import type { GraphNode3D } from '../components/three/types';
@@ -32,6 +32,12 @@ export const JobGraphPage: React.FC = () => {
   const [showPublic, setShowPublic] = useState(true);
   const [showPrivate, setShowPrivate] = useState(true);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [mpActive, setMpActive] = useState(false);
+
+  // Reset message passing highlight when clearing selection
+  useEffect(() => {
+    if (!selectedNodeId) setMpActive(false);
+  }, [selectedNodeId]);
 
   useEffect(() => {
     const t = window.setTimeout(() => setDebouncedQ(search.trim()), 260);
@@ -83,6 +89,31 @@ export const JobGraphPage: React.FC = () => {
     }
     return list.sort((a, b) => Number(a.isPublic) - Number(b.isPublic));
   }, [data, nodeMap, selectedNode]);
+
+  // Compute 1-Hop and 2-Hop LightGCN Ego-Subgraph around selectedNode
+  const { hop1Ids, hop2Nodes, hop2Ids } = useMemo(() => {
+    if (!selectedNode || !data) {
+      return { hop1Ids: [] as string[], hop2Nodes: [] as GraphNodeRich[], hop2Ids: [] as string[] };
+    }
+    const h1 = new Set<string>(neighbors.map((n) => n.node.id));
+    const h2 = new Set<string>();
+    for (const e of data.edges) {
+      if (h1.has(e.source) && e.target !== selectedNode.id && !h1.has(e.target)) {
+        h2.add(e.target);
+      } else if (h1.has(e.target) && e.source !== selectedNode.id && !h1.has(e.source)) {
+        h2.add(e.source);
+      }
+    }
+    const h2List = Array.from(h2)
+      .map((id) => nodeMap.get(id))
+      .filter((n): n is GraphNodeRich => Boolean(n))
+      .sort((a, b) => b.degree - a.degree);
+    return {
+      hop1Ids: Array.from(h1),
+      hop2Nodes: h2List,
+      hop2Ids: h2List.map((n) => n.id),
+    };
+  }, [selectedNode, data, neighbors, nodeMap]);
 
   const highlightIds = useMemo(() => {
     if (!data) return undefined;
@@ -198,6 +229,9 @@ export const JobGraphPage: React.FC = () => {
                 showPrivate={showPrivate}
                 highlightIds={highlightIds}
                 selectedNodeId={selectedNodeId}
+                messagePassingActive={mpActive}
+                hop1Ids={hop1Ids}
+                hop2Ids={hop2Ids}
                 onSelectNode={(n) => setSelectedNodeId(n ? n.id : null)}
                 className="w-full h-full"
               />
@@ -257,11 +291,65 @@ export const JobGraphPage: React.FC = () => {
                     </div>
                   </div>
 
+                  {/* Interactive 2-Hop LightGCN Message Passing Explainer */}
+                  <div className="rounded-xl border border-orange-200/80 bg-[#FFF7ED]/70 p-2.5 space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-mono-tech text-[0.68rem] font-bold uppercase tracking-wider text-[#C2410C] flex items-center gap-1.5">
+                        <GitBranch size={12} /> LightGCN 2-Hop Explainer
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setMpActive((v) => !v)}
+                        className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all ${
+                          mpActive
+                            ? 'bg-[#FF5A1F] text-white shadow-xs'
+                            : 'bg-white text-[#C2410C] border border-orange-300 hover:bg-orange-50'
+                        }`}
+                      >
+                        <span>{mpActive ? 'Đang phát 2-Hop' : '▶ Minh họa 2-Hop'}</span>
+                      </button>
+                    </div>
+                    <div className="text-[11px] leading-snug text-[#7C2D12]">
+                      <b>Layer 1 ({hop1Ids.length})</b> → <b>Layer 2 ({hop2Ids.length} nodes)</b> lan truyền qua Public Backbone (O*NET Occupation / Skill).
+                    </div>
+                    {mpActive && (
+                      <div className="space-y-1.5 pt-1 border-t border-orange-200/70">
+                        <div className="font-mono-tech text-[10px] text-slate-700 bg-white/85 rounded px-2 py-1 border border-orange-100">
+                          eᵢ⁽ᵏ⁺¹⁾ = Σⱼ∈N(i) eⱼ⁽ᵏ⁾ / √(|N(i)|·|N(j)|)
+                        </div>
+                        {hop2Nodes.length > 0 && (
+                          <div>
+                            <div className="font-mono-tech text-[10px] font-semibold uppercase text-[#C2410C] mb-1">
+                              Nút 2-Hop tiếp cận được ({hop2Nodes.length})
+                            </div>
+                            <div className="flex flex-wrap gap-1 max-h-[68px] overflow-y-auto">
+                              {hop2Nodes.slice(0, 10).map((h2) => (
+                                <button
+                                  key={h2.id}
+                                  type="button"
+                                  onClick={() => setSelectedNodeId(h2.id)}
+                                  className="inline-flex items-center gap-1 rounded-md border border-orange-200 bg-white/90 px-1.5 py-0.5 text-[10px] font-medium text-slate-800 hover:border-[#FF5A1F] cursor-pointer max-w-[140px]"
+                                >
+                                  <span
+                                    className={`h-1.5 w-1.5 rounded-full shrink-0 ${
+                                      KIND_BADGE_COLOR[h2.kind].dot
+                                    }`}
+                                  />
+                                  <span className="truncate">{h2.label}</span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
                   <div>
                     <div className="font-mono-tech text-[0.68rem] uppercase text-[#64748B] font-semibold mb-1.5">
                       Neighbors ({neighbors.length})
                     </div>
-                    <div className="space-y-1.5 max-h-[290px] overflow-y-auto pr-1">
+                    <div className="space-y-1.5 max-h-[210px] overflow-y-auto pr-1">
                       {neighbors.slice(0, 30).map(({ node, isPublic, edgeLabel }) => (
                         <button
                           key={`${node.id}-${edgeLabel}`}
